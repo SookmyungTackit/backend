@@ -39,6 +39,16 @@ public class UserDataInitializer implements CommandLineRunner {
                     .status(Status.ACTIVE)
                     .createdAt(LocalDateTime.now())
                     .build());
+
+            userRepository.save(User.builder()
+                    .email("noonsong2@sookmyung.ac.kr")
+                    .password("1234")
+                    .nickname("눈송22")
+                    .role(Role.USER)
+                    .joinedYear(2023)
+                    .status(Status.DELETED)
+                    .createdAt(LocalDateTime.now())
+                    .build());
         }
     }
 }
