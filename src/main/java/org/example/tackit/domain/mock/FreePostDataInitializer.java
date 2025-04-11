@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.FreePost;
 import org.example.tackit.domain.entity.Post;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.entity.User;
+import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.free_post.repository.FreePostJPARepository;
 import org.example.tackit.domain.free_post.repository.UserJPARepository;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +23,7 @@ public class FreePostDataInitializer implements CommandLineRunner {
     @Override
     public void run(final String... args) throws Exception {
         if (freePostRepository.count() == 0) {
-            User writer = userRepository.findTopByOrderByIdAsc();
+            Member writer = userRepository.findTopByOrderByIdAsc();
 
             if (writer != null) {
                 FreePost post = FreePost.builder()

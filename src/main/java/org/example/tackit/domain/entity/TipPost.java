@@ -16,7 +16,7 @@ public class TipPost {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User writer;
+    private Member writer;
 
     private String title;
     private String content;

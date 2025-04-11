@@ -1,9 +1,9 @@
 package org.example.tackit.domain.mock;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.entity.User;
 import org.example.tackit.domain.free_post.repository.UserJPARepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -20,7 +20,7 @@ public class UserDataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.count() == 0) {
-            userRepository.save(User.builder()
+            userRepository.save(Member.builder()
                     .email("yy@sookmyung.ac.kr")
                     .password("1234")
                     .nickname("영신")
@@ -30,7 +30,7 @@ public class UserDataInitializer implements CommandLineRunner {
                     .createdAt(LocalDateTime.now())
                     .build());
 
-            userRepository.save(User.builder()
+            userRepository.save(Member.builder()
                     .email("noonsong@sookmyung.ac.kr")
                     .password("1234")
                     .nickname("눈송")

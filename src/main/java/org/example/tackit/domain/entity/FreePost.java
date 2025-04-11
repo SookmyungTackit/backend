@@ -20,7 +20,7 @@ public class FreePost {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User writer;
+    private Member writer;
 
     private String title;
     private String content;

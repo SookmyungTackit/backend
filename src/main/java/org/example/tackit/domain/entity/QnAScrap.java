@@ -17,7 +17,7 @@ public class QnAScrap {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private Member memberId;
 
     @ManyToOne
     @JoinColumn(name = "qna_id", nullable = false)
