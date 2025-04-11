@@ -16,7 +16,7 @@ public class FreeComment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User writer;
+    private Member writer;
 
     @ManyToOne
     @JoinColumn(name = "free_id", nullable = false)

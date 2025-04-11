@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDTO {
+public class MemberDTO {
     // nickname, email, status, created_at
     private String nickname;
     private String email;
