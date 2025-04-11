@@ -5,7 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.FreePost;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.entity.User;
+import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.free_post.dto.request.FreePostCreateDTO;
 import org.example.tackit.domain.free_post.dto.request.FreePostUpdateDTO;
 import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
@@ -43,7 +43,7 @@ public class FreePostService {
     @Transactional
     public FreePostDTO createPost(FreePostCreateDTO dto) {
         // 1. nickname으로 유저 조회
-        User user = userJPARepository.findByNickname(dto.getNickname())
+        Member user = userJPARepository.findByNickname(dto.getNickname())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
         // 2. 게시글 생성
