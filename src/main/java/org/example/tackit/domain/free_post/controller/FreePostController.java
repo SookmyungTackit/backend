@@ -57,4 +57,11 @@ public class FreePostController {
         return ResponseEntity.noContent().build();
     }
 
+    // 6. 게시글 신고
+    @PostMapping("{freePostId}/report")
+    public ResponseEntity<String> reportPost(@PathVariable Long freePostId) {
+        freePostService.incresePostReportCount(freePostId);
+        return ResponseEntity.ok("게시글을 신고하였습니다.");
+    }
+
 }
