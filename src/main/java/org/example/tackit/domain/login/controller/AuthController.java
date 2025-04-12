@@ -5,11 +5,10 @@ import org.example.tackit.domain.login.dto.SignInDto;
 import org.example.tackit.domain.login.dto.SignUpDto;
 import org.example.tackit.domain.login.dto.TokenDto;
 import org.example.tackit.domain.login.service.AuthService;
+import org.example.tackit.domain.login.service.CheckService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final CheckService checkService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> signup(@RequestBody SignUpDto signUpDto) {
@@ -30,6 +30,24 @@ public class AuthController {
     public ResponseEntity<TokenDto> signIn(@RequestBody SignInDto signInDto) {
         TokenDto tokenDto = authService.signIn(signInDto);
         return ResponseEntity.ok(tokenDto);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestParam String email) {
+        boolean isDuplicated = checkService.isEmailDuplicated(email);
+        if (isDuplicated) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 이메일입니다.");
+        }
+        return ResponseEntity.ok("사용 가능한 이메일입니다.");
+    }
+
+    @GetMapping("/check-nickname")
+    public ResponseEntity<?> checkNickname(@RequestParam String nickname) {
+        boolean isDuplicated = checkService.isNicknameDuplicated(nickname);
+        if (isDuplicated) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 닉네임입니다.");
+        }
+        return ResponseEntity.ok("사용 가능한 닉네임입니다.");
     }
 }
 
