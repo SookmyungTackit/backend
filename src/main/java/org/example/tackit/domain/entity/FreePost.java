@@ -55,4 +55,16 @@ public class FreePost {
         this.status = Status.DELETED;
     }
 
+    public void increaseReportCount() {
+        this.reportCount++;
+        if (this.reportCount >= 3) {
+            this.status = Status.DELETED;
+        }
+    }
+
+    public void activate(){
+        this.status = Status.ACTIVE;
+        this.reportCount = 0;
+    }
+
 }
