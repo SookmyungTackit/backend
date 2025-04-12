@@ -31,7 +31,9 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false, name = "joined_year")
     private int joinedYear;
+
     private Status status;
     private LocalDateTime createdAt = LocalDateTime.now();
 }

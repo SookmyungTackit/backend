@@ -39,8 +39,12 @@ public class AuthService {
             throw new RuntimeException("이미 가입되어 있는 유저입니다");
         }
 
+        if (userRepository.existsByNickname(signUpDto.getNickname())) {
+            throw new RuntimeException("이미 사용 중인 닉네임입니다");
+        }
+
         int currentYear = LocalDate.now().getYear();
-        int joinedYear = currentYear; // 회원가입 기준으로 설정
+        int joinedYear = signUpDto.getJoinedYear(); // 회원가입 기준으로 설정
 
         // 가입 연도 기준으로 역할 부여
         Role role = (joinedYear == currentYear) ? Role.NEWBIE : Role.SENIOR;
@@ -49,9 +53,9 @@ public class AuthService {
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .nickname(signUpDto.getNickname())
+                .joinedYear(signUpDto.getJoinedYear())
                 .role(role)
                 .status(Status.ACTIVE)
-                .joinedYear(LocalDate.now().getYear())
                 .createdAt(LocalDateTime.now())
                 .build();
 
