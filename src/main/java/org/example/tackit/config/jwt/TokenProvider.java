@@ -59,15 +59,13 @@ public class TokenProvider {
                 .build();
     }
 
+
+
     public TokenDto reissueAccessToken(String refreshToken) {
 
         // 리프레시 토큰에서 사용자 정보 추출 -> 클레임 확인
         Claims claims = parseClaims(refreshToken);
 
-//        // Refresh Token 검증 및 클레임에서 Refresh Token 여부 확인
-//        if (!validateToken(refreshToken) || claims.get("isRefreshToken") == null || !Boolean.TRUE.equals(claims.get("isRefreshToken"))) {
-//            throw new InvalidTokenException("유효하지 않은 리프레시 토큰입니다.");
-//        }
         // Refresh Token 유효성 + isRefreshToken 클레임 체크
         if (!validateToken(refreshToken)) {
             throw new BadCredentialsException("유효하지 않은 리프레시 토큰입니다.");
@@ -78,14 +76,24 @@ public class TokenProvider {
             throw new BadCredentialsException("이 토큰은 리프레시 토큰이 아닙니다.");
         }
 
+        // 사용자 정보 추출
         String email = claims.getSubject();
         String authorities = claims.get(AUTHORITIES_KEY).toString();
 
+        // Redis에서 저장된 토큰과 일치하는지 확인
+        String storedToken = redisUtil.getData(email);
+        if (storedToken == null || !storedToken.equals(refreshToken)) {
+            throw new BadCredentialsException("리프레시 토큰이 일치하지 않습니다. 다시 로그인 해주세요.");
+        }
+
+        // 새 토큰 생성
         String newAccessToken = generateAccessToken(email, authorities);
         String newRefreshToken = generateRefreshToken(email, authorities);
 
+        // Redis에 새 토큰 저장 - 기존 값 덮어쓰기
         redisUtil.save(email, newRefreshToken);
 
+        // 반환
         return TokenDto.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(newAccessToken)
