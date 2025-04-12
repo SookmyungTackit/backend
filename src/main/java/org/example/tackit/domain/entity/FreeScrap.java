@@ -16,7 +16,7 @@ public class FreeScrap {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private Member userId;
+    private Member memberId;
 
     @ManyToOne
     @JoinColumn(name = "free_id", nullable = false)

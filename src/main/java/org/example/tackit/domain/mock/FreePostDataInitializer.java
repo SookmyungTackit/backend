@@ -6,7 +6,7 @@ import org.example.tackit.domain.entity.Post;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.free_post.repository.FreePostJPARepository;
-import org.example.tackit.domain.free_post.repository.MemberJPARepository;
+import org.example.tackit.domain.free_post.repository.UserJPARepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,13 +17,13 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Order(2)
 public class FreePostDataInitializer implements CommandLineRunner {
-    private final MemberJPARepository memberRepository;
+    private final UserJPARepository userRepository;
     private final FreePostJPARepository freePostRepository;
 
     @Override
     public void run(final String... args) throws Exception {
         if (freePostRepository.count() == 0) {
-            Member writer = memberRepository.findTopByOrderByIdAsc();
+            Member writer = userRepository.findTopByOrderByIdAsc();
 
             if (writer != null) {
                 FreePost post = FreePost.builder()
