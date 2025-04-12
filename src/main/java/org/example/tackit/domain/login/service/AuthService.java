@@ -1,6 +1,7 @@
 package org.example.tackit.domain.login.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.example.tackit.config.jwt.TokenProvider;
 import org.example.tackit.domain.entity.Member;
@@ -10,8 +11,9 @@ import org.example.tackit.domain.login.dto.SignInDto;
 import org.example.tackit.domain.login.dto.SignUpDto;
 import org.example.tackit.domain.login.dto.TokenDto;
 import org.example.tackit.domain.login.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+// import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
     private final RedisUtil redisUtil;
 
@@ -36,11 +39,17 @@ public class AuthService {
             throw new RuntimeException("이미 가입되어 있는 유저입니다");
         }
 
+        int currentYear = LocalDate.now().getYear();
+        int joinedYear = currentYear; // 회원가입 기준으로 설정
+
+        // 가입 연도 기준으로 역할 부여
+        Role role = (joinedYear == currentYear) ? Role.NEWBIE : Role.SENIOR;
+
         Member member = Member.builder()
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .nickname(signUpDto.getNickname())
-                .role(Role.USER)
+                .role(role)
                 .status(Status.ACTIVE)
                 .joinedYear(LocalDate.now().getYear())
                 .createdAt(LocalDateTime.now())
@@ -53,11 +62,18 @@ public class AuthService {
     public TokenDto signIn(SignInDto signInDto) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(signInDto.getEmail(), signInDto.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+        try {
+            log.info("로그인 시도: {}", signInDto.getEmail());
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            log.info("로그인 성공: {}", authentication.getName());
 
-        redisUtil.save(signInDto.getEmail(), tokenDto.getRefreshToken());
-        return tokenDto;
+            TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+            redisUtil.save(signInDto.getEmail(), tokenDto.getRefreshToken());
+            return tokenDto;
+        } catch (Exception e) {
+            log.error("로그인 실패", e);
+            throw e;
+        }
     }
 }
 
