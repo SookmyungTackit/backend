@@ -1,5 +1,6 @@
 package org.example.tackit.domain.login.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.login.dto.SignInDto;
 import org.example.tackit.domain.login.dto.SignUpDto;
@@ -48,6 +49,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 닉네임입니다.");
         }
         return ResponseEntity.ok("사용 가능한 닉네임입니다.");
+    }
+
+    // 만료된 Access Token 대신 유효한 Refresh Token으로 새로운 Access Token을 발급
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenDto> reissueToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        TokenDto tokenDto = authService.reissue(bearerToken);
+        return ResponseEntity.ok(tokenDto);
     }
 }
 

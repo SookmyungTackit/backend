@@ -12,6 +12,7 @@ import org.example.tackit.domain.login.dto.SignUpDto;
 import org.example.tackit.domain.login.dto.TokenDto;
 import org.example.tackit.domain.login.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 // import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -78,6 +79,21 @@ public class AuthService {
             log.error("로그인 실패", e);
             throw e;
         }
+    }
+
+    // Bearer 제거 및 형식 검증
+    public String resolveRefreshToken(String refreshToken) {
+        if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
+            throw new BadCredentialsException("리프레시 토큰이 누락되었거나 올바르지 않습니다.");
+        }
+        return refreshToken.substring(7);
+    }
+
+    // 토큰 재발급 처리
+    @Transactional
+    public TokenDto reissue(String bearerToken) {
+        String refreshToken = resolveRefreshToken(bearerToken);
+        return tokenProvider.reissueAccessToken(refreshToken);
     }
 }
 

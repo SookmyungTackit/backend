@@ -29,7 +29,7 @@ public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;            // 1일
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
     private final Key key;
     private final RedisUtil redisUtil;
@@ -49,12 +49,12 @@ public class TokenProvider {
         String accessToken = generateAccessToken(authentication.getName(), authorities);
         String refreshToken = generateRefreshToken(authentication.getName(), authorities);
 
-        long now = (new Date()).getTime();
+        long now = System.currentTimeMillis();
 
         return TokenDto.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
-                .accessTokenExpiresIn(new Date(now + ACCESS_TOKEN_EXPIRE_TIME).getTime())
+                .accessTokenExpiresIn(now + ACCESS_TOKEN_EXPIRE_TIME)
                 .refreshToken(refreshToken)
                 .build();
     }
