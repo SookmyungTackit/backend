@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @Order(1)
-public class UserDataInitializer implements CommandLineRunner {
+public class MemberDataInitializer implements CommandLineRunner {
     private final UserJPARepository userRepository;
 
     @Override
