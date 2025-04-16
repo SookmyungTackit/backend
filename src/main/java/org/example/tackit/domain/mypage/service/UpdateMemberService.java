@@ -38,7 +38,7 @@ public class UpdateMemberService {
         Member member = memberDetailRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
 
-        // 현재 비밀번호 일치 여부 확인
+        // 기존 비밀번호와 입력받은 현재 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
