@@ -44,6 +44,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JWT를 JSON으로 직렬화/역직렬화 하는데 사용
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //openapitools 설치 - jsonNullable
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.4'
 }
 
 tasks.named('test') {

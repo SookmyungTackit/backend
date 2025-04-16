@@ -53,4 +53,10 @@ public class Member {
                 this.calculateYearsOfService()
         );
     }
+
+    // 닉네임 변경 책임은 Member 도메인 내부에 분리
+    public void updateNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
+
 }
