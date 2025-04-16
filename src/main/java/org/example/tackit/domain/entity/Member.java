@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.example.tackit.domain.mypage.dto.MemberMypageResponse;
+import org.example.tackit.domain.mypage.dto.response.MemberMypageResponse;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,5 +58,10 @@ public class Member {
     public void updateNickname(String newNickname) {
         this.nickname = newNickname;
     }
+
+    public void changePassword(String encodedNewPassword) {
+        this.password = encodedNewPassword;
+    }
+
 
 }

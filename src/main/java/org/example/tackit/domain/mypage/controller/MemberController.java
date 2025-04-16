@@ -1,9 +1,11 @@
 package org.example.tackit.domain.mypage.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.mypage.dto.MemberMypageResponse;
-import org.example.tackit.domain.mypage.dto.UpdateNicknameRequest;
-import org.example.tackit.domain.mypage.dto.UpdateNicknameResponse;
+import org.example.tackit.domain.mypage.dto.request.UpdatePasswordRequest;
+import org.example.tackit.domain.mypage.dto.response.MemberMypageResponse;
+import org.example.tackit.domain.mypage.dto.request.UpdateNicknameRequest;
+import org.example.tackit.domain.mypage.dto.response.UpdateNicknameResponse;
+import org.example.tackit.domain.mypage.dto.response.UpdatePasswordResponse;
 import org.example.tackit.domain.mypage.service.MemberService;
 import org.example.tackit.domain.mypage.service.UpdateMemberService;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,18 @@ public class MemberController {
         );
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/password")
+    public ResponseEntity<UpdatePasswordResponse> updatePassword(@AuthenticationPrincipal UserDetails userDetails,
+                                                                 @RequestBody UpdatePasswordRequest request) {
+        UpdatePasswordResponse response = updateMemberService.updatePassword(
+                userDetails.getUsername(),
+                request.getCurrentPassword(),
+                request.getNewPassword()
+        );
+        return ResponseEntity.ok(response);
+    }
+
 
 
 

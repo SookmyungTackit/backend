@@ -1,4 +1,4 @@
-package org.example.tackit.domain.mypage.dto;
+package org.example.tackit.domain.mypage.dto.response;
 
 
 import lombok.AllArgsConstructor;

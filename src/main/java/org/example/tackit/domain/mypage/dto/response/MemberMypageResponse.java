@@ -1,10 +1,8 @@
-package org.example.tackit.domain.mypage.dto;
+package org.example.tackit.domain.mypage.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
