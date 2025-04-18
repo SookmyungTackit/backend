@@ -54,3 +54,7 @@
 - MariaDB Driver
 - Lombok
 - Spring Boot DevTools
+- Spring Security
+- Jwt
+- Redis
+- jsonNullable
