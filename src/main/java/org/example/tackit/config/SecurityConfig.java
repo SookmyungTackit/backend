@@ -43,7 +43,7 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/api/v2/admin/**").hasAuthority("ROLE_ADMIN") // 관리자 페이지 role 추가
+                        .requestMatchers("/api/v2/admin/**").hasAuthority("ADMIN") // 관리자 페이지 role 추가
                         .requestMatchers("/auth/**") // 로그인, 회원가입은 열어주기
                         .permitAll()
                         .anyRequest().authenticated()

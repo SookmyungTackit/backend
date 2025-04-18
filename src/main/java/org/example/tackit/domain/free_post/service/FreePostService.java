@@ -1,5 +1,6 @@
 package org.example.tackit.domain.free_post.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.FreePost;
@@ -74,6 +75,14 @@ public class FreePostService {
         FreePost post = freePostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
         post.delete();
+    }
+
+    // [ 게시글 신고 ]
+    @Transactional
+    public void incresePostReportCount(Long id) {
+        FreePost post = freePostJPARepository.findById(id)
+                .orElseThrow( () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+        post.increaseReportCount();
     }
 
 }

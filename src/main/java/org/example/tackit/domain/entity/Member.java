@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.tackit.domain.mypage.dto.response.MemberMypageResponse;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,4 +38,30 @@ public class Member {
 
     private Status status;
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    // 연차 계산 책임은 Member 도메인 내부에 분리
+    // member 도메인 내에서만 쓰이기 때문에 private
+    private int calculateYearsOfService() {
+        return LocalDate.now().getYear() - this.joinedYear + 1;
+    }
+
+    // 마이페이지 응답을 만들어 반환한다.
+    public MemberMypageResponse generateMypageResponse() {
+        return new MemberMypageResponse(
+                this.nickname,
+                this.joinedYear,
+                this.calculateYearsOfService()
+        );
+    }
+
+    // 닉네임 변경 책임은 Member 도메인 내부에 분리
+    public void updateNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
+
+    public void changePassword(String encodedNewPassword) {
+        this.password = encodedNewPassword;
+    }
+
+
 }
