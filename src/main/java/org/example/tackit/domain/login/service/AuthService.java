@@ -54,6 +54,7 @@ public class AuthService {
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .nickname(signUpDto.getNickname())
+                .organization(signUpDto.getOrganization())
                 .joinedYear(signUpDto.getJoinedYear())
                 .role(role)
                 .status(Status.ACTIVE)
