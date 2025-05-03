@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/Logout")
+@RequestMapping("/auth-logout")
 @RequiredArgsConstructor
 public class LogoutController {
 
     private final LogoutService logoutService;
 
-    @PostMapping("authLogout")
+    @PostMapping
     public ResponseEntity<String> logout(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {

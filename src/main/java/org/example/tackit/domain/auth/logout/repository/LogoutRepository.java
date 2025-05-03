@@ -8,7 +8,4 @@ import java.util.Optional;
 
 public interface LogoutRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
-    boolean existsByEmail(String email);
-    boolean existsByEmailAndStatus(String email, Status status);
-    void deleteByEmail(String email); // 하드 삭제용
 }
