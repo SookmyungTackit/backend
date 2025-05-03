@@ -62,8 +62,14 @@ public class Member {
         this.nickname = newNickname;
     }
 
+    // 비밀번호 변경 책임은 Member 도메인 내부에 분리
     public void changePassword(String encodedNewPassword) {
         this.password = encodedNewPassword;
+    }
+
+    // 자신을 비활성화는 책임 부여
+    public void deactivate() {
+        this.status = Status.DELETED;
     }
 
 

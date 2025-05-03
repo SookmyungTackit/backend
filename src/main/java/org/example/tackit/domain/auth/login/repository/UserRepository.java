@@ -1,4 +1,4 @@
-package org.example.tackit.domain.login.repository;
+package org.example.tackit.domain.auth.login.repository;
 
 import org.example.tackit.domain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

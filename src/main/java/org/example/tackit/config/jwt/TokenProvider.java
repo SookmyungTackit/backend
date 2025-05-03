@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
-import org.example.tackit.domain.login.dto.TokenDto;
+import org.example.tackit.domain.auth.login.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -167,4 +167,20 @@ public class TokenProvider {
             return e.getClaims();
         }
     }
+    // 토큰에서 이메일(subject)을 추출
+    // Authentication 필요 없음
+    public String getEmailFromToken(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    //accessToken의 만료시간을 추출
+    // 로그아웃할 때 해당 accessToken을 블랙리스트에 저장할때 TTL로 설정해야함
+    //  이건 "남은 만료 시간"을 계산하는 것이지, expiration.getTime()만 반환하면 고정된 시간값이라 TTL이 아님!
+    public long getExpiration(String token) {
+        Date expiration = parseClaims(token).getExpiration();
+        return expiration.getTime() - System.currentTimeMillis();
+    }
+
+
+
 }

@@ -1,8 +1,8 @@
-package org.example.tackit.domain.login.service;
+package org.example.tackit.domain.auth.login.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.login.repository.UserRepository;
+import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 

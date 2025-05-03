@@ -1,4 +1,4 @@
-package org.example.tackit.domain.login.service;
+package org.example.tackit.domain.auth.login.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,10 +7,10 @@ import org.example.tackit.config.jwt.TokenProvider;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.login.dto.SignInDto;
-import org.example.tackit.domain.login.dto.SignUpDto;
-import org.example.tackit.domain.login.dto.TokenDto;
-import org.example.tackit.domain.login.repository.UserRepository;
+import org.example.tackit.domain.auth.login.dto.SignInDto;
+import org.example.tackit.domain.auth.login.dto.SignUpDto;
+import org.example.tackit.domain.auth.login.dto.TokenDto;
+import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

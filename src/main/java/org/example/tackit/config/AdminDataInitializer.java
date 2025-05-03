@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.login.repository.UserRepository;
+import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

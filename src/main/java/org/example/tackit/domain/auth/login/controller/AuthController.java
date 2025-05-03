@@ -1,12 +1,12 @@
-package org.example.tackit.domain.login.controller;
+package org.example.tackit.domain.auth.login.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.login.dto.SignInDto;
-import org.example.tackit.domain.login.dto.SignUpDto;
-import org.example.tackit.domain.login.dto.TokenDto;
-import org.example.tackit.domain.login.service.AuthService;
-import org.example.tackit.domain.login.service.CheckService;
+import org.example.tackit.domain.auth.login.dto.SignInDto;
+import org.example.tackit.domain.auth.login.dto.SignUpDto;
+import org.example.tackit.domain.auth.login.dto.TokenDto;
+import org.example.tackit.domain.auth.login.service.AuthService;
+import org.example.tackit.domain.auth.login.service.CheckService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,4 @@
-package org.example.tackit.domain.login.dto;
+package org.example.tackit.domain.auth.login.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
