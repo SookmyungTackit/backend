@@ -18,6 +18,7 @@ public class AdminMemberService {
                 .map(member -> MemberDTO.builder()
                         .nickname(member.getNickname())
                         .email(member.getEmail())
+                        .organization(member.getOrganization())
                         .status(member.getStatus())
                         .createdAt(member.getCreatedAt().toLocalDate())
                         .build())
