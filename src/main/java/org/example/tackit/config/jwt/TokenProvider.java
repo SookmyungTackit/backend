@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
-import org.example.tackit.domain.login.dto.TokenDto;
+import org.example.tackit.domain.auth.login.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

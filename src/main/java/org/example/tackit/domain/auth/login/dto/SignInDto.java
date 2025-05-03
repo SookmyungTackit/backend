@@ -1,4 +1,4 @@
-package org.example.tackit.domain.login.dto;
+package org.example.tackit.domain.auth.login.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpDto {
+public class SignInDto {
     private String email;
     private String password;
-    private String nickname;
-    private String organization;
-    private int joinedYear;
 }
-
