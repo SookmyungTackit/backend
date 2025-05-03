@@ -38,3 +38,6 @@ out/
 
 .env
 backend.git/
+
+### redis ###
+dump.rdb

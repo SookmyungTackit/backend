@@ -10,7 +10,7 @@ import org.example.tackit.domain.free_post.dto.request.FreePostCreateDTO;
 import org.example.tackit.domain.free_post.dto.request.FreePostUpdateDTO;
 import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
 import org.example.tackit.domain.free_post.repository.FreePostJPARepository;
-import org.example.tackit.domain.free_post.repository.UserJPARepository;
+import org.example.tackit.domain.free_post.repository.MemberJPARepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FreePostService {
     private final FreePostJPARepository freePostJPARepository;
-    private final UserJPARepository userJPARepository;
+    private final MemberJPARepository memberJPARepository;
 
     // [ 게시글 전체 조회 ]
     public List<FreePostDTO> getAllActivePosts() {
@@ -43,7 +43,7 @@ public class FreePostService {
     @Transactional
     public FreePostDTO createPost(FreePostCreateDTO dto) {
         // 1. nickname으로 유저 조회
-        Member member = userJPARepository.findByNickname(dto.getNickname())
+        Member member = memberJPARepository.findByNickname(dto.getNickname())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
         // 2. 게시글 생성
