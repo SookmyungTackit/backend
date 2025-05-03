@@ -13,9 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class MemberDTO {
-    // nickname, email, status, created_at
+    // nickname, email, org, status, created_at
     private String nickname;
     private String email;
+    private String organization;
     private Status status;
     private LocalDate createdAt;
 }
