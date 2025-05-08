@@ -18,7 +18,6 @@ public class TipPostDTO {
         this.content = post.getContent();
         this.created_at = post.getCreatedAt();
 
-
     }
 
 }
