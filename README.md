@@ -47,7 +47,7 @@
 ### 9. git-flow를 사용한다, Merge는 dev branch에 하고 branch는 기능별로 생성한다
 [git-flow 참고](https://techblog.woowahan.com/2553/)
 
-### 9. 추가한 dependencies
+### 10. 추가한 dependencies
 - Spring Data JPA
 - Thymeleaf
 - Spring Web
