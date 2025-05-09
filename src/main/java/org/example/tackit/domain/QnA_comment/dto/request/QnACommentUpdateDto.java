@@ -1,14 +1,13 @@
-package org.example.tackit.domain.QnA_post.dto.request;
+package org.example.tackit.domain.QnA_comment.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-public class UpdateQnARequestDto {
-    private String title;
+public class QnACommentUpdateDto {
     private String content;
-    private String tag;
 }
+
