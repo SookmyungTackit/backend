@@ -8,6 +8,7 @@ import org.example.tackit.domain.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +66,7 @@ public class QnAPostService {
         qnAPostRepository.deleteById(id);
     }
 
-    //게시글 전체 조회
+    // 게시글 전체 조회
     public List<QnAPostResponseDto> findALl(){
         List<QnAPost> posts = qnAPostRepository.findAllByStatus(Status.ACTIVE);
         return posts.stream()
@@ -73,5 +74,11 @@ public class QnAPostService {
                 .toList();
     }
 
+    // 게시글 상세 조회
+    public QnAPostResponseDto getPostById(Long id) {
+        QnAPost QnAPost = qnAPostRepository.findById(id)
+                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        return new QnAPostResponseDto(QnAPost);
+    }
 
 }
