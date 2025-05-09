@@ -1,22 +1,18 @@
 package org.example.tackit.domain.QnA_post.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.QnA_post.dto.request.QnAPostRequestDto;
-import org.example.tackit.domain.QnA_post.dto.request.UpdateQnARequestDto;
+import org.example.tackit.domain.QnA_post.dto.request.QnAPostCreateDto;
+import org.example.tackit.domain.QnA_post.dto.request.QnAPostUpdateDto;
 import org.example.tackit.domain.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.entity.*;
-import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +23,7 @@ public class QnAPostService {
 
     // 게시글 작성
     @Transactional
-    public QnAPostResponseDto createPost(QnAPostRequestDto dto) {
+    public QnAPostResponseDto createPost(QnAPostCreateDto dto) {
         Member member = qnAMemberRepository.findByNickname(dto.getNickname())
                 .orElseThrow(() -> new IllegalArgumentException("작성자가 존재하지 않습니다."));
 
@@ -52,7 +48,7 @@ public class QnAPostService {
 
     // 게시글 수정
     @Transactional
-    public QnAPostResponseDto update(long id, UpdateQnARequestDto request){
+    public QnAPostResponseDto update(long id, QnAPostUpdateDto request){
         QnAPost post = qnAPostRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("작성자가 존재하지 않습니다."));
 

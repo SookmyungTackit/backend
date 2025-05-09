@@ -1,13 +1,10 @@
 package org.example.tackit.domain.QnA_post.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.QnA_post.dto.request.QnAPostRequestDto;
-import org.example.tackit.domain.QnA_post.dto.request.UpdateQnARequestDto;
+import org.example.tackit.domain.QnA_post.dto.request.QnAPostCreateDto;
+import org.example.tackit.domain.QnA_post.dto.request.QnAPostUpdateDto;
 import org.example.tackit.domain.QnA_post.dto.response.QnAPostResponseDto;
-import org.example.tackit.domain.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.QnA_post.service.QnAPostService;
-import org.example.tackit.domain.entity.QnAPost;
-import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +19,14 @@ public class QnAPostController {
 
     // 게시글 생성
     @PostMapping("/create")
-    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostRequestDto dto) {
+    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostCreateDto dto) {
         QnAPostResponseDto response = qnAPostService.createPost(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 게시글 수정
-    @PutMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody UpdateQnARequestDto request){
+    @PatchMapping("/{QnAPostId}")
+    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody QnAPostUpdateDto request){
         QnAPostResponseDto updateResponse = qnAPostService.update(QnAPostId, request);
 
         return ResponseEntity.ok().body(updateResponse);
