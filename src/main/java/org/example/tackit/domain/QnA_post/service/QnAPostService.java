@@ -7,12 +7,15 @@ import org.example.tackit.domain.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.entity.*;
+import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,4 +64,14 @@ public class QnAPostService {
     public void delete(long id){
         qnAPostRepository.deleteById(id);
     }
+
+    //게시글 전체 조회
+    public List<QnAPostResponseDto> findALl(){
+        List<QnAPost> posts = qnAPostRepository.findAllByStatus(Status.ACTIVE);
+        return posts.stream()
+                .map(QnAPostResponseDto::new)
+                .toList();
+    }
+
+
 }
