@@ -10,6 +10,7 @@ import org.example.tackit.domain.entity.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
 
@@ -56,4 +57,8 @@ public class QnAPostService {
         return new QnAPostResponseDto(post);
     }
 
+    // 게시글 삭제
+    public void delete(long id){
+        qnAPostRepository.deleteById(id);
+    }
 }

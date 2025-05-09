@@ -30,4 +30,12 @@ public class QnAPostController {
 
         return ResponseEntity.ok().body(updateResponse);
     }
+
+    //게시글 삭제
+    @DeleteMapping("/{QnAPostId}")
+    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(@PathVariable("QnAPostId") Long QnAPostId){
+        qnAPostService.delete(QnAPostId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
