@@ -33,4 +33,15 @@ public class QnAPost {
     private Status status;
     private int reportCount;
 
+    public void update(String title, String content, String tag){
+        this.title = title;
+        this.content = content;
+
+        if (tag == null || tag.trim().isEmpty()) {
+            this.tag = null; // 태그 삭제
+        } else {
+            this.tag = tag; // 태그 추가 또는 수정
+        }
+    }
+
 }

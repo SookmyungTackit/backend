@@ -2,6 +2,7 @@ package org.example.tackit.domain.QnA_post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.QnA_post.dto.request.QnAPostRequestDto;
+import org.example.tackit.domain.QnA_post.dto.request.UpdateQnARequestDto;
 import org.example.tackit.domain.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_post.repository.QnAPostRepository;
@@ -19,6 +20,7 @@ public class QnAPostService {
     private final QnAPostRepository qnAPostRepository;
     private final QnAMemberRepository qnAMemberRepository;
 
+    // 게시글 작성
     @Transactional
     public QnAPostResponseDto createPost(QnAPostRequestDto dto) {
         Member member = qnAMemberRepository.findByNickname(dto.getNickname())
@@ -42,4 +44,16 @@ public class QnAPostService {
         qnAPostRepository.save(post);
         return new QnAPostResponseDto(post);
     }
+
+    // 게시글 수정
+    @Transactional
+    public QnAPostResponseDto update(long id, UpdateQnARequestDto request){
+        QnAPost post = qnAPostRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("작성자가 존재하지 않습니다."));
+
+        post.update(request.getTitle(), request.getContent(), request.getTag());
+
+        return new QnAPostResponseDto(post);
+    }
+
 }
