@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class QnAPostUpdateDto {
+public class QnAPostRequestDto {
     private String title;
     private String content;
     private String tag;
