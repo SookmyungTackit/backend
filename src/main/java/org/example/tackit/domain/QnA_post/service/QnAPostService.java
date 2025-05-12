@@ -27,7 +27,9 @@ public class QnAPostService {
 
     // 게시글 작성 (NEWBIE만 가능)
     @Transactional
-    public QnAPostResponseDto createPost(QnAPostRequestDto dto, Member member) {
+    public QnAPostResponseDto createPost(QnAPostRequestDto dto, String email) {
+        Member member = qnAMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (member.getRole() != Role.NEWBIE) {
             throw new AccessDeniedException("NEWBIE만 질문을 작성할 수 있습니다.");
@@ -50,9 +52,12 @@ public class QnAPostService {
 
     // 게시글 수정 (작성자, 관리자만 가능)
     @Transactional
-    public QnAPostResponseDto update(long id, UpdateQnARequestDto request, Member member){
+    public QnAPostResponseDto update(long id, UpdateQnARequestDto request, String email){
+        Member member = qnAMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
         QnAPost post = qnAPostRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("작성자가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
         boolean isWriter = post.getWriter().getId().equals(member.getId());
         boolean isAdmin = member.getRole() == Role.ADMIN;
@@ -68,7 +73,10 @@ public class QnAPostService {
 
     // 게시글 삭제 (작성자, 관리자만 가능)
     @Transactional
-    public void delete(long id, Member member){
+    public void delete(long id, String email){
+        Member member = qnAMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
         QnAPost post = qnAPostRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 

@@ -12,6 +12,7 @@ import org.example.tackit.domain.free_post.dto.response.FreePostDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,23 +25,26 @@ public class QnAPostController {
 
     // 게시글 생성
     @PostMapping("/create")
-    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostRequestDto dto, @AuthenticationPrincipal Member member) {
-        QnAPostResponseDto response = qnAPostService.createPost(dto, member);
+    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostRequestDto dto, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername(); // userDetails로부터 이메일 획득
+        QnAPostResponseDto response = qnAPostService.createPost(dto, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 게시글 수정
     @PutMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody UpdateQnARequestDto request, @AuthenticationPrincipal Member member){
-        QnAPostResponseDto updateResponse = qnAPostService.update(QnAPostId, request, member);
+    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody UpdateQnARequestDto request, @AuthenticationPrincipal UserDetails userDetails){
+        String email = userDetails.getUsername();
+        QnAPostResponseDto updateResponse = qnAPostService.update(QnAPostId, request, email);
 
         return ResponseEntity.ok().body(updateResponse);
     }
 
     // 게시글 삭제
     @DeleteMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(@PathVariable("QnAPostId") long QnAPostId, @AuthenticationPrincipal Member member){
-        qnAPostService.delete(QnAPostId, member);
+    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(@PathVariable("QnAPostId") long QnAPostId, @AuthenticationPrincipal UserDetails userDetails){
+        String email = userDetails.getUsername();
+        qnAPostService.delete(QnAPostId, email);
 
         return ResponseEntity.noContent().build();
     }
