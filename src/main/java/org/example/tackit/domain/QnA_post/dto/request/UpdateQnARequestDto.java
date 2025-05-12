@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class QnAPostCreateDto {
+public class UpdateQnARequestDto {
     private String title;
     private String content;
     private String tag;
