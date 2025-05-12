@@ -12,6 +12,5 @@ import java.time.LocalDateTime;
 public class QnAPostRequestDto {
     private String title;
     private String content;
-    private String nickname;
     private String tag;
 }
