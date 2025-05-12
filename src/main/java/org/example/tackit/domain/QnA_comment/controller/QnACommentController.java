@@ -9,6 +9,7 @@ import org.example.tackit.domain.entity.Member;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +23,9 @@ public class QnACommentController {
 
     // 댓글 작성
     @PostMapping("/create")
-    public ResponseEntity<QnACommentResponseDto> createComment(@RequestBody QnACommentCreateDto request, @AuthenticationPrincipal Member member) {
-        QnACommentResponseDto response = qnACommentService.createComment(request, member);
+    public ResponseEntity<QnACommentResponseDto> createComment(@RequestBody QnACommentCreateDto request, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        QnACommentResponseDto response = qnACommentService.createComment(request, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -35,15 +37,17 @@ public class QnACommentController {
 
     // 댓글 수정
     @PatchMapping("/{commentId}")
-    public ResponseEntity<QnACommentResponseDto> updateComment(@PathVariable long commentId, @RequestBody QnACommentUpdateDto request, @AuthenticationPrincipal Member member){
-        QnACommentResponseDto updateResponse = qnACommentService.updateComment(commentId, request, member);
+    public ResponseEntity<QnACommentResponseDto> updateComment(@PathVariable long commentId, @RequestBody QnACommentUpdateDto request, @AuthenticationPrincipal UserDetails userDetails){
+        String email = userDetails.getUsername();
+        QnACommentResponseDto updateResponse = qnACommentService.updateComment(commentId, request, email);
         return ResponseEntity.ok().body(updateResponse);
     }
 
     // 댓글 삭제
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable long commentId, @AuthenticationPrincipal Member member){
-        qnACommentService.deleteComment(commentId, member);
+    public ResponseEntity<Void> deleteComment(@PathVariable long commentId, @AuthenticationPrincipal UserDetails userDetails){
+        String email = userDetails.getUsername();
+        qnACommentService.deleteComment(commentId, email);
         return ResponseEntity.noContent().build();
     }
 

@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface QnACommentRepository extends JpaRepository<QnAComment, Long> {
-    List<QnAComment> findByQnaPost(QnAPost post);
+    List<QnAComment> findByQnAPost(QnAPost post);
 }
 

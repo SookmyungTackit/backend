@@ -28,7 +28,9 @@ public class QnACommentService {
 
     // 댓글 생성 (SENIOR만 가능)
     @Transactional
-    public QnACommentResponseDto createComment(QnACommentCreateDto dto, Member member){
+    public QnACommentResponseDto createComment(QnACommentCreateDto dto, String email){
+        Member member = qnAMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (member.getRole() != Role.SENIOR) {
             throw new AccessDeniedException("SENIOR만 댓글을 작성할 수 있습니다.");
@@ -52,9 +54,9 @@ public class QnACommentService {
     @Transactional (readOnly = true)
     public List<QnACommentResponseDto> getCommentByPost(long postId){
         QnAPost post = qnAPostRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
-        return qnACommentRepository.findByQnaPost(post)
+        return qnACommentRepository.findByQnAPost(post)
                 .stream()
                 .map(QnACommentResponseDto::new)
                 .toList();
@@ -62,12 +64,16 @@ public class QnACommentService {
 
     // 댓글 수정 (작성자, 관리자만 가능)
     @Transactional
-    public QnACommentResponseDto updateComment(long commentId, QnACommentUpdateDto dto, Member loginUser){
+    public QnACommentResponseDto updateComment(long commentId, QnACommentUpdateDto dto, String email){
+        Member member = qnAMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+
         QnAComment comment = qnACommentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
-        boolean isWriter = comment.getWriter().getId().equals(loginUser.getId());
-        boolean isAdmin = loginUser.getRole() == Role.ADMIN;
+        boolean isWriter = comment.getWriter().getId().equals(member.getId());
+        boolean isAdmin = member.getRole() == Role.ADMIN;
 
         if (!isWriter && !isAdmin) {
             throw new AccessDeniedException("작성자 또는 관리자만 수정할 수 있습니다.");
@@ -80,12 +86,15 @@ public class QnACommentService {
 
     // 댓글 삭제 (작성자, 관리자만 가능)
     @Transactional
-    public void deleteComment(long commentId, Member loginUser){
-        QnAComment comment = qnACommentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("댓글이 없습니다."));
+    public void deleteComment(long commentId, String email){
+        Member member = qnAMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        boolean isWriter = comment.getWriter().getId().equals(loginUser.getId());
-        boolean isAdmin = loginUser.getRole() == Role.ADMIN;
+        QnAComment comment = qnACommentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
+
+        boolean isWriter = comment.getWriter().getId().equals(member.getId());
+        boolean isAdmin = member.getRole() == Role.ADMIN;
 
         if (!isWriter && !isAdmin) {
             throw new AccessDeniedException("작성자 또는 관리자만 삭제할 수 있습니다.");
