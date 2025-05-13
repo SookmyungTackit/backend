@@ -3,6 +3,7 @@ package org.example.tackit.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +16,7 @@ public class FreeScrap {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member memberId;
 
     @ManyToOne
@@ -23,5 +24,7 @@ public class FreeScrap {
     private FreePost freeId;
 
     private LocalDateTime saved_at;
+
+    private Post type = Post.Free;
 
 }

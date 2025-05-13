@@ -1,11 +1,15 @@
 package org.example.tackit.domain.tip.controller;
 
+import org.example.tackit.domain.auth.login.service.CustomUserDetailsService;
+import org.example.tackit.domain.entity.Member;
+import org.example.tackit.domain.mypage.service.MemberService;
 import org.example.tackit.domain.tip.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.tip.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.tip.dto.response.TipPostDTO;
 import org.example.tackit.domain.tip.service.TipService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +18,11 @@ import java.util.List;
 @RequestMapping("/tip")
 public class TipController {
     private final TipService tipService;
-    public TipController(final TipService tipService) {
+    private final MemberService memberService;
+
+    public TipController(final TipService tipService, MemberService memberService) {
         this.tipService = tipService;
+        this.memberService = memberService;
     }
 
     // 1. 게시글 전체 조회
@@ -55,4 +62,19 @@ public class TipController {
         return ResponseEntity.noContent().build();
     }
 
+    // 6. 게시글 찜
+    /*
+    @PostMapping("/{tipPostId}/scrap")
+    public ResponseEntity<?> scrapPost(@PathVariable Long tipPostId,
+                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        Long memberId = userDetails.getMemberId();
+        tipService.scrapPost(memberId, tipPostId);
+        return ResponseEntity.ok("스크랩 완료");
+    }
+
+     */
 }

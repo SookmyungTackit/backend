@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.TipPost;
+import org.example.tackit.domain.entity.TipScrap;
 import org.example.tackit.domain.free_post.repository.MemberJPARepository;
 import org.example.tackit.domain.tip.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.tip.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.tip.dto.response.TipPostDTO;
 import org.example.tackit.domain.tip.repository.TipPostJPARepository;
+import org.example.tackit.domain.tip.repository.TipScrapRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class TipService {
     private final TipPostJPARepository tipPostJPARepository;
     private final MemberJPARepository memberJPARepository;
+    private final TipScrapRepository tipScrapRepository;
 
     // [ 게시글 전체 조회 ]
     public List<TipPostDTO> getAllActivePosts() {
@@ -73,6 +76,28 @@ public class TipService {
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
         post.delete();
+    }
+
+    // [ 게시글 스크랩 ]
+    @Transactional
+    public void scrapPost(Long id, Long memberId) {
+        // 1. 게시글 조회
+        TipPost post = tipPostJPARepository.findById(id)
+                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
+
+        // 2. 멤버 조회
+        Member member = memberJPARepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+
+        // 3. 중복 스크랩 방지
+        boolean alreadyScrapped = tipScrapRepository.existsByMemberAndTipPost(member, post);
+        if (alreadyScrapped) {
+            throw new IllegalStateException("이미 스크랩한 게시글입니다.");
+        }
+
+        // 4. 스크랩 저장
+        TipScrap scrap = new TipScrap(member, post);
+        tipScrapRepository.save(scrap);
     }
 
 }

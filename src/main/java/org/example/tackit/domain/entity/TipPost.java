@@ -23,14 +23,16 @@ public class TipPost {
     private String content;
     private LocalDateTime createdAt;
     private Status status = Status.ACTIVE;
+    private Post type = Post.Tip;
 
     @Builder
-    public TipPost(Member writer, String title, String content, LocalDateTime createdAt, Status status) {
+    public TipPost(Member writer, String title, String content, LocalDateTime createdAt, Status status, Post type) {
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
         this.status = (status != null) ? status : Status.ACTIVE;
+        this.type = (type != null) ? type : Post.Tip;
     }
 
     public void update(String title, String content) {

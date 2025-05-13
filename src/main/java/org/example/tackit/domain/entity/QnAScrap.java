@@ -24,4 +24,6 @@ public class QnAScrap {
     private FreePost qnaId;
 
     private LocalDateTime saved_at;
+
+    private Post type = Post.QnA;
 }
