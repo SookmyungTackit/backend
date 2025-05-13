@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface TipPostJPARepository extends JpaRepository<TipPost, Long> {
     List<TipPost> findAllByStatus(Status status);
+
+    List<TipPost> findByOrganizationAndStatus(String organization, Status status);
 }

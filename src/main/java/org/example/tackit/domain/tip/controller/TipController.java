@@ -1,7 +1,6 @@
 package org.example.tackit.domain.tip.controller;
 
-import org.example.tackit.domain.auth.login.service.CustomUserDetailsService;
-import org.example.tackit.domain.entity.Member;
+import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.mypage.service.MemberService;
 import org.example.tackit.domain.tip.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.tip.dto.request.TipPostUpdateDTO;
@@ -18,17 +17,16 @@ import java.util.List;
 @RequestMapping("/tip")
 public class TipController {
     private final TipService tipService;
-    private final MemberService memberService;
 
     public TipController(final TipService tipService, MemberService memberService) {
         this.tipService = tipService;
-        this.memberService = memberService;
     }
 
     // 1. 게시글 전체 조회
     @GetMapping("/list")
-    public ResponseEntity<List<TipPostDTO>> getAllPosts() {
-        List<TipPostDTO> posts = tipService.getAllActivePosts();
+    public ResponseEntity<List<TipPostDTO>> getAllPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String org = userDetails.getOrganization();
+        List<TipPostDTO> posts = tipService.getActivePostsByOrganization(org);
         return ResponseEntity.ok(posts);
     }
 

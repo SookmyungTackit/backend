@@ -25,6 +25,13 @@ public class TipService {
     private final MemberJPARepository memberJPARepository;
     private final TipScrapRepository tipScrapRepository;
 
+    public List<TipPostDTO> getActivePostsByOrganization(String org) {
+        List<TipPost> posts = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE);
+
+        return posts.stream()
+                .map(TipPostDTO::new)
+                .collect(Collectors.toList());
+    }
     // [ 게시글 전체 조회 ]
     public List<TipPostDTO> getAllActivePosts() {
         List<TipPost> posts = tipPostJPARepository.findAllByStatus(Status.ACTIVE);
