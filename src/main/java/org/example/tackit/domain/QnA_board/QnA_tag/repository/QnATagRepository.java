@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface QnATagRepository extends JpaRepository<QnATag, Long> {
-    // 태그 이름으로 중복 검사 등
+    // 태그 이름으로 중복 검사
     Optional<QnATag> findByTagName(String tagName);
 }
