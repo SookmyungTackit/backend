@@ -1,6 +1,7 @@
 package org.example.tackit.domain.auth.login.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,9 +33,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserDetails createUserDetails(Member member) {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole().toString());
 
+        /*
         return new User(
                 member.getEmail(), // 사용자 식별자로 이메일을 사용
                 member.getPassword(),
+                Collections.singleton(grantedAuthority)
+        );
+         */
+        return new CustomUserDetails(
+                member.getEmail(),
+                member.getPassword(),
+                member.getOrganization(),
                 Collections.singleton(grantedAuthority)
         );
     }

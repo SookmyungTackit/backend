@@ -6,6 +6,9 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
+import org.example.tackit.domain.admin.repository.MemberRepository;
+import org.example.tackit.domain.auth.login.security.CustomUserDetails;
+import org.example.tackit.domain.entity.Member;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.example.tackit.domain.auth.login.dto.TokenDto;
@@ -33,11 +36,13 @@ public class TokenProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
     private final Key key;
     private final RedisUtil redisUtil;
+    private final MemberRepository memberRepository;
 
-    public TokenProvider(@Value("${custom.jwt.secret}") String secretKey, RedisUtil redisUtil) {
+    public TokenProvider(@Value("${custom.jwt.secret}") String secretKey, RedisUtil redisUtil, MemberRepository memberRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.redisUtil = redisUtil;
+        this.memberRepository = memberRepository;
     }
 
     public TokenDto generateTokenDto(Authentication authentication) {
@@ -138,10 +143,26 @@ public class TokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
+        // 이메일로 Member 조회
+        String email = claims.getSubject();
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow( () -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // CustomUserDetails 생성
+        CustomUserDetails customUserDetails = new CustomUserDetails(
+                member.getEmail(),
+                member.getPassword(),
+                member.getOrganization().toString(),
+                authorities
+        );
+
+        return new UsernamePasswordAuthenticationToken(customUserDetails, "", authorities);
+        /* [ 기존 방법 ]
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+         */
     }
 
     public boolean validateToken(String token) {
