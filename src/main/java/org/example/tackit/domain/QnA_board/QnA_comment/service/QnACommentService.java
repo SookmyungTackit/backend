@@ -8,10 +8,7 @@ import org.example.tackit.domain.QnA_board.QnA_comment.dto.response.QnACommentRe
 import org.example.tackit.domain.QnA_board.QnA_comment.repository.QnACommentRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
-import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.QnAComment;
-import org.example.tackit.domain.entity.QnAPost;
-import org.example.tackit.domain.entity.Role;
+import org.example.tackit.domain.entity.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +38,7 @@ public class QnACommentService {
 
         QnAComment comment = QnAComment.builder()
                 .writer(member)
+                .status(Status.ACTIVE)
                 .qnAPost(post)
                 .content(dto.getContent())
                 .createdAt(LocalDateTime.now())
