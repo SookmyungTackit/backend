@@ -1,5 +1,6 @@
 package org.example.tackit.domain.QnA_board.QnA_post.repository;
 
+import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Post;
 import org.example.tackit.domain.entity.QnAPost;
 import org.example.tackit.domain.entity.Status;
@@ -14,4 +15,5 @@ public interface QnAPostRepository extends JpaRepository<QnAPost, Long> {
     List<QnAPost> findByType(Post type);
     // 상태로 조회
     List<QnAPost> findAllByStatus (Status status);
+    List<QnAPost> findByWriter(Member member);
 }
