@@ -103,8 +103,8 @@ public class QnAPostService {
         if (!isWriter && !isAdmin) {
             throw new AccessDeniedException("작성자 또는 관리자만 삭제할 수 있습니다.");
         }
-        tagService.deleteTagsByPost(post);
-        qnAPostRepository.delete(post);
+       // tagService.deleteTagsByPost(post);
+        post.markAsDeleted(); //Deleted로 soft delete
     }
 
     // 게시글 전체 조회

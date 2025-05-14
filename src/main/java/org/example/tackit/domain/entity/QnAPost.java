@@ -38,4 +38,9 @@ public class QnAPost {
         this.content = content;
     }
 
+    public void markAsDeleted() {
+        this.status = Status.DELETED;
+    }
+
+
 }
