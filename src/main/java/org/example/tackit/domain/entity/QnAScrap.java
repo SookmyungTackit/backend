@@ -1,6 +1,7 @@
 package org.example.tackit.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,15 +16,26 @@ public class QnAScrap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Member userId;
+    private Member user;
 
-    @ManyToOne
-    @JoinColumn(name = "qna_id", nullable = false)
-    private FreePost qnaId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "qna_post_id", nullable = false)
+    private QnAPost qnaPost;
 
-    private LocalDateTime saved_at;
+    @Column(nullable = false)
+    private LocalDateTime savedAt;
 
-    private Post type = Post.QnA;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Post type;
+
+    @Builder
+    public QnAScrap(Member user, QnAPost qnaPost, LocalDateTime savedAt) {
+        this.user = user;
+        this.qnaPost = qnaPost;
+        this.savedAt = savedAt;
+        this.type = Post.QnA; // 여기서 기본값 명확하게 지정
+    }
 }

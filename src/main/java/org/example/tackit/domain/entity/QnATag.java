@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="qna_tag", uniqueConstraints = @UniqueConstraint(columnNames = "tagName") )
+@Table(name="qna_tag", uniqueConstraints = @UniqueConstraint(name = "uq_tag_tagname", columnNames = "tagName") )
 public class QnATag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
