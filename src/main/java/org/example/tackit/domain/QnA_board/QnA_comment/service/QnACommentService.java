@@ -99,8 +99,9 @@ public class QnACommentService {
         if (!isWriter && !isAdmin) {
             throw new AccessDeniedException("작성자 또는 관리자만 삭제할 수 있습니다.");
         }
-// soft delete로 변경
-        qnACommentRepository.delete(comment);
+        // soft delete로 변경
+       // qnACommentRepository.delete(comment);
+        comment.markAsDeleted();
     }
 
     // 댓글 신고하기

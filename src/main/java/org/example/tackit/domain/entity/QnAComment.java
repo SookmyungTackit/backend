@@ -36,6 +36,10 @@ public class QnAComment {
         this.content = content;
     }
 
+    public void markAsDeleted() {
+        this.status = Status.DELETED;
+    }
+
     public void increaseReportCount() {
         this.reportCount++;
         if (this.reportCount >= 3) {
