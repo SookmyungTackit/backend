@@ -1,5 +1,6 @@
 package org.example.tackit.domain.QnA_board.QnA_comment.repository;
 
+import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.QnAComment;
 import org.example.tackit.domain.entity.QnAPost;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,6 @@ import java.util.List;
 @Repository
 public interface QnACommentRepository extends JpaRepository<QnAComment, Long> {
     List<QnAComment> findByQnAPost(QnAPost post);
+    List<QnAComment> findByWriter(Member member);
 }
 

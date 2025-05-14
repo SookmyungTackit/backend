@@ -21,6 +21,7 @@ public class MemberController {
     private final MemberService memberService;
     private final UpdateMemberService updateMemberService;
 
+    // 내정보 조회
     @GetMapping("/me")
     public ResponseEntity<MemberMypageResponse> getMyPageInfo(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername(); // Spring Security 내부적으로 email이 username
@@ -29,6 +30,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    // 닉네임 변경
     @PatchMapping("/nickname")
     public ResponseEntity<UpdateNicknameResponse> updateNickname(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateNicknameRequest request) {
         UpdateNicknameResponse response = updateMemberService.changeNickname(
@@ -38,6 +40,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    // 비밀번호 변경
     @PatchMapping("/password")
     public ResponseEntity<UpdatePasswordResponse> updatePassword(@AuthenticationPrincipal UserDetails userDetails,
                                                                  @RequestBody UpdatePasswordRequest request) {
