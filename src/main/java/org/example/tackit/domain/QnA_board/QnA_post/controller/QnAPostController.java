@@ -58,4 +58,11 @@ public class QnAPostController {
         QnAPostResponseDto post = qnAPostService.getPostById(QnAPostId);
         return ResponseEntity.ok(post);
     }
+
+    // 게시글 신고
+    @PostMapping("{QnAPostId}/report")
+    public ResponseEntity<String> reportPost(@PathVariable long QnAPostId) {
+        qnAPostService.increasePostReportCount(QnAPostId);
+        return ResponseEntity.ok("게시글을 신고하였습니다.");
+    }
 }

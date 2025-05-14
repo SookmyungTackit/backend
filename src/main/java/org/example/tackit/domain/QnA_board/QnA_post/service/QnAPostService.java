@@ -1,5 +1,6 @@
 package org.example.tackit.domain.QnA_board.QnA_post.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.QnAPostRequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequestDto;
@@ -143,5 +144,14 @@ public class QnAPostService {
                 .createdAt(post.getCreatedAt())
                 .build();
     }
+
+    // 게시글 신고하기
+    @Transactional
+    public void increasePostReportCount(Long id) {
+        QnAPost post = qnAPostRepository.findById(id)
+                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        post.increaseReportCount();
+    }
+
 
 }
