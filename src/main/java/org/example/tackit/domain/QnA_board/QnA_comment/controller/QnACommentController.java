@@ -50,4 +50,11 @@ public class QnACommentController {
         return ResponseEntity.noContent().build();
     }
 
+    // 댓글 신고
+    @PostMapping("{commentId}/report")
+    public ResponseEntity<String> reportComment(@PathVariable long commentId) {
+        qnACommentService.increaseCommentReportCount(commentId);
+        return ResponseEntity.ok("댓글을 신고하였습니다.");
+    }
+
 }

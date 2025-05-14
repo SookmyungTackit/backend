@@ -29,8 +29,17 @@ public class QnAComment {
 
     private String content;
     private LocalDateTime createdAt;
+    private Status status;
+    private int reportCount;
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void increaseReportCount() {
+        this.reportCount++;
+        if (this.reportCount >= 3) {
+            this.status = Status.DELETED;
+        }
     }
 }
