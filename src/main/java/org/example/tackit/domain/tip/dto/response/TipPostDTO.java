@@ -17,7 +17,11 @@ public class TipPostDTO {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.created_at = post.getCreatedAt();
+    }
 
+    // 정적 팩토리 메서드
+    public static TipPostDTO fromEntity(TipPost post) {
+        return new TipPostDTO(post);
     }
 
 }

@@ -2,6 +2,7 @@ package org.example.tackit.domain.tip.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.TipPost;
@@ -12,7 +13,11 @@ import org.example.tackit.domain.tip.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.tip.dto.response.TipPostDTO;
 import org.example.tackit.domain.tip.repository.TipPostJPARepository;
 import org.example.tackit.domain.tip.repository.TipScrapRepository;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,46 +46,59 @@ public class TipService {
     }
 
     // [ 게시글 상세 조회 ]
-    public TipPostDTO getPostById(Long id) {
+    public TipPostDTO getPostById(Long id, String org) {
         TipPost tipPost = tipPostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        return new TipPostDTO(tipPost);
+
+        if (!tipPost.getOrganization().equals(org)) {
+            throw new AccessDeniedException("해당 조직의 게시글이 아닙니다.");
+        }
+
+        if (!tipPost.getStatus().equals(Status.ACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
+        }
+
+        return TipPostDTO.fromEntity(tipPost);
     }
 
     // [ 게시글 작성 ]
     @Transactional
-    public TipPostDTO writePost(TipPostCreateDTO dto) {
-        // 1. nickname으로 유저 조회
-        Member member = memberJPARepository.findByNickname(dto.getNickname())
+    public TipPostDTO writePost(TipPostCreateDTO dto, CustomUserDetails user) {
+        // 1. 유저 조회
+        Member writer = memberJPARepository.findById(user.getId())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
-        // 2. 게시글 생성
-        TipPost newPost = TipPost.builder()
-                .writer(member)
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .createdAt(LocalDateTime.now())
-                .build();
+        // 2. 게시글 생성 : 작성 글, 회원 데이터, 조직 정보
+        TipPost newPost = dto.toEntity(writer, user.getOrganization());
 
-        tipPostJPARepository.save(newPost);
-        return new TipPostDTO(newPost);
+        // 3. 게시글 DB 저장 + TipPostDTO로 변환하여 반환
+        return TipPostDTO.fromEntity(tipPostJPARepository.save(newPost));
     }
 
     // [ 게시글 수정 ]
     @Transactional
-    public TipPostDTO updatePost(Long id, TipPostUpdateDTO dto) {
+    public TipPostDTO updatePost(Long id, TipPostUpdateDTO dto, CustomUserDetails user) {
         TipPost post = tipPostJPARepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다.") );
 
+        // 권한 체크 : 요청 유저가 작성자인지
+        if(!post.getWriter().getId().equals(user.getId())) {
+            throw new AccessDeniedException("해당 게시글을 수정할 권한이 없습니다.");
+        }
         post.update(dto.getTitle(), dto.getContent());
         return new TipPostDTO(post);
     }
 
     // [ 게시글 삭제 ]
     @Transactional
-    public void deletePost(Long id) {
+    public void deletePost(Long id, CustomUserDetails user) {
         TipPost post = tipPostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        // 권한 체크 : 요청 유저가 작성자인지
+        if(!post.getWriter().getId().equals(user.getId())) {
+            throw new AccessDeniedException("해당 게시글을 수정할 권한이 없습니다.");
+        }
 
         post.delete();
     }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tip")
+@RequestMapping("/api/tip-posts")
 public class TipController {
     private final TipService tipService;
 
@@ -23,40 +23,48 @@ public class TipController {
     }
 
     // 1. 게시글 전체 조회
-    @GetMapping("/list")
-    public ResponseEntity<List<TipPostDTO>> getAllPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        String org = userDetails.getOrganization();
+    @GetMapping
+    public ResponseEntity<List<TipPostDTO>> getAllPosts(@AuthenticationPrincipal CustomUserDetails user) {
+        String org = user.getOrganization();
         List<TipPostDTO> posts = tipService.getActivePostsByOrganization(org);
         return ResponseEntity.ok(posts);
     }
 
     // 2. 게시글 상세 조회
-    @GetMapping("/{tipPostId}")
-    public ResponseEntity<TipPostDTO> getPostById(@PathVariable("tipPostId") Long tipPostId) {
-        TipPostDTO post = tipService.getPostById(tipPostId);
+    @GetMapping("/{id}")
+    public ResponseEntity<TipPostDTO> getPostById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        String org = user.getOrganization();
+        TipPostDTO post = tipService.getPostById(id, org);
         return ResponseEntity.ok(post);
     }
 
     // 3. 게시글 작성
-    @PostMapping("/write")
-    public ResponseEntity<TipPostDTO> writePost(@RequestBody TipPostCreateDTO dto) {
-        TipPostDTO post = tipService.writePost(dto);
+    @PostMapping
+    public ResponseEntity<TipPostDTO> create(
+            @RequestBody TipPostCreateDTO dto,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        TipPostDTO post = tipService.writePost(dto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     // 4. 게시글 수정
-    @PutMapping("/{tipPostId}")
-    public ResponseEntity<TipPostDTO> updatePost(
-            @PathVariable("tipPostId") Long tipPostId,
-            @RequestBody TipPostUpdateDTO dto) {
-        TipPostDTO updatedPost = tipService.updatePost(tipPostId, dto);
+    @PutMapping("/{id}")
+    public ResponseEntity<TipPostDTO> update(
+            @PathVariable Long id,
+            @RequestBody TipPostUpdateDTO dto,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        TipPostDTO updatedPost = tipService.updatePost(id, dto, user);
         return ResponseEntity.ok(updatedPost);
     }
 
     // 5. 게시글 삭제
-    @DeleteMapping("{tipPostId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long tipPostId) {
-        tipService.deletePost(tipPostId);
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        tipService.deletePost(id, user);
         return ResponseEntity.noContent().build();
     }
 
