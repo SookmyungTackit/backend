@@ -7,7 +7,6 @@ import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,6 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         );
          */
         return new CustomUserDetails(
+                member.getId(),
                 member.getEmail(),
                 member.getPassword(),
                 member.getOrganization(),

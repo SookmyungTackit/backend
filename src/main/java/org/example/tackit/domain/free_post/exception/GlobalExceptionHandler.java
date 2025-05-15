@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-
+/*
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -24,3 +24,4 @@ public class GlobalExceptionHandler {
     }
 }
 
+ */

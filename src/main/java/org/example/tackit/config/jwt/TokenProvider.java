@@ -150,6 +150,7 @@ public class TokenProvider {
 
         // CustomUserDetails 생성
         CustomUserDetails customUserDetails = new CustomUserDetails(
+                member.getId(),
                 member.getEmail(),
                 member.getPassword(),
                 member.getOrganization().toString(),
