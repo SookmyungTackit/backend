@@ -68,19 +68,12 @@ public class TipController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6. 게시글 찜
-    /*
-    @PostMapping("/{tipPostId}/scrap")
-    public ResponseEntity<?> scrapPost(@PathVariable Long tipPostId,
-                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-        }
-
-        Long memberId = userDetails.getMemberId();
-        tipService.scrapPost(memberId, tipPostId);
-        return ResponseEntity.ok("스크랩 완료");
+    // 6. 게시글 스크랩
+    @PostMapping("/{id}/scrap")
+    public ResponseEntity<Void> scrapPost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        tipService.scrapPost(id, user.getId());
+        return ResponseEntity.ok().build();
     }
-
-     */
 }

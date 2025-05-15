@@ -2,6 +2,7 @@ package org.example.tackit.domain.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,14 +24,19 @@ public class TipScrap {
     @JoinColumn(name = "tip_id", nullable = false)
     private TipPost tipPost;
 
-    private LocalDateTime saved_at;
+    @Column(name = "saved_at", nullable = false)
+    private LocalDateTime savedAt;
 
     @Enumerated(EnumType.STRING)
     private Post type = Post.Tip;
 
+    @Builder
     public TipScrap(Member member, TipPost tipPost) {
+        if (member == null || tipPost == null) {
+            throw new IllegalArgumentException("회원 또는 게시글은 null일 수 없습니다.");
+        }
         this.member = member;
         this.tipPost = tipPost;
-        this.saved_at = LocalDateTime.now();
+        this.savedAt = LocalDateTime.now();
     }
 }

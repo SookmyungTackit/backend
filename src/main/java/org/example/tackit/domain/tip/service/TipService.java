@@ -105,13 +105,13 @@ public class TipService {
 
     // [ 게시글 스크랩 ]
     @Transactional
-    public void scrapPost(Long id, Long memberId) {
+    public void scrapPost(Long id, Long userId) {
         // 1. 게시글 조회
         TipPost post = tipPostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
 
         // 2. 멤버 조회
-        Member member = memberJPARepository.findById(memberId)
+        Member member = memberJPARepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
         // 3. 중복 스크랩 방지
