@@ -89,7 +89,7 @@ public class QnACommentService {
     // 댓글 삭제 (작성자, 관리자만 가능)
     @Transactional
     public void deleteComment(long commentId, String email, String org){
-        Member member = qnAMemberRepository.findByEmailAndOrganization(email)
+        Member member = qnAMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         QnAComment comment = qnACommentRepository.findById(commentId)

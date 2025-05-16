@@ -107,7 +107,7 @@ public class QnAPostService {
     // 게시글 전체 조회
     @Transactional(readOnly = true)
     public List<QnAPostResponseDto> findALl(String org){
-        List<QnAPost> posts = qnAPostRepository.findAllByStatus(Status.ACTIVE, org);
+        List<QnAPost> posts = qnAPostRepository.findAllByStatusAndWriter_Organization(Status.ACTIVE, org);
         return posts
                 .stream()
                 .map(post -> {

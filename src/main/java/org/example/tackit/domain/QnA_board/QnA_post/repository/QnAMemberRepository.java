@@ -9,8 +9,7 @@ import java.util.Optional;
 @Repository
 public interface QnAMemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByNickname(String nickname);
-    Optional<Member> findByEmailAndOrganization(String email);
+    Optional<Member> findByEmail(String email);
     Optional<Member> findByEmailAndOrganization(String email, String organization);
-
 }
 
