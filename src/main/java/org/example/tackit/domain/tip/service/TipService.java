@@ -37,13 +37,6 @@ public class TipService {
                 .map(TipPostDTO::new)
                 .collect(Collectors.toList());
     }
-    // [ 게시글 전체 조회 ]
-    public List<TipPostDTO> getAllActivePosts() {
-        List<TipPost> posts = tipPostJPARepository.findAllByStatus(Status.ACTIVE);
-        return posts.stream()
-                .map(TipPostDTO::new)
-                .collect(Collectors.toList());
-    }
 
     // [ 게시글 상세 조회 ]
     public TipPostDTO getPostById(Long id, String org) {
@@ -63,7 +56,7 @@ public class TipService {
 
     // [ 게시글 작성 ]
     @Transactional
-    public TipPostDTO writePost(TipPostCreateDTO dto, CustomUserDetails user) {
+    public TipPostDTO createPost(TipPostCreateDTO dto, CustomUserDetails user) {
         // 1. 유저 조회
         Member writer = memberJPARepository.findById(user.getId())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));

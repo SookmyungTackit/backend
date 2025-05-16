@@ -1,12 +1,12 @@
 package org.example.tackit.domain.mock;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.entity.FreePost;
 import org.example.tackit.domain.entity.Post;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.free_post.repository.FreePostJPARepository;
-import org.example.tackit.domain.free_post.repository.MemberJPARepository;
+import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Order(2)
 public class FreePostDataInitializer implements CommandLineRunner {
-    private final MemberJPARepository memberRepository;
+    private final MemberRepository memberRepository;
     private final FreePostJPARepository freePostRepository;
 
     @Override

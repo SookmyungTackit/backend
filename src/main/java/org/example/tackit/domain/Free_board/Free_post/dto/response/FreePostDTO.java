@@ -1,4 +1,4 @@
-package org.example.tackit.domain.free_post.dto.response;
+package org.example.tackit.domain.Free_board.Free_post.dto.response;
 
 import lombok.Getter;
 import org.example.tackit.domain.entity.FreePost;

@@ -45,7 +45,7 @@ public class TipController {
     public ResponseEntity<TipPostDTO> create(
             @RequestBody TipPostCreateDTO dto,
             @AuthenticationPrincipal CustomUserDetails user) {
-        TipPostDTO post = tipService.writePost(dto, user);
+        TipPostDTO post = tipService.createPost(dto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
