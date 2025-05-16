@@ -1,10 +1,10 @@
 package org.example.tackit.domain.mock;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.free_post.repository.MemberJPARepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Order(1)
 public class MemberDataInitializer implements CommandLineRunner {
-    private final MemberJPARepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public void run(String... args) throws Exception {

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,27 +18,25 @@ public class FreePost {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Member writer;
 
     private String title;
     private String content;
-
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Builder.Default
-    private Post type = Post.Free;
+    private LocalDateTime createdAt;
+    private Post type;
+    private String organization;
 
     @Column(nullable = true)
     private String tag;
-
-    @Builder.Default
-    private Status status = Status.ACTIVE;
-
-    @Builder.Default
+    private Status status;
     private int reportCount = 0;
 
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+    /*
     public void update(String title, String content, String tag) {
         this.title = title;
         this.content = content;
@@ -50,6 +47,7 @@ public class FreePost {
             this.tag = tag; // 태그 추가 또는 수정
         }
     }
+     */
 
     public void delete() {
         this.status = Status.DELETED;
@@ -66,5 +64,4 @@ public class FreePost {
         this.status = Status.ACTIVE;
         this.reportCount = 0;
     }
-
 }
