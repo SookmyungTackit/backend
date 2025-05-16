@@ -25,7 +25,7 @@ public class MyPageQnAService {
     // 질문게시판) 내가 쓴 게시글 조회
     @Transactional(readOnly = true)
     public List<QnAMyPostResponseDto> getMyPosts(String email) {
-        Member member = qnAMemberRepository.findByEmail(email)
+        Member member = qnAMemberRepository.findByEmailAndOrganization(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         return qnAPostRepository.findByWriter(member).stream()
@@ -48,7 +48,7 @@ public class MyPageQnAService {
     // 질문게시판) 내가 쓴 댓글 조회
     @Transactional(readOnly = true)
     public List<QnAMyCommentResponseDto> getMyComments(String email) {
-        Member member = qnAMemberRepository.findByEmail(email)
+        Member member = qnAMemberRepository.findByEmailAndOrganization(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         return qnACommentRepository.findByWriter(member).stream()

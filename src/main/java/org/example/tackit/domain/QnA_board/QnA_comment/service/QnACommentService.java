@@ -25,8 +25,8 @@ public class QnACommentService {
 
     // 댓글 생성 (SENIOR만 가능)
     @Transactional
-    public QnACommentResponseDto createComment(QnACommentCreateDto dto, String email){
-        Member member = qnAMemberRepository.findByEmail(email)
+    public QnACommentResponseDto createComment(QnACommentCreateDto dto, String email, String org){
+        Member member = qnAMemberRepository.findByEmailAndOrganization(email,org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (member.getRole() != Role.SENIOR) {
@@ -50,9 +50,13 @@ public class QnACommentService {
 
     // 전체 댓글 조회
     @Transactional (readOnly = true)
-    public List<QnACommentResponseDto> getCommentByPost(long postId){
+    public List<QnACommentResponseDto> getCommentByPost(long postId, String org){
         QnAPost post = qnAPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+
+        if (!post.getWriter().getOrganization().equals(org)) {
+            throw new AccessDeniedException("해당 조직의 게시글만 조회할 수 있습니다.");
+        }
 
         return qnACommentRepository.findByQnAPost(post)
                 .stream()
@@ -62,8 +66,8 @@ public class QnACommentService {
 
     // 댓글 수정 (작성자, 관리자만 가능)
     @Transactional
-    public QnACommentResponseDto updateComment(long commentId, QnACommentUpdateDto dto, String email){
-        Member member = qnAMemberRepository.findByEmail(email)
+    public QnACommentResponseDto updateComment(long commentId, QnACommentUpdateDto dto, String email, String org){
+        Member member = qnAMemberRepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
 
@@ -84,8 +88,8 @@ public class QnACommentService {
 
     // 댓글 삭제 (작성자, 관리자만 가능)
     @Transactional
-    public void deleteComment(long commentId, String email){
-        Member member = qnAMemberRepository.findByEmail(email)
+    public void deleteComment(long commentId, String email, String org){
+        Member member = qnAMemberRepository.findByEmailAndOrganization(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         QnAComment comment = qnACommentRepository.findById(commentId)
@@ -104,9 +108,13 @@ public class QnACommentService {
 
     // 댓글 신고하기
     @Transactional
-    public void increaseCommentReportCount(long id) {
+    public void increaseCommentReportCount(long id, String org) {
         QnAComment comment = qnACommentRepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        if (!comment.getWriter().getOrganization().equals(org)) {
+            throw new AccessDeniedException("해당 조직의 댓글만 신고할 수 있습니다.");
+        }
         comment.increaseReportCount();
     }
 

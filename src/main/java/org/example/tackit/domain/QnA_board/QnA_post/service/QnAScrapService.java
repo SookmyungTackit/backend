@@ -29,7 +29,7 @@ public class QnAScrapService {
     // 스크랩한적 있으면 스크랩 취소, 없으면 저장
     @Transactional
     public QnAScrapResponseDto toggleScrap(long postId, String email, String userOrg){
-        Member user = qnAMemberRepository.findByEmail(email)
+        Member user = qnAMemberRepository.findByEmailAndOrganization(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         QnAPost post = qnAPostRepository.findById(postId)
@@ -60,7 +60,7 @@ public class QnAScrapService {
     // 찜은 사용자 개인이 찜한 글 + 찜할때 이미 소속 검사함 -> 소속확인 필요 x
     @Transactional(readOnly = true)
     public List<QnACheckScrapResponseDto> getMyQnAScraps(String email) {
-        Member user = qnAMemberRepository.findByEmail(email)
+        Member user = qnAMemberRepository.findByEmailAndOrganization(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         return qnAScrapRepository.findByUserAndType(user, Post.QnA).stream()

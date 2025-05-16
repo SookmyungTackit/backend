@@ -5,6 +5,7 @@ import org.example.tackit.domain.QnA_board.QnA_post.dto.request.QnAPostRequestDt
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.service.QnAPostService;
+import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,48 +22,54 @@ public class QnAPostController {
 
     // 게시글 생성
     @PostMapping("/create")
-    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostRequestDto dto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostRequestDto dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
         String email = userDetails.getUsername(); // userDetails로부터 이메일 획득
-        QnAPostResponseDto response = qnAPostService.createPost(dto, email);
+        String org = userDetails.getOrganization();
+        QnAPostResponseDto response = qnAPostService.createPost(dto, email, org);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 게시글 수정
     @PutMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody UpdateQnARequestDto request, @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody UpdateQnARequestDto request, @AuthenticationPrincipal CustomUserDetails userDetails){
         String email = userDetails.getUsername();
-        QnAPostResponseDto updateResponse = qnAPostService.update(QnAPostId, request, email);
+        String org = userDetails.getOrganization();
+        QnAPostResponseDto updateResponse = qnAPostService.update(QnAPostId, request, email, org);
 
         return ResponseEntity.ok().body(updateResponse);
     }
 
     // 게시글 삭제
     @DeleteMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(@PathVariable("QnAPostId") long QnAPostId, @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(@PathVariable("QnAPostId") long QnAPostId, @AuthenticationPrincipal CustomUserDetails userDetails){
         String email = userDetails.getUsername();
-        qnAPostService.delete(QnAPostId, email);
+        String org = userDetails.getOrganization();
+        qnAPostService.delete(QnAPostId, email, org);
 
         return ResponseEntity.noContent().build();
     }
 
     // 게시글 전체 조회
     @GetMapping("/list")
-    public ResponseEntity<List<QnAPostResponseDto>> findALlQnAPost(){
-        List<QnAPostResponseDto> posts = qnAPostService.findALl();
+    public ResponseEntity<List<QnAPostResponseDto>> findALlQnAPost(@AuthenticationPrincipal CustomUserDetails userDetails){
+        String org = userDetails.getOrganization();
+        List<QnAPostResponseDto> posts = qnAPostService.findALl(org);
         return ResponseEntity.ok().body(posts);
     }
 
     // 게시글 상세 조회
     @GetMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> findQnAPost(@PathVariable("QnAPostId") long QnAPostId) {
-        QnAPostResponseDto post = qnAPostService.getPostById(QnAPostId);
+    public ResponseEntity<QnAPostResponseDto> findQnAPost(@PathVariable("QnAPostId") long QnAPostId , @AuthenticationPrincipal CustomUserDetails userDetails) {
+        String org = userDetails.getOrganization();
+        QnAPostResponseDto post = qnAPostService.getPostById(QnAPostId, org);
         return ResponseEntity.ok(post);
     }
 
     // 게시글 신고
     @PostMapping("{QnAPostId}/report")
-    public ResponseEntity<String> reportPost(@PathVariable long QnAPostId) {
-        qnAPostService.increasePostReportCount(QnAPostId);
+    public ResponseEntity<String> reportPost(@PathVariable long QnAPostId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        String org = userDetails.getOrganization();
+        qnAPostService.increasePostReportCount(QnAPostId, org);
         return ResponseEntity.ok("게시글을 신고하였습니다.");
     }
 }

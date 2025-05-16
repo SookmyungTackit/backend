@@ -14,6 +14,6 @@ public interface QnAPostRepository extends JpaRepository<QnAPost, Long> {
     // 선택적으로 질문 게시글만 조회할 때 사용
     List<QnAPost> findByType(Post type);
     // 상태로 조회
-    List<QnAPost> findAllByStatus (Status status);
+    List<QnAPost> findAllByStatus (Status status, String organization);
     List<QnAPost> findByWriter(Member member);
 }
