@@ -2,24 +2,22 @@ package org.example.tackit.domain.tip.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.TipPost;
 import org.example.tackit.domain.entity.TipScrap;
-import org.example.tackit.domain.free_post.repository.MemberJPARepository;
 import org.example.tackit.domain.tip.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.tip.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.tip.dto.response.TipPostDTO;
 import org.example.tackit.domain.tip.repository.TipPostJPARepository;
 import org.example.tackit.domain.tip.repository.TipScrapRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TipService {
     private final TipPostJPARepository tipPostJPARepository;
-    private final MemberJPARepository memberJPARepository;
+    private final FreeMemberJPARepository freeMemberJPARepository;
     private final TipScrapRepository tipScrapRepository;
 
     public List<TipPostDTO> getActivePostsByOrganization(String org) {
@@ -58,7 +56,7 @@ public class TipService {
     @Transactional
     public TipPostDTO createPost(TipPostCreateDTO dto, CustomUserDetails user) {
         // 1. 유저 조회
-        Member writer = memberJPARepository.findById(user.getId())
+        Member writer = freeMemberJPARepository.findById(user.getId())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
         // 2. 게시글 생성 : 작성 글, 회원 데이터, 조직 정보
@@ -104,7 +102,7 @@ public class TipService {
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
 
         // 2. 멤버 조회
-        Member member = memberJPARepository.findById(userId)
+        Member member = freeMemberJPARepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
         // 3. 중복 스크랩 방지

@@ -7,11 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.admin.repository.UserLogRepository;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.UserLog;
-import org.example.tackit.domain.free_post.repository.MemberJPARepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class LoggingAspect {
     private final UserLogRepository userLogRepository;
-    private final MemberJPARepository memberJPARepository;
+    private final FreeMemberJPARepository freeMemberJPARepository;
 
     @Around("execution(* org.example.tackit..*Controller.*(..))")
     public Object logUserAction(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -48,7 +48,7 @@ public class LoggingAspect {
         Role role = null;
         String org = null;
         if (!"anonymous".equals(email)) {
-            Member member = memberJPARepository.findByEmail(email).orElse(null);
+            Member member = freeMemberJPARepository.findByEmail(email).orElse(null);
             if (member != null) {
                 role = member.getRole();
                 org = member.getOrganization();

@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
+import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
 import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
 import org.example.tackit.domain.entity.*;
-import org.example.tackit.domain.free_post.repository.MemberJPARepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FreePostService {
     private final FreePostJPARepository freePostJPARepository;
-    private final MemberJPARepository memberJPARepository;
+    private final FreeMemberJPARepository freeMemberJPARepository;
     private final FreeTagService freeTagService;
 
     // [ 게시글 전체 조회 ]
@@ -76,7 +76,7 @@ public class FreePostService {
     @Transactional
     public FreePostRespDto createPost(FreePostReqDto dto, String email, String org) {
         // 1. 유저 조회
-        Member member = memberJPARepository.findByEmailAndOrganization(email, org)
+        Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
         // 2. 게시글 생성
@@ -109,7 +109,7 @@ public class FreePostService {
     // [ 게시글 수정 ] : 작성자, 관리자만
     @Transactional
     public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) {
-        Member member = memberJPARepository.findByEmailAndOrganization(email, org)
+        Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         FreePost post = freePostJPARepository.findById(id)
@@ -140,7 +140,7 @@ public class FreePostService {
     // [ 게시글 삭제 ] : 작성자, 관리자만
     @Transactional
     public void delete(Long id, String email, String org) {
-        Member member = memberJPARepository.findByEmailAndOrganization(email, org)
+        Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         FreePost post = freePostJPARepository.findById(id)
