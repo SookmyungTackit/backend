@@ -158,7 +158,7 @@ public class FreePostService {
 
     // [ 게시글 신고 ]
     @Transactional
-    public void incresePostReportCount(Long id) {
+    public void increasePostReportCount(Long id) {
         FreePost post = freePostJPARepository.findById(id)
                 .orElseThrow( () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
 

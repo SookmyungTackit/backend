@@ -82,7 +82,7 @@ public class FreePostController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
         String org = user.getOrganization();
-        freePostService.incresePostReportCount(id);
+        freePostService.increasePostReportCount(id);
         return ResponseEntity.ok("게시글을 신고하였습니다.");
     }
 
