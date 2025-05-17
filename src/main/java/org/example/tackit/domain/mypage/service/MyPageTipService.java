@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MypageTipService {
+public class MyPageTipService {
     private final TipScrapRepository tipScrapRepository;
 
     public List<TipScrapResponse> getScrapListByMember(Member member) {

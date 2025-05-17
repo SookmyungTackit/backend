@@ -59,33 +59,6 @@ public class TipService {
                 .createdAt(tipPost.getCreatedAt())
                 .build();
     }
-    /*
-        // [ 게시글 상세 조회 ]
-    @Transactional
-    public FreePostRespDto getPostById(Long id, String org) {
-        FreePost post = freePostJPARepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-
-        if (!post.getOrganization().equals(org)) {
-            throw new AccessDeniedException("해당 조직의 게시글이 아닙니다.");
-        }
-
-        if (!post.getStatus().equals(Status.ACTIVE)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
-        }
-
-        List<String> tagNames = freeTagService.getTagNamesByPost(post);
-
-        return FreePostRespDto.builder()
-                .id(post.getId())
-                .writer(post.getWriter().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .tags(tagNames)
-                .createdAt(post.getCreatedAt())
-                .build();
-    }
-     */
 
     // [ 게시글 작성 ]
     @Transactional

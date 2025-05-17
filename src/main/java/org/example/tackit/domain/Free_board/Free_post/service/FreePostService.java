@@ -8,6 +8,7 @@ import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqD
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
+import org.example.tackit.domain.Free_board.Free_post.repository.FreeScrapJPARepository;
 import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
 import org.example.tackit.domain.entity.*;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ public class FreePostService {
     private final FreePostJPARepository freePostJPARepository;
     private final FreeMemberJPARepository freeMemberJPARepository;
     private final FreeTagService freeTagService;
+    private final FreeScrapJPARepository freeScrapJPARepository;
 
     // [ 게시글 전체 조회 ]
     @Transactional
@@ -164,6 +166,28 @@ public class FreePostService {
 
 
         post.increaseReportCount();
+    }
+
+    // [ 게시글 스크랩 ]
+    @Transactional
+    public void scrapPost(Long id, Long userId) {
+        // 1. 게시글 조회
+        FreePost post = freePostJPARepository.findById(id)
+                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
+
+        // 2. 멤버 조회
+        Member member = freeMemberJPARepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
+
+        // 3. 중복 스크랩 방지
+        boolean alreadyScrapped = freeScrapJPARepository.existsByMemberAndFreePost(member, post);
+        if (alreadyScrapped) {
+            throw new IllegalStateException("이미 스크랩한 게시글입니다.");
+        }
+
+        // 4. 스크랩 저장
+        FreeScrap scrap = new FreeScrap(member, post);
+        freeScrapJPARepository.save(scrap);
     }
 
 }
