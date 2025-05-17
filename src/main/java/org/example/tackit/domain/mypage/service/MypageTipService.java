@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.TipScrap;
 import org.example.tackit.domain.mypage.dto.response.TipScrapResponse;
-import org.example.tackit.domain.tip.repository.TipScrapRepository;
+import org.example.tackit.domain.Tip_board.repository.TipScrapRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

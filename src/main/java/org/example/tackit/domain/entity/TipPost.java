@@ -1,6 +1,7 @@
 package org.example.tackit.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TipPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,16 +28,13 @@ public class TipPost {
     private Status status = Status.ACTIVE;
     private Post type = Post.Tip;
     private String organization;
+    private int reportCount = 0;
 
-    @Builder
-    public TipPost(Member writer, String title, String content, LocalDateTime createdAt, Status status, Post type, String organization) {
-        this.writer = writer;
-        this.title = title;
-        this.content = content;
-        this.createdAt = createdAt;
-        this.status = (status != null) ? status : Status.ACTIVE;
-        this.type = (type != null) ? type : Post.Tip;
-        this.organization= (writer != null) ? writer.getOrganization() : null;
+    public void increaseReportCount() {
+        this.reportCount++;
+        if (this.reportCount >= 3) {
+            this.status = Status.DELETED;
+        }
     }
 
     public void update(String title, String content) {
