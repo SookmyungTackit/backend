@@ -42,8 +42,5 @@ public class QnAComment {
 
     public void increaseReportCount() {
         this.reportCount++;
-        if (this.reportCount >= 3) {
-            this.status = Status.DELETED;
-        }
     }
 }
