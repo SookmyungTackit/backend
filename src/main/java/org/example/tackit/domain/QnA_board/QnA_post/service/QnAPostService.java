@@ -47,6 +47,7 @@ public class QnAPostService {
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
         return QnAPostResponseDto.builder()
+                .postId(post.getId())
                 .writer(member.getNickname())
                 .title(post.getTitle())
                 .content(post.getContent())
@@ -77,6 +78,7 @@ public class QnAPostService {
         List<String> tagNames = tagService.assignTagsToPost(post, request.getTagIds()); // 새 태그 등록
 
         return QnAPostResponseDto.builder()
+                .postId(post.getId())
                 .writer(post.getWriter().getNickname())
                 .title(post.getTitle())
                 .content(post.getContent())
@@ -114,6 +116,7 @@ public class QnAPostService {
                     List<String> tagNames = tagService.getTagNamesByPost(post);
 
                     return QnAPostResponseDto.builder()
+                            .postId(post.getId())
                             .writer(post.getWriter().getNickname())
                             .title(post.getTitle())
                             .content(post.getContent())
@@ -136,6 +139,7 @@ public class QnAPostService {
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
         return QnAPostResponseDto.builder()
+                .postId(post.getId())
                 .writer(post.getWriter().getNickname())
                 .title(post.getTitle())
                 .content(post.getContent())

@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 public class QnAPostResponseDto {
+    private final Long postId;
     private final String writer;
     private final String title;
     private final String content;
@@ -20,6 +21,7 @@ public class QnAPostResponseDto {
     private final LocalDateTime createdAt;
 
     public QnAPostResponseDto(QnAPost post, List<String> tags) {
+        this.postId = post.getId();
         this.writer = post.getWriter().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();
