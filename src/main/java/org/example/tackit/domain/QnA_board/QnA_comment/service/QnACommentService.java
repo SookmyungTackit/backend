@@ -64,7 +64,7 @@ public class QnACommentService {
                 .toList();
     }
 
-    // 댓글 수정 (작성자, 관리자만 가능)
+    // 댓글 수정 (작성자만 가능)
     @Transactional
     public QnACommentResponseDto updateComment(long commentId, QnACommentUpdateDto dto, String email, String org){
         Member member = qnAMemberRepository.findByEmailAndOrganization(email, org)
@@ -75,10 +75,10 @@ public class QnACommentService {
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
         boolean isWriter = comment.getWriter().getId().equals(member.getId());
-        boolean isAdmin = member.getRole() == Role.ADMIN;
+      //  boolean isAdmin = member.getRole() == Role.ADMIN;
 
-        if (!isWriter && !isAdmin) {
-            throw new AccessDeniedException("작성자 또는 관리자만 수정할 수 있습니다.");
+        if (!isWriter ) {
+            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
         comment.updateContent(dto.getContent());
@@ -101,9 +101,9 @@ public class QnACommentService {
         if (!isWriter && !isAdmin) {
             throw new AccessDeniedException("작성자 또는 관리자만 삭제할 수 있습니다.");
         }
-        // soft delete로 변경
-       // qnACommentRepository.delete(comment);
-        comment.markAsDeleted();
+
+        qnACommentRepository.delete(comment); // hard delete
+       // comment.markAsDeleted(); // soft delete
     }
 
     // 댓글 신고하기
@@ -116,6 +116,10 @@ public class QnACommentService {
             throw new AccessDeniedException("해당 조직의 댓글만 신고할 수 있습니다.");
         }
         comment.increaseReportCount();
+
+        if (comment.getReportCount() >= 3) {
+            qnACommentRepository.delete(comment); // hard delete
+        }
     }
 
 }
