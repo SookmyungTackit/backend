@@ -56,7 +56,7 @@ public class QnAPostService {
                 .build();
     }
 
-    // 게시글 수정 (작성자, 관리자만 가능)
+    // 게시글 수정 (작성자만 가능)
     @Transactional
     public QnAPostResponseDto update(long id, UpdateQnARequestDto request, String email, String org){
         Member member = qnAMemberRepository.findByEmailAndOrganization(email, org)
@@ -66,10 +66,10 @@ public class QnAPostService {
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
         boolean isWriter = post.getWriter().getId().equals(member.getId());
-        boolean isAdmin = member.getRole() == Role.ADMIN;
+      //  boolean isAdmin = member.getRole() == Role.ADMIN;
 
-        if (!isWriter && !isAdmin) {
-            throw new AccessDeniedException("작성자 또는 관리자만 수정할 수 있습니다.");
+        if (!isWriter) {
+            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
         post.update(request.getTitle(), request.getContent());
