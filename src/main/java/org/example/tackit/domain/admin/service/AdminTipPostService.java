@@ -3,11 +3,10 @@ package org.example.tackit.domain.admin.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
 import org.example.tackit.domain.admin.dto.ReportedPostDTO;
-import org.example.tackit.domain.admin.repository.AdminFreePostRepository;
-import org.example.tackit.domain.entity.FreePost;
+import org.example.tackit.domain.admin.repository.AdminTipPostRepository;
 import org.example.tackit.domain.entity.Status;
+import org.example.tackit.domain.entity.TipPost;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,14 +14,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AdminFreePostService implements ReportedPostService{
-    private final AdminFreePostRepository adminFreePostRepository;
-    private final FreePostJPARepository freePostRepository;
+public class AdminTipPostService implements ReportedPostService{
+    private final AdminTipPostRepository adminTipPostRepository;
 
-    // 비활성화 자유 게시글 전체 조회
+    // 비활성화 게시글 전체 조회
     @Override
     public List<ReportedPostDTO> getDeletedPosts() {
-        return adminFreePostRepository.findAllByStatus(Status.DELETED)
+        return adminTipPostRepository.findAllByStatus(Status.DELETED)
                 .stream()
                 .map(ReportedPostDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -32,22 +30,19 @@ public class AdminFreePostService implements ReportedPostService{
     @Override
     @Transactional
     public void deletePost(Long id) {
-        FreePost post = freePostRepository.findById(id)
+        TipPost post = adminTipPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
 
-        freePostRepository.delete(post);
+        adminTipPostRepository.delete(post);
     }
 
     // 신고 게시글 활성 전환
     @Override
     @Transactional
     public void activatePost(Long id) {
-        FreePost post = freePostRepository.findById(id)
+        TipPost post = adminTipPostRepository.findById(id)
                 .orElseThrow( () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
 
         post.activate();
     }
-
-
-
 }

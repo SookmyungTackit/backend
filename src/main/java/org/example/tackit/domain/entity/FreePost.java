@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.tackit.domain.admin.model.ReportablePost;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FreePost {
+public class FreePost implements ReportablePost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +31,8 @@ public class FreePost {
 
     @Column(nullable = true)
     private String tag;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
     private int reportCount = 0;
 
@@ -61,6 +65,10 @@ public class FreePost {
     }
 
     public void activate(){
+        if (this.status != Status.DELETED) {
+            throw new IllegalStateException("삭제되지 않은 게시글은 활성화할 수 없습니다.");
+        }
+
         this.status = Status.ACTIVE;
         this.reportCount = 0;
     }
