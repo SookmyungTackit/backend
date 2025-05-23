@@ -2,6 +2,7 @@ package org.example.tackit.domain.Tip_board.dto.request;
 
 import lombok.Getter;
 import org.example.tackit.domain.entity.Member;
+import org.example.tackit.domain.entity.Post;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.TipPost;
 
@@ -18,6 +19,7 @@ public class TipPostCreateDTO {
                 .content(this.content)
                 .writer(writer)
                 .organization(org)
+                .type(Post.Tip)
                 .createdAt(LocalDateTime.now())
                 .status(Status.ACTIVE)
                 .build();

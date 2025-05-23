@@ -5,10 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.entity.TipPost;
-import org.example.tackit.domain.entity.TipScrap;
+import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.Tip_board.dto.response.TipPostDTO;
@@ -60,12 +57,16 @@ public class TipService {
                 .build();
     }
 
-    // [ 게시글 작성 ]
+    // [ 게시글 작성 ] : 선임자만 가능
     @Transactional
     public TipPostDTO createPost(TipPostCreateDTO dto, CustomUserDetails user) {
         // 1. 유저 조회
         Member writer = freeMemberJPARepository.findById(user.getId())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
+
+        if (writer.getRole() != Role.SENIOR) {
+            throw new AccessDeniedException("SENIOR만 게시글을 작성할 수 있습니다.");
+        }
 
         // 2. 게시글 생성 : 작성 글, 회원 데이터, 조직 정보
         TipPost newPost = dto.toEntity(writer, user.getOrganization());

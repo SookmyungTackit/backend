@@ -29,7 +29,7 @@ public class TipPost implements ReportablePost {
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
-    private Post type = Post.Tip;
+    private Post type;
     private String organization;
     private int reportCount = 0;
 
