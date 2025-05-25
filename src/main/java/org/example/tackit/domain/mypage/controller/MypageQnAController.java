@@ -6,6 +6,10 @@ import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.mypage.dto.response.QnAMyCommentResponseDto;
 import org.example.tackit.domain.mypage.dto.response.QnAMyPostResponseDto;
 import org.example.tackit.domain.mypage.service.MyPageQnAService;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,14 +27,24 @@ public class MypageQnAController {
 
     // 질문게시판) 내가 쓴 게시글 조회
     @GetMapping("/qna_posts")
-    public ResponseEntity<List<QnAMyPostResponseDto>> getMyQnaPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(myPageQnAService.getMyPosts(userDetails.getUsername()));
+    public ResponseEntity<PageResponseDTO<QnAMyPostResponseDto>> getMyQnaPosts(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 5) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                myPageQnAService.getMyPosts(userDetails.getUsername(), pageable)
+        );
     }
 
     // 질문게시판) 내가 쓴 댓글 조회
     @GetMapping("/qna_comments")
-    public ResponseEntity<List<QnAMyCommentResponseDto>> getMyQnaComments(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(myPageQnAService.getMyComments(userDetails.getUsername()));
+    public ResponseEntity<PageResponseDTO<QnAMyCommentResponseDto>> getMyQnaComments(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 5) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                myPageQnAService.getMyComments(userDetails.getUsername(), pageable)
+        );
     }
 
 }

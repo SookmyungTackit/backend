@@ -17,5 +17,5 @@ public interface QnAPostRepository extends JpaRepository<QnAPost, Long> {
     List<QnAPost> findByType(Post type);
     // 상태로 조회
     Page<QnAPost> findAllByStatusAndWriter_Organization(Status status, String org, Pageable pageable);
-    List<QnAPost> findByWriter(Member member);
+    Page<QnAPost> findByWriterAndStatus(Member writer, Status status, Pageable pageable);
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.tackit.domain.entity.Post;
+import org.example.tackit.domain.entity.QnAComment;
 
 import java.time.LocalDateTime;
 
@@ -18,4 +19,15 @@ public class QnAMyCommentResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private Post type;
+
+    public static QnAMyCommentResponseDto fromEntity(QnAComment comment) {
+        return QnAMyCommentResponseDto.builder()
+                .commentId(comment.getId())
+                .postId(comment.getQnAPost().getId())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .type(comment.getQnAPost().getType())
+                .build();
+    }
+
 }
