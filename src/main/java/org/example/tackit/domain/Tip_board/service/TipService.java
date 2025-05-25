@@ -19,8 +19,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +32,6 @@ public class TipService {
         Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
 
         return PageResponseDTO.from(page, TipPostDTO::fromEntity);
-        // List<TipPost> posts = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE);
-
-        /*
-        return posts.stream()
-                .map(TipPostDTO::new)
-                .collect(Collectors.toList());
-         */
     }
 
     // [ 게시글 상세 조회 ]

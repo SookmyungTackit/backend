@@ -1,7 +1,6 @@
 package org.example.tackit.domain.Free_board.Free_post.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
@@ -9,11 +8,16 @@ import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespD
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeScrapJPARepository;
+import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
 import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
 import org.example.tackit.domain.entity.*;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -24,28 +28,29 @@ import java.util.List;
 public class FreePostService {
     private final FreePostJPARepository freePostJPARepository;
     private final FreeMemberJPARepository freeMemberJPARepository;
-    private final FreeTagService freeTagService;
+    private final FreePostTagService freeService;
     private final FreeScrapJPARepository freeScrapJPARepository;
+    private final FreePostTagMapRepository freePostTagMapRepository;
 
     // [ 게시글 전체 조회 ]
     @Transactional
-    public List<FreePostRespDto> findAll(String org) {
-        List<FreePost> posts = freePostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE);
+    public PageResponseDTO<FreePostRespDto> findAll(String org, Pageable pageable ) {
+        Page<FreePost> page = freePostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
 
-        return posts.stream()
-                .map(post -> {
-                    List<String> tagNames = freeTagService.getTagNamesByPost(post);
+        return PageResponseDTO.from(page, post -> {
+            List<String> tags = freePostTagMapRepository.findByFreePost(post).stream()
+                    .map(mapping -> mapping.getTag().getTagName())
+                    .toList();
 
-                    return FreePostRespDto.builder()
-                            .id(post.getId())
-                            .writer(post.getWriter().getNickname())
-                            .title(post.getTitle())
-                            .content(post.getContent())
-                            .createdAt(post.getCreatedAt())
-                            .tags(tagNames)
-                            .build();
-                })
-                .toList();
+            return FreePostRespDto.builder()
+                    .id(post.getId())
+                    .writer(post.getWriter().getNickname())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .createdAt(post.getCreatedAt())
+                    .tags(tags)
+                    .build();
+        });
     }
 
     // [ 게시글 상세 조회 ]
@@ -62,7 +67,7 @@ public class FreePostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
 
-        List<String> tagNames = freeTagService.getTagNamesByPost(post);
+        List<String> tagNames = freeService.getTagNamesByPost(post);
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -95,7 +100,7 @@ public class FreePostService {
 
         freePostJPARepository.save(post);
 
-        List<String> tagNames = freeTagService.assignTagsToPost(post, dto.getTagIds());
+        List<String> tagNames = freeService.assignTagsToPost(post, dto.getTagIds());
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -108,7 +113,7 @@ public class FreePostService {
 
     }
 
-    // [ 게시글 수정 ] : 작성자, 관리자만
+    // [ 게시글 수정 ] : 작성자만
     @Transactional
     public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) {
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
@@ -118,16 +123,15 @@ public class FreePostService {
                 .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
         boolean isWriter = post.getWriter().getId().equals(member.getId());
-        boolean isAdmin = member.getRole() == Role.ADMIN;
 
-        if (!isAdmin && !isWriter) {
-            throw new AccessDeniedException("작성자 또는 관리자만 수정할 수 있습니다.");
+        if (!isWriter) {
+            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
         post.update(req.getTitle(), req.getContent());
 
-        freeTagService.deleteTagsByPost(post);
-        List<String> tagNames = freeTagService.assignTagsToPost(post, req.getTagIds());
+        freeService.deleteTagsByPost(post);
+        List<String> tagNames = freeService.assignTagsToPost(post, req.getTagIds());
 
         return FreePostRespDto.builder()
                 .id(post.getId())

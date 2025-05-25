@@ -6,10 +6,13 @@ import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqD
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.service.FreePostService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +25,12 @@ public class FreePostController {
 
     // 1. 게시글 전체 조회
     @GetMapping
-    public ResponseEntity<List<FreePostRespDto>> findAllFreePosts(
-            @AuthenticationPrincipal CustomUserDetails user
-    ) {
+    public ResponseEntity<PageResponseDTO<FreePostRespDto>> getAllPosts(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         String org = user.getOrganization();
-        List<FreePostRespDto> posts = freePostService.findAll(org);
-        return ResponseEntity.ok(posts);
+        PageResponseDTO<FreePostRespDto> pageResponse = freePostService.findAll(org, pageable);
+        return ResponseEntity.ok(pageResponse);
     }
 
     // 2. 게시글 상세 조회

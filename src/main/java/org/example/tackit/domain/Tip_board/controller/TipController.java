@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tip-posts")
@@ -35,14 +34,6 @@ public class TipController {
         PageResponseDTO<TipPostDTO> pageResponse = tipService.getActivePostsByOrganization(org, pageable);
         return ResponseEntity.ok(pageResponse);
     }
-    /*
-    @GetMapping
-    public ResponseEntity<List<TipPostDTO>> getAllPosts(@AuthenticationPrincipal CustomUserDetails user) {
-        String org = user.getOrganization();
-        List<TipPostDTO> posts = tipService.getActivePostsByOrganization(org);
-        return ResponseEntity.ok(posts);
-    }
-     */
 
     // 2. 게시글 상세 조회
     @GetMapping("/{id}")

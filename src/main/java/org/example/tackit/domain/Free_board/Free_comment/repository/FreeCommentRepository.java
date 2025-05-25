@@ -1,8 +1,6 @@
 package org.example.tackit.domain.Free_board.Free_comment.repository;
 
-import org.example.tackit.domain.entity.FreeComment;
-import org.example.tackit.domain.entity.FreePost;
-import org.example.tackit.domain.entity.Member;
+import org.example.tackit.domain.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +15,6 @@ public interface FreeCommentRepository extends JpaRepository<FreeComment, Long> 
     // 댓글을 작성한 게시글 조회
     @Query("SELECT DISTINCT fc.freePost FROM FreeComment fc WHERE fc.writer = :writer")
     List<FreePost> findDistinctPostsByWriter(@Param("writer")Member writer);
+
+    List<FreeComment> findByWriter(Member member);
 }

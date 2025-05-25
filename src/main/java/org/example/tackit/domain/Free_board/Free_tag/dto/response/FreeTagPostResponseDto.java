@@ -1,4 +1,4 @@
-package org.example.tackit.domain.Free_board.Free_post.dto.response;
+package org.example.tackit.domain.Free_board.Free_tag.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,16 +11,14 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
-public class FreePostRespDto {
-    private long id;
+public class FreeTagPostResponseDto {
     private final String writer;
     private final String title;
     private final String content;
     private final List<String> tags;
     private final LocalDateTime createdAt;
 
-    public FreePostRespDto(FreePost post, List<String> tags) {
-        this.id = post.getId();
+    public FreeTagPostResponseDto(FreePost post, List<String> tags) {
         this.writer = post.getWriter().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();
