@@ -11,6 +11,9 @@ import org.example.tackit.domain.Tip_board.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.Tip_board.dto.response.TipPostDTO;
 import org.example.tackit.domain.Tip_board.repository.TipPostJPARepository;
 import org.example.tackit.domain.Tip_board.repository.TipScrapRepository;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -26,12 +29,18 @@ public class TipService {
     private final FreeMemberJPARepository freeMemberJPARepository;
     private final TipScrapRepository tipScrapRepository;
 
-    public List<TipPostDTO> getActivePostsByOrganization(String org) {
-        List<TipPost> posts = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE);
 
+    public PageResponseDTO<TipPostDTO> getActivePostsByOrganization(String org, Pageable pageable) {
+        Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
+
+        return PageResponseDTO.from(page, TipPostDTO::fromEntity);
+        // List<TipPost> posts = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE);
+
+        /*
         return posts.stream()
                 .map(TipPostDTO::new)
                 .collect(Collectors.toList());
+         */
     }
 
     // [ 게시글 상세 조회 ]

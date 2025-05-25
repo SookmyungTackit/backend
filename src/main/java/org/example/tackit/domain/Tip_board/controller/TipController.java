@@ -6,6 +6,10 @@ import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.Tip_board.dto.response.TipPostDTO;
 import org.example.tackit.domain.Tip_board.service.TipService;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,11 +28,21 @@ public class TipController {
 
     // 1. 게시글 전체 조회
     @GetMapping
+    public ResponseEntity<PageResponseDTO<TipPostDTO>> getAllPosts(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        String org = user.getOrganization();
+        PageResponseDTO<TipPostDTO> pageResponse = tipService.getActivePostsByOrganization(org, pageable);
+        return ResponseEntity.ok(pageResponse);
+    }
+    /*
+    @GetMapping
     public ResponseEntity<List<TipPostDTO>> getAllPosts(@AuthenticationPrincipal CustomUserDetails user) {
         String org = user.getOrganization();
         List<TipPostDTO> posts = tipService.getActivePostsByOrganization(org);
         return ResponseEntity.ok(posts);
     }
+     */
 
     // 2. 게시글 상세 조회
     @GetMapping("/{id}")
