@@ -10,6 +10,9 @@ import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Post;
 import org.example.tackit.domain.entity.QnAPost;
 import org.example.tackit.domain.entity.QnAScrap;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,23 +62,17 @@ public class QnAScrapService {
     // 내가 찜한 글 불러오기
     // 찜은 사용자 개인이 찜한 글 + 찜할때 이미 소속 검사함 -> 소속확인 필요 x
     @Transactional(readOnly = true)
-    public List<QnACheckScrapResponseDto> getMyQnAScraps(String email) {
+    public PageResponseDTO<QnACheckScrapResponseDto> getMyQnAScraps(String email, Pageable pageable) {
         Member user = qnAMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        return qnAScrapRepository.findByUserAndType(user, Post.QnA).stream()
-                .map(scrap -> {
-                    QnAPost post = scrap.getQnaPost();
-                    return QnACheckScrapResponseDto.builder()
-                            .postId(post.getId())
-                            .title(post.getTitle())
-                            .writer(post.getWriter().getNickname())
-                            .createdAt(post.getCreatedAt())
-                            .type(scrap.getType()) // 항상 QnA이지만 명시
-                            .build();
-                })
-                .toList();
+        Page<QnAScrap> page = qnAScrapRepository.findByUserAndType(user, Post.QnA, pageable);
+
+        return PageResponseDTO.from(page, scrap ->
+                QnACheckScrapResponseDto.fromEntity(scrap.getQnaPost(), scrap.getType())
+        );
     }
+
 
 
 }

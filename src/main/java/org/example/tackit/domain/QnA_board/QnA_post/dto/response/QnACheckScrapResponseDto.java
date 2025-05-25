@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.tackit.domain.entity.Post;
+import org.example.tackit.domain.entity.QnAPost;
 
 import java.time.LocalDateTime;
 
@@ -17,4 +18,15 @@ public class QnACheckScrapResponseDto {
     private String writer;
     private LocalDateTime createdAt;
     private Post type;
+
+    public static QnACheckScrapResponseDto fromEntity(QnAPost post, Post type) {
+        return QnACheckScrapResponseDto.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .writer(post.getWriter().getNickname())
+                .createdAt(post.getCreatedAt())
+                .type(type)
+                .build();
+    }
+
 }
