@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.tackit.domain.entity.Post;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,4 +19,5 @@ public class QnAMyPostResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private List<String> tags;
+    private Post type;
 }

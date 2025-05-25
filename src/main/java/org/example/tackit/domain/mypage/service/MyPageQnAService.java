@@ -40,6 +40,7 @@ public class MyPageQnAService {
                             .content(post.getContent())
                             .createdAt(post.getCreatedAt())
                             .tags(tags)
+                            .type(post.getType())
                             .build();
                 }).toList();
     }
@@ -57,6 +58,7 @@ public class MyPageQnAService {
                         .postId(comment.getQnAPost().getId())
                         .content(comment.getContent())
                         .createdAt(comment.getCreatedAt())
+                        .type(comment.getQnAPost().getType())
                         .build())
                 .toList();
     }
