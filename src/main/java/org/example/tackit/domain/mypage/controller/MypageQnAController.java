@@ -20,13 +20,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mypage")
+@RequestMapping("/api/mypage")
 public class MypageQnAController {
 
     private final MyPageQnAService myPageQnAService;
 
     // 질문게시판) 내가 쓴 게시글 조회
-    @GetMapping("/qna_posts")
+    @GetMapping("/qna-posts")
     public ResponseEntity<PageResponseDTO<QnAMyPostResponseDto>> getMyQnaPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 5) Pageable pageable
@@ -37,7 +37,7 @@ public class MypageQnAController {
     }
 
     // 질문게시판) 내가 쓴 댓글 조회
-    @GetMapping("/qna_comments")
+    @GetMapping("/qna-comments")
     public ResponseEntity<PageResponseDTO<QnAMyCommentResponseDto>> getMyQnaComments(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 5) Pageable pageable

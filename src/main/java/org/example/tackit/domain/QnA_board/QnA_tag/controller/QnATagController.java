@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/qna_tags")
+@RequestMapping("/api/qna-tags")
 public class QnATagController {
     private final QnATagService qnATagService;
 
