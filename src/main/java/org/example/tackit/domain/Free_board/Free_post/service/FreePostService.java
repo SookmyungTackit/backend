@@ -24,6 +24,7 @@ import java.util.List;
 public class FreePostService {
     private final FreePostJPARepository freePostJPARepository;
     private final FreeMemberJPARepository freeMemberJPARepository;
+    private final FreePostTagService freeService;
     private final FreeTagService freeTagService;
     private final FreeScrapJPARepository freeScrapJPARepository;
 
@@ -34,7 +35,7 @@ public class FreePostService {
 
         return posts.stream()
                 .map(post -> {
-                    List<String> tagNames = freeTagService.getTagNamesByPost(post);
+                    List<String> tagNames = freeService.getTagNamesByPost(post);
 
                     return FreePostRespDto.builder()
                             .id(post.getId())
@@ -62,7 +63,7 @@ public class FreePostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
 
-        List<String> tagNames = freeTagService.getTagNamesByPost(post);
+        List<String> tagNames = freeService.getTagNamesByPost(post);
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -95,7 +96,7 @@ public class FreePostService {
 
         freePostJPARepository.save(post);
 
-        List<String> tagNames = freeTagService.assignTagsToPost(post, dto.getTagIds());
+        List<String> tagNames = freeService.assignTagsToPost(post, dto.getTagIds());
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -108,7 +109,7 @@ public class FreePostService {
 
     }
 
-    // [ 게시글 수정 ] : 작성자, 관리자만
+    // [ 게시글 수정 ] : 작성자만
     @Transactional
     public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) {
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
@@ -118,16 +119,15 @@ public class FreePostService {
                 .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
         boolean isWriter = post.getWriter().getId().equals(member.getId());
-        boolean isAdmin = member.getRole() == Role.ADMIN;
 
-        if (!isAdmin && !isWriter) {
-            throw new AccessDeniedException("작성자 또는 관리자만 수정할 수 있습니다.");
+        if (!isWriter) {
+            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
         post.update(req.getTitle(), req.getContent());
 
-        freeTagService.deleteTagsByPost(post);
-        List<String> tagNames = freeTagService.assignTagsToPost(post, req.getTagIds());
+        freeService.deleteTagsByPost(post);
+        List<String> tagNames = freeService.assignTagsToPost(post, req.getTagIds());
 
         return FreePostRespDto.builder()
                 .id(post.getId())

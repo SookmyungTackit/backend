@@ -1,12 +1,14 @@
 package org.example.tackit.domain.Free_board.Free_tag.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.Free_board.Free_post.service.FreePostTagService;
+import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
+import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreeTagRepository;
-import org.example.tackit.domain.entity.FreePost;
-import org.example.tackit.domain.entity.FreeTag;
-import org.example.tackit.domain.entity.FreeTagMap;
+import org.example.tackit.domain.entity.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,30 +18,41 @@ import java.util.List;
 public class FreeTagService {
     private final FreeTagRepository freeTagRepository;
     private final FreePostTagMapRepository freePostTagMapRepository;
+    private final FreePostTagService freePostTagService;
 
-    // 태그 매핑 저장
-    public List<String> assignTagsToPost(FreePost post, List<Long> tagIds) {
-        List<String> tagNames = new ArrayList<>();
-
-        for(Long tagId : tagIds) {
-            FreeTag tag = freeTagRepository.findById(tagId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그입니다."));
-            freePostTagMapRepository.save(FreeTagMap.builder()
-                    .freePost(post)
-                    .tag(tag)
-                    .build());
-            tagNames.add(tag.getTagName());
-        }
-        return tagNames;
+    // 모든 태그 목록 가져오기
+    public List<FreeTagResponseDto> getAllTags() {
+        return freeTagRepository.findAll().stream()
+                .map(tag -> FreeTagResponseDto.builder()
+                        .id(tag.getId())
+                        .tagName(tag.getTagName())
+                        .build())
+                .toList();
     }
 
-    // 게시글에 연결된 모든 태그 삭제
-    public void deleteTagsByPost(FreePost post) { freePostTagMapRepository.deleteAllByFreePost(post); }
+    // 태그별 게시물 불러오기
+    @Transactional(readOnly = true)
+    public List<FreeTagPostResponseDto> getPostsByTag(Long tagId) {
+        FreeTag tag = freeTagRepository.findById(tagId)
+                .orElseThrow(() -> new IllegalArgumentException("태그가 존재하지 않습니다."));
 
-    // 게시글에 연결된 태그 이름 조회
-    public List<String> getTagNamesByPost(FreePost post) {
-        return freePostTagMapRepository.findByFreePost(post).stream()
-                .map(mapping -> mapping.getTag().getTagName())
+        List<FreePost> posts = freePostTagMapRepository.findByTag(tag).stream()
+                .map(FreeTagMap::getFreePost)
+                .filter(post -> post.getStatus() == Status.ACTIVE) // 상태 체크
+                .distinct() // 중복 제거
+                .toList();
+
+        return posts.stream()
+                .map(post -> {
+                    List<String> tagNames = freePostTagService.getTagNamesByPost(post);
+                    return FreeTagPostResponseDto.builder()
+                            .writer(post.getWriter().getNickname())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .createdAt(post.getCreatedAt())
+                            .tags(tagNames)
+                            .build();
+                })
                 .toList();
     }
 }
