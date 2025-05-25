@@ -51,6 +51,8 @@ public class TokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        // "ROLE_" prefix 제거
+        String role = authorities.replace("ROLE_", "");
         String accessToken = generateAccessToken(authentication.getName(), authorities);
         String refreshToken = generateRefreshToken(authentication.getName(), authorities);
 
@@ -61,6 +63,7 @@ public class TokenProvider {
                 .accessToken(accessToken)
                 .accessTokenExpiresIn(now + ACCESS_TOKEN_EXPIRE_TIME)
                 .refreshToken(refreshToken)
+                .role(role)
                 .build();
     }
 
@@ -94,6 +97,8 @@ public class TokenProvider {
         // 새 토큰 생성
         String newAccessToken = generateAccessToken(email, authorities);
         String newRefreshToken = generateRefreshToken(email, authorities);
+        // "ROLE_" prefix 제거
+        String role = authorities.replace("ROLE_", "");
 
         // Redis에 새 토큰 저장 - 기존 값 덮어쓰기
         redisUtil.save(email, newRefreshToken);
@@ -104,6 +109,7 @@ public class TokenProvider {
                 .accessToken(newAccessToken)
                 .accessTokenExpiresIn(new Date((new Date()).getTime() + ACCESS_TOKEN_EXPIRE_TIME).getTime())
                 .refreshToken(newRefreshToken)
+                .role(role)
                 .build();
     }
 
