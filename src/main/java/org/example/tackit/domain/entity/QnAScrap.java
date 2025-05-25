@@ -27,7 +27,6 @@ public class QnAScrap {
     @Column(nullable = false)
     private LocalDateTime savedAt;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Post type;
 
