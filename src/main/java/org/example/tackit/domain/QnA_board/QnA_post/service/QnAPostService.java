@@ -7,6 +7,9 @@ import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponse
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.entity.*;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,25 +110,22 @@ public class QnAPostService {
     }
 
     // 게시글 전체 조회
-    @Transactional(readOnly = true)
-    public List<QnAPostResponseDto> findALl(String org){
-        List<QnAPost> posts = qnAPostRepository.findAllByStatusAndWriter_Organization(Status.ACTIVE, org);
-        return posts
-                .stream()
-                .map(post -> {
-                    List<String> tagNames = tagService.getTagNamesByPost(post);
+    public PageResponseDTO<QnAPostResponseDto> findAll(String org, Pageable pageable) {
+        Page<QnAPost> page = qnAPostRepository.findAllByStatusAndWriter_Organization(Status.ACTIVE, org, pageable);
 
-                    return QnAPostResponseDto.builder()
-                            .postId(post.getId())
-                            .writer(post.getWriter().getNickname())
-                            .title(post.getTitle())
-                            .content(post.getContent())
-                            .createdAt(post.getCreatedAt())
-                            .tags(tagNames)
-                            .build();
-                })
-                .toList();
+        return PageResponseDTO.from(page, post -> {
+            List<String> tagNames = tagService.getTagNamesByPost(post);
+            return QnAPostResponseDto.builder()
+                    .postId(post.getId())
+                    .writer(post.getWriter().getNickname())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .createdAt(post.getCreatedAt())
+                    .tags(tagNames)
+                    .build();
+        });
     }
+
 
     // 게시글 상세 조회
     @Transactional(readOnly = true)

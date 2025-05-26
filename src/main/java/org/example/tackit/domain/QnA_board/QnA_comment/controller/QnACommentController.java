@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/qna_comment")
+@RequestMapping("/api/qna-comment")
 public class QnACommentController {
 
     private final QnACommentService qnACommentService;

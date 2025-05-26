@@ -6,6 +6,10 @@ import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequest
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.service.QnAPostService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/qna_post")
+@RequestMapping("/api/qna-post")
 public class QnAPostController {
     private final QnAPostService qnAPostService;
 
@@ -51,11 +55,15 @@ public class QnAPostController {
 
     // 게시글 전체 조회
     @GetMapping("/list")
-    public ResponseEntity<List<QnAPostResponseDto>> findALlQnAPost(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<PageResponseDTO<QnAPostResponseDto>> findAllQnAPost(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 5) Pageable pageable
+    ) {
         String org = userDetails.getOrganization();
-        List<QnAPostResponseDto> posts = qnAPostService.findALl(org);
-        return ResponseEntity.ok().body(posts);
+        PageResponseDTO<QnAPostResponseDto> page = qnAPostService.findAll(org, pageable);
+        return ResponseEntity.ok(page);
     }
+
 
     // 게시글 상세 조회
     @GetMapping("/{QnAPostId}")
