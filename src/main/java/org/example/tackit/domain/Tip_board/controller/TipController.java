@@ -29,7 +29,7 @@ public class TipController {
     @GetMapping
     public ResponseEntity<PageResponseDTO<TipPostDTO>> getAllPosts(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String org = user.getOrganization();
         PageResponseDTO<TipPostDTO> pageResponse = tipService.getActivePostsByOrganization(org, pageable);
         return ResponseEntity.ok(pageResponse);

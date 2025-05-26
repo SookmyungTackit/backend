@@ -17,8 +17,8 @@ public class TipScrap {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "user_id", nullable = false)
+    private Member user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tip_id", nullable = false)
@@ -27,15 +27,14 @@ public class TipScrap {
     @Column(name = "saved_at", nullable = false)
     private LocalDateTime savedAt;
 
-    @Enumerated(EnumType.STRING)
     private Post type = Post.Tip;
 
     @Builder
-    public TipScrap(Member member, TipPost tipPost) {
-        if (member == null || tipPost == null) {
+    public TipScrap(Member user, TipPost tipPost) {
+        if (user == null || tipPost == null) {
             throw new IllegalArgumentException("회원 또는 게시글은 null일 수 없습니다.");
         }
-        this.member = member;
+        this.user = user;
         this.tipPost = tipPost;
         this.savedAt = LocalDateTime.now();
     }
