@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/free-posts")
@@ -27,7 +26,7 @@ public class FreePostController {
     @GetMapping
     public ResponseEntity<PageResponseDTO<FreePostRespDto>> getAllPosts(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         String org = user.getOrganization();
         PageResponseDTO<FreePostRespDto> pageResponse = freePostService.findAll(org, pageable);
         return ResponseEntity.ok(pageResponse);
