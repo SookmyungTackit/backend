@@ -1,9 +1,6 @@
 package org.example.tackit.domain.QnA_board.QnA_post.repository;
 
-import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.Post;
-import org.example.tackit.domain.entity.QnAPost;
-import org.example.tackit.domain.entity.QnAScrap;
+import org.example.tackit.domain.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -16,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface QnAScrapRepository extends JpaRepository<QnAScrap, Long> {
     Optional<QnAScrap> findByUserAndQnaPost(Member user, QnAPost qnaPost);
-    void deleteByUserAndQnaPost(Member user, QnAPost qnaPost);
     @EntityGraph(attributePaths = {"qnaPost", "qnaPost.writer"}) // 페이징 함께 지원, writer까지 fetch해서 n+1방지
-    Page<QnAScrap> findByUserAndType(Member user, Post type, Pageable pageable);
+    Page<QnAScrap> findByUserAndQnaPost_Status(Member user, Status status, Pageable pageable);
+
 }

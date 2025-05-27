@@ -2,14 +2,12 @@ package org.example.tackit.domain.QnA_board.QnA_post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnACheckScrapResponseDto;
+import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAScrapResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAScrapRepository;
-import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.Post;
-import org.example.tackit.domain.entity.QnAPost;
-import org.example.tackit.domain.entity.QnAScrap;
+import org.example.tackit.domain.entity.*;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +25,7 @@ public class QnAScrapService {
     private final QnAScrapRepository qnAScrapRepository;
     private final QnAPostRepository qnAPostRepository;
     private final QnAMemberRepository qnAMemberRepository;
+    private final QnAPostTagService tagService;
 
 
     // 스크랩한적 있으면 스크랩 취소, 없으면 저장
@@ -66,13 +65,15 @@ public class QnAScrapService {
         Member user = qnAMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Page<QnAScrap> page = qnAScrapRepository.findByUserAndType(user, Post.QnA, pageable);
+        Page<QnAScrap> page = qnAScrapRepository.findByUserAndQnaPost_Status(user,Status.ACTIVE, pageable);
 
-        return PageResponseDTO.from(page, scrap ->
-                QnACheckScrapResponseDto.fromEntity(scrap.getQnaPost(), scrap.getType())
-        );
+        // Page -> PageResponseDTO로 변환
+        return PageResponseDTO.from(page, scrap -> {
+            QnAPost post = scrap.getQnaPost();
+            List<String> tagNames = tagService.getTagNamesByPost(post);
+            return QnACheckScrapResponseDto.fromEntity(post, Post.QnA, tagNames);
+        });
     }
-
 
 
 }
