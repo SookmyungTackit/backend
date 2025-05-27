@@ -16,7 +16,7 @@ public class FreeScrap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -24,9 +24,13 @@ public class FreeScrap {
     @JoinColumn(name = "free_id", nullable = false)
     private FreePost freePost;
 
-    private LocalDateTime saved_at;
+    @Column(name = "saved_at", nullable = false)
+    private LocalDateTime savedAt;
 
     private Post type = Post.Free;
+
+    @Column(nullable = true)
+    private String tag;
 
     @Builder
     public FreeScrap(Member member, FreePost freePost) {
@@ -35,7 +39,8 @@ public class FreeScrap {
         }
         this.member = member;
         this.freePost = freePost;
-        this.saved_at = LocalDateTime.now();
+        this.savedAt = LocalDateTime.now();
+        this.tag = freePost.getTag();
     }
 
 

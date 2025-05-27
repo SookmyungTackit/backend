@@ -115,7 +115,7 @@ public class TipService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
         // 3. 중복 스크랩 방지
-        boolean alreadyScrapped = tipScrapRepository.existsByUserAndTipPost(member, post);
+        boolean alreadyScrapped = tipScrapRepository.existsByMemberAndTipPost(member, post);
         if (alreadyScrapped) {
             throw new IllegalStateException("이미 스크랩한 게시글입니다.");
         }

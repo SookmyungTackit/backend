@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class TipController {
     private final TipService tipService;
 
-    public TipController(final TipService tipService, MemberService memberService) {
+    public TipController(final TipService tipService) {
         this.tipService = tipService;
     }
 
