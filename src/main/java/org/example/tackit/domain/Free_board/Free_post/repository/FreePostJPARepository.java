@@ -10,8 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FreePostJPARepository extends JpaRepository<FreePost, Long> {
-    List<FreePost> findByOrganizationAndStatus(String organization, Status status);
-
     List<FreePost> findByWriter(Member member);
 
     Page<FreePost> findByOrganizationAndStatus(String organization, Status status, Pageable pageable);

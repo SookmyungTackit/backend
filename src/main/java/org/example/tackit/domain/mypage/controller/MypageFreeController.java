@@ -6,6 +6,10 @@ import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.mypage.dto.response.*;
 import org.example.tackit.domain.mypage.service.MemberService;
 import org.example.tackit.domain.mypage.service.MyPageFreeService;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,25 +23,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MypageFreeController {
     private final MyPageFreeService myPageFreeService;
-    private final MemberService memberService;
 
-    @GetMapping("/free_scraps")
-    public ResponseEntity<List<FreeScrapResponse>> getMyFreeScraps(
-            @AuthenticationPrincipal CustomUserDetails user) {
-
-        Member member = memberService.getMemberByEmail(user.getEmail());
-        List<FreeScrapResponse> scraps = myPageFreeService.getScrapListByMember(member);
-        return ResponseEntity.ok(scraps);
+    // 스크랩한 자유 게시글
+    @GetMapping("/free-scraps")
+    public ResponseEntity<PageResponseDTO<FreeScrapResponse>> getMyFreeScraps(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PageableDefault(size = 5, sort = "savedAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(myPageFreeService.getScrapListByMember(user.getEmail(), pageable));
     }
 
-    @GetMapping("/free_posts")
+    // 내가 작성한 자유 게시글
+    @GetMapping("/free-posts")
     public ResponseEntity<List<FreeMyPostResponseDto>> getMyTipPosts(
             @AuthenticationPrincipal CustomUserDetails user) {
         return ResponseEntity.ok(myPageFreeService.getMyPosts(user.getUsername()));
     }
 
-    // 질문게시판) 내가 쓴 댓글 조회
-    @GetMapping("/free_comments")
+    // 내가 쓴 댓글 조회
+    @GetMapping("/free-comments")
     public ResponseEntity<List<FreeMyCommentResponseDto>> getMyQnaComments(@AuthenticationPrincipal CustomUserDetails user) {
         return ResponseEntity.ok(myPageFreeService.getMyComments(user.getUsername()));
     }

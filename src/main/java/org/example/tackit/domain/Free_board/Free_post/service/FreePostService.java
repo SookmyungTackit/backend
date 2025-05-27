@@ -9,7 +9,6 @@ import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARe
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeScrapJPARepository;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
-import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;

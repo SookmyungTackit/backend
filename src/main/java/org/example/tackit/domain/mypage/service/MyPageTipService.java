@@ -30,28 +30,15 @@ public class MyPageTipService {
     // 스크랩한 tip 게시글 조회
     @Transactional
     public PageResponseDTO<TipScrapResponse> getScrapListByMember(String email, Pageable pageable) {
-        Member user = memberRepository.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Page<TipScrap> page = tipScrapRepository.findByUserAndType(user, Post.Tip, pageable);
+        Page<TipScrap> page = tipScrapRepository.findByMemberAndType(member, Post.Tip, pageable);
 
         return PageResponseDTO.from(page, scrap ->
                 TipScrapResponse.from(scrap, scrap.getType())
         );
     }
-    /*
-    @Transactional(readOnly = true)
-    public PageResponseDTO<QnACheckScrapResponseDto> getMyQnAScraps(String email, Pageable pageable) {
-        Member user = qnAMemberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Page<QnAScrap> page = qnAScrapRepository.findByUserAndType(user, Post.QnA, pageable);
-
-        return PageResponseDTO.from(page, scrap ->
-                QnACheckScrapResponseDto.fromEntity(scrap.getQnaPost(), scrap.getType())
-        );
-    }
-     */
 
     // 내가 쓴 tip 게시글 조회
     @Transactional(readOnly = true)

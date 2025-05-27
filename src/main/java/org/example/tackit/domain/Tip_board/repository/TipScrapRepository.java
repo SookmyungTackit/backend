@@ -5,12 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
 
 public interface TipScrapRepository extends JpaRepository<TipScrap, Long> {
-    boolean existsByUserAndTipPost(Member user, TipPost tipPost);
-    List<TipScrap> findByUser(Member user);
-    Optional<TipScrap> findByUserAndTipPost(Member user, TipPost tipPost);
-    Page<TipScrap> findByUserAndType(Member user, Post type, Pageable pageable);
+    boolean existsByMemberAndTipPost(Member member, TipPost tipPost);
+    Page<TipScrap> findByMemberAndType(Member member, Post type, Pageable pageable);
 }
