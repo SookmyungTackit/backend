@@ -28,12 +28,12 @@ public class QnATagController {
         return ResponseEntity.ok(qnATagService.getAllTags());
     }
 
- /*   // 특정 태그가 포함된 게시글 리스트 조회
+    // 특정 태그가 포함된 게시글 리스트 조회
     @GetMapping("/{tagId}/posts")
     public ResponseEntity<PageResponseDTO<QnATagPostResponseDto>> getPostsByTag(
             @PathVariable Long tagId,
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(qnATagService.getPostsByTag(tagId, pageable));
-    }*/
+    }
 }
