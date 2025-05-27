@@ -58,3 +58,4 @@
 - Jwt
 - Redis
 - jsonNullable
+- queryDSL
