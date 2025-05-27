@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -99,9 +100,12 @@ public class QnAPostService {
     // 게시글 전체 조회
     public PageResponseDTO<QnAPostResponseDto> findAll(String org, Pageable pageable) {
         Page<QnAPost> page = qnAPostRepository.findAllByStatusAndWriter_Organization(Status.ACTIVE, org, pageable);
+        List<QnAPost> posts = page.getContent();
+
+        Map<Long, List<String>> tagMap = tagService.getTagNamesByPosts(posts); 
 
         return PageResponseDTO.from(page, post -> {
-            List<String> tagNames = tagService.getTagNamesByPost(post);
+            List<String> tagNames = tagMap.getOrDefault(post.getId(), List.of());
             return QnAPostResponseDto.fromEntity(post, tagNames);
         });
     }
