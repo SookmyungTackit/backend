@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.example.tackit.domain.admin.model.ReportablePost;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,12 +32,13 @@ public class QnAPost implements ReportablePost {
     private Post type;
     private String organization;
 
-    @Column(nullable = true)
-    private String tag;
-
     @Enumerated(EnumType.STRING)
     private Status status;
     private int reportCount;
+
+    // QnATagMap 연관관계 추가
+    @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QnATagMap> tagMaps = new ArrayList<>();
 
     public void update(String title, String content){
         this.title = title;
@@ -61,6 +64,5 @@ public class QnAPost implements ReportablePost {
         this.status = Status.ACTIVE;
         this.reportCount = 0;
     }
-
 
 }

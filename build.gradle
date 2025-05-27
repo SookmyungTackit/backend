@@ -47,6 +47,12 @@ dependencies {
 
     //openapitools 설치 - jsonNullable
     implementation 'org.openapitools:jackson-databind-nullable:0.2.4'
+
+    // querydsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
 tasks.named('test') {

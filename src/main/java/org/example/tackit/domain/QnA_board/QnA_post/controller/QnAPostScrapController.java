@@ -35,7 +35,7 @@ public class QnAPostScrapController {
     @GetMapping("/scrap")
     public ResponseEntity<PageResponseDTO<QnACheckScrapResponseDto>> getMyScraps(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 5, sort = "savedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(qnAScrapService.getMyQnAScraps(userDetails.getEmail(), pageable));
     }

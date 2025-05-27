@@ -15,7 +15,6 @@ public interface QnAPostTagMapRepository extends JpaRepository<QnATagMap, Long> 
     // 게시글에 연결된 태그 매핑 조회
     List<QnATagMap> findByQnaPost(QnAPost qnaPost);
     // 특정 태그에 연결된 게시글 조회
-    List<QnATagMap> findByTag(QnATag tag);
     List<QnATagMap> findByQnaPostIn(List<QnAPost> posts);
 
 }
