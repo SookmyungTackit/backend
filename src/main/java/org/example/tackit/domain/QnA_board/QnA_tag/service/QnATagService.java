@@ -33,29 +33,29 @@ public class QnATagService {
                 .toList();
     }
 
-    // 태그별 게시물 불러오기
-    @Transactional(readOnly = true)
-    public List<QnATagPostResponseDto> getPostsByTag(Long tagId) {
-        QnATag tag = qnATagRepository.findById(tagId)
-                .orElseThrow(() -> new IllegalArgumentException("태그가 존재하지 않습니다."));
-
-        List<QnAPost> posts = qnAPostTagMapRepository.findByTag(tag).stream()
-                .map(QnATagMap::getQnaPost)
-                .filter(post -> post.getStatus() == Status.ACTIVE) // 상태 체크
-                .distinct() // 중복 제거
-                .toList();
-
-        return posts.stream()
-                .map(post -> {
-                    List<String> tagNames = qnAPostTagService.getTagNamesByPost(post);
-                    return QnATagPostResponseDto.builder()
-                            .writer(post.getWriter().getNickname())
-                            .title(post.getTitle())
-                            .content(post.getContent())
-                            .createdAt(post.getCreatedAt())
-                            .tags(tagNames)
-                            .build();
-                })
-                .toList();
-    }
+//    // 태그별 게시물 불러오기
+//    @Transactional(readOnly = true)
+//    public List<QnATagPostResponseDto> getPostsByTag(Long tagId) {
+//        QnATag tag = qnATagRepository.findById(tagId)
+//                .orElseThrow(() -> new IllegalArgumentException("태그가 존재하지 않습니다."));
+//
+//        List<QnAPost> posts = qnAPostTagMapRepository.findByTag(tag).stream()
+//                .map(QnATagMap::getQnaPost)
+//                .filter(post -> post.getStatus() == Status.ACTIVE) // 상태 체크
+//                .distinct() // 중복 제거
+//                .toList();
+//
+//        return posts.stream()
+//                .map(post -> {
+//                    List<String> tagNames = qnAPostTagService.getTagNamesByPost(post);
+//                    return QnATagPostResponseDto.builder()
+//                            .writer(post.getWriter().getNickname())
+//                            .title(post.getTitle())
+//                            .content(post.getContent())
+//                            .createdAt(post.getCreatedAt())
+//                            .tags(tagNames)
+//                            .build();
+//                })
+//                .toList();
+//    }
 }

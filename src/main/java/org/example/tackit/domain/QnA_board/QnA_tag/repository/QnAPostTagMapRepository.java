@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface QnAPostTagMapRepository extends JpaRepository<QnATagMap, Long> {
+public interface QnAPostTagMapRepository extends JpaRepository<QnATagMap, Long>, QnATagCustomRepository {
     // 게시글에 연결된 모든 태그 매핑 삭제
     void deleteAllByQnaPost(QnAPost qnaPost);
     // 게시글에 연결된 태그 매핑 조회

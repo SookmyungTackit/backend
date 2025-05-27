@@ -41,6 +41,7 @@ public class QnAPostService {
                 .content(dto.getContent())
                 .createdAt(LocalDateTime.now())
                 .type(Post.QnA)
+                .organization(org)
                 .status(Status.ACTIVE)
                 .reportCount(0)
                 .build();
@@ -49,14 +50,7 @@ public class QnAPostService {
 
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
-        return QnAPostResponseDto.builder()
-                .postId(post.getId())
-                .writer(member.getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .createdAt(post.getCreatedAt())
-                .tags(tagNames)
-                .build();
+        return QnAPostResponseDto.fromEntity(post, tagNames);
     }
 
     // 게시글 수정 (작성자만 가능)
@@ -80,14 +74,7 @@ public class QnAPostService {
         tagService.deleteTagsByPost(post); // 기존 태그 삭제
         List<String> tagNames = tagService.assignTagsToPost(post, request.getTagIds()); // 새 태그 등록
 
-        return QnAPostResponseDto.builder()
-                .postId(post.getId())
-                .writer(post.getWriter().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .createdAt(post.getCreatedAt())
-                .tags(tagNames)
-                .build();
+        return QnAPostResponseDto.fromEntity(post, tagNames);
     }
 
     // 게시글 삭제 (작성자, 관리자만 가능)
@@ -106,7 +93,7 @@ public class QnAPostService {
             throw new AccessDeniedException("작성자 또는 관리자만 삭제할 수 있습니다.");
         }
        // tagService.deleteTagsByPost(post);
-        post.markAsDeleted(); //Deleted로 soft delete
+        post.markAsDeleted(); //Deleted로 -> soft delete
     }
 
     // 게시글 전체 조회
@@ -115,14 +102,7 @@ public class QnAPostService {
 
         return PageResponseDTO.from(page, post -> {
             List<String> tagNames = tagService.getTagNamesByPost(post);
-            return QnAPostResponseDto.builder()
-                    .postId(post.getId())
-                    .writer(post.getWriter().getNickname())
-                    .title(post.getTitle())
-                    .content(post.getContent())
-                    .createdAt(post.getCreatedAt())
-                    .tags(tagNames)
-                    .build();
+            return QnAPostResponseDto.fromEntity(post, tagNames);
         });
     }
 
@@ -138,14 +118,7 @@ public class QnAPostService {
         }
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
-        return QnAPostResponseDto.builder()
-                .postId(post.getId())
-                .writer(post.getWriter().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .tags(tagNames)
-                .createdAt(post.getCreatedAt())
-                .build();
+        return QnAPostResponseDto.fromEntity(post, tagNames);
     }
 
     // 게시글 신고하기

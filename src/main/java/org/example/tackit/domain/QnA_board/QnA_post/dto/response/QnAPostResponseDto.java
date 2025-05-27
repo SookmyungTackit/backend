@@ -20,12 +20,14 @@ public class QnAPostResponseDto {
     private final List<String> tags;
     private final LocalDateTime createdAt;
 
-    public QnAPostResponseDto(QnAPost post, List<String> tags) {
-        this.postId = post.getId();
-        this.writer = post.getWriter().getNickname();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.tags = tags;
-        this.createdAt = post.getCreatedAt();
+    public static QnAPostResponseDto fromEntity(QnAPost post, List<String> tagNames) {
+        return QnAPostResponseDto.builder()
+                .postId(post.getId())
+                .writer(post.getWriter().getNickname())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .tags(tagNames)
+                .createdAt(post.getCreatedAt())
+                .build();
     }
 }
