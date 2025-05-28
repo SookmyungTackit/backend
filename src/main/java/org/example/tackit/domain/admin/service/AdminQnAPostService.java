@@ -7,23 +7,21 @@ import org.example.tackit.domain.admin.dto.ReportedPostDTO;
 import org.example.tackit.domain.admin.repository.AdminQnAPostRepository;
 import org.example.tackit.domain.entity.QnAPost;
 import org.example.tackit.domain.entity.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AdminQnAPostService implements ReportedPostService {
     private final AdminQnAPostRepository adminQnAPostRepository;
 
-    // 비활성화 게시글 전체 조회
+    // 비활성화 질문 게시글 전체 조회
     @Override
-    public List<ReportedPostDTO> getDeletedPosts() {
-        return adminQnAPostRepository.findAllByStatus(Status.DELETED)
-                .stream()
-                .map(ReportedPostDTO::fromEntity)
-                .collect(Collectors.toList());
+    public Page<ReportedPostDTO> getDeletedPosts(Pageable pageable) {
+        return adminQnAPostRepository.findAllByStatus(Status.DELETED, pageable)
+                .map(ReportedPostDTO::fromEntity);
     }
 
     // 신고 게시글 완전 삭제

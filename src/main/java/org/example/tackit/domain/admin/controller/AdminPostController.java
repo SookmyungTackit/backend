@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.admin.dto.ReportedPostDTO;
 import org.example.tackit.domain.admin.service.ReportedPostService;
 import org.example.tackit.domain.entity.Post;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,15 +23,17 @@ public class AdminPostController {
 
     // 신고된 게시글 조회
     @GetMapping("/{postType}/posts")
-    public ResponseEntity<List<ReportedPostDTO>> getReportedPosts(@PathVariable("postType") Post postType) {
+    public ResponseEntity<PageResponseDTO<ReportedPostDTO>> getReportedPosts(
+            @PathVariable("postType") Post postType,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         ReportedPostService service = reportedPostServices.get(postType);
 
         if (service == null) {
             throw new IllegalArgumentException("지원하지 않는 게시글 유형입니다: " + postType);
         }
 
-        List<ReportedPostDTO> reportedPosts = service.getDeletedPosts();
-        return ResponseEntity.ok(reportedPosts);
+        Page<ReportedPostDTO> posts = service.getDeletedPosts(pageable);
+        return ResponseEntity.ok(PageResponseDTO.from(posts));
     }
 
     // 게시글 완전 삭제
