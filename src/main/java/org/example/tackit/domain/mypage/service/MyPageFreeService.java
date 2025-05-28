@@ -49,24 +49,27 @@ public class MyPageFreeService {
 
     // 내가 쓴 자유 게시글 조회
     @Transactional(readOnly = true)
-    public List<FreeMyPostResponseDto> getMyPosts(String email) {
+    public PageResponseDTO<FreeMyPostResponseDto> getMyPosts(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        return freePostJPARepository.findByWriter(member).stream()
-                .filter(post -> post.getStatus() == Status.ACTIVE)
-                .map((FreePost post) -> {
-                    List<String> tags = freePostTagMapRepository.findByFreePost(post).stream()
-                            .map(mapping -> mapping.getTag().getTagName())
-                            .toList();
-                    return FreeMyPostResponseDto.builder()
-                            .postId(post.getId())
-                            .title(post.getTitle())
-                            .content(post.getContent())
-                            .createdAt(post.getCreatedAt())
-                            .tags(tags)
-                            .build();
-                }).toList();
+        Page<FreePost> page = freePostJPARepository.findByWriter(member, pageable);
+
+        return PageResponseDTO.from(page, post -> {
+            List<String> tags = freePostTagMapRepository.findByFreePost(post).stream()
+                    .map(mapping -> mapping.getTag().getTagName())
+                    .toList();
+
+            return FreeMyPostResponseDto.builder()
+                    .id(post.getId())
+                    .writer(post.getWriter().getNickname())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .tags(tags)
+                    .type(post.getType())
+                    .createdAt(post.getCreatedAt())
+                    .build();
+        });
     }
 
     // 내가 쓴 댓글 조회

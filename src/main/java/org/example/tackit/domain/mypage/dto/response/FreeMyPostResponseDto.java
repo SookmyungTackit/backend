@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.tackit.domain.entity.Post;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,9 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FreeMyPostResponseDto {
-    private Long postId;
+    private Long id;
+    private String writer;
     private String title;
     private String content;
-    private LocalDateTime createdAt;
     private List<String> tags;
+    private Post type;
+    private LocalDateTime createdAt;
 }
