@@ -35,10 +35,13 @@ public class MypageFreeController {
 
     // 내가 작성한 자유 게시글
     @GetMapping("/free-posts")
-    public ResponseEntity<List<FreeMyPostResponseDto>> getMyTipPosts(
-            @AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.ok(myPageFreeService.getMyPosts(user.getUsername()));
+    public ResponseEntity<PageResponseDTO<FreeMyPostResponseDto>> getMyFreePosts(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        return ResponseEntity.ok(myPageFreeService.getMyPosts(user.getUsername(), pageable));
     }
+
 
     // 내가 쓴 댓글 조회
     @GetMapping("/free-comments")

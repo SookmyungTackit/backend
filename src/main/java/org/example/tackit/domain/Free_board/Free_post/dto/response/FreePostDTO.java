@@ -11,14 +11,14 @@ public class FreePostDTO {
     private final String title;
     private final String content;
     private final String tag;
-    private final LocalDateTime created_at;
+    private final LocalDateTime createdAt;
 
     public FreePostDTO(FreePost post) {
         this.writer = post.getWriter().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tag = post.getTag();
-        this.created_at = post.getCreatedAt();
+        this.createdAt = post.getCreatedAt();
 
     }
 

@@ -20,7 +20,7 @@ public class FreePost implements ReportablePost {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member writer;
 
     private String title;
