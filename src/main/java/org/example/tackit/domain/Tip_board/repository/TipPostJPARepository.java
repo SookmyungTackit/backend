@@ -15,4 +15,6 @@ public interface TipPostJPARepository extends JpaRepository<TipPost, Long> {
 
     Page<TipPost> findByOrganizationAndStatus(String organization, Status status, Pageable pageable);
 
+    Page<TipPost> findByWriterAndStatus(Member writer, Status status, Pageable pageable );
+
 }
