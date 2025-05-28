@@ -7,10 +7,10 @@ import org.example.tackit.domain.admin.dto.ReportedPostDTO;
 import org.example.tackit.domain.admin.repository.AdminTipPostRepository;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.TipPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +19,9 @@ public class AdminTipPostService implements ReportedPostService{
 
     // 비활성화 게시글 전체 조회
     @Override
-    public List<ReportedPostDTO> getDeletedPosts() {
-        return adminTipPostRepository.findAllByStatus(Status.DELETED)
-                .stream()
-                .map(ReportedPostDTO::fromEntity)
-                .collect(Collectors.toList());
+    public Page<ReportedPostDTO> getDeletedPosts(Pageable pageable) {
+        return adminTipPostRepository.findAllByStatus(Status.DELETED, pageable)
+                .map(ReportedPostDTO::fromEntity);
     }
 
     // 신고 게시글 완전 삭제

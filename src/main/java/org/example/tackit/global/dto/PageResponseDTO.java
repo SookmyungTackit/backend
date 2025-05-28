@@ -27,4 +27,8 @@ public class PageResponseDTO<T> {
         return new PageResponseDTO<>(mapped);
     }
 
+    public static <T> PageResponseDTO<T> from(Page<T> page) {
+        return new PageResponseDTO<>(page);
+    }
+
 }
