@@ -3,10 +3,7 @@ package org.example.tackit.domain.mypage.service;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Tip_board.repository.TipPostJPARepository;
 import org.example.tackit.domain.admin.repository.MemberRepository;
-import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.Post;
-import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.entity.TipScrap;
+import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.mypage.dto.response.QnAMyPostResponseDto;
 import org.example.tackit.domain.mypage.dto.response.TipMyPostResponseDto;
 import org.example.tackit.domain.mypage.dto.response.TipScrapResponse;
@@ -42,19 +39,19 @@ public class MyPageTipService {
 
     // 내가 쓴 tip 게시글 조회
     @Transactional(readOnly = true)
-    public List<TipMyPostResponseDto> getMyPosts(String email) {
+    public PageResponseDTO<TipMyPostResponseDto> getMyPosts(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        return tipPostJPARepository.findByWriter(member).stream()
-                .filter(post -> post.getStatus() == Status.ACTIVE)
-                .map(post -> TipMyPostResponseDto.builder()
-                        .postId(post.getId())
-                        .title(post.getTitle())
-                        .content(post.getContent())
-                        .createdAt(post.getCreatedAt())
-                        .build()
-                ).toList();
+        Page<TipPost> posts = tipPostJPARepository.findByWriterAndStatus(member, Status.ACTIVE, pageable);
+
+        return PageResponseDTO.from(posts, post -> TipMyPostResponseDto.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .type(post.getType())
+                .createdAt(post.getCreatedAt())
+                .build());
     }
 
 

@@ -6,6 +6,7 @@ import org.example.tackit.domain.mypage.dto.response.TipMyPostResponseDto;
 import org.example.tackit.domain.mypage.dto.response.TipScrapResponse;
 import org.example.tackit.domain.mypage.service.MyPageTipService;
 import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/api/mypage")
@@ -32,8 +34,10 @@ public class MypageTipController {
     }
 
     @GetMapping("/tip-posts")
-    public ResponseEntity<List<TipMyPostResponseDto>> getMyTipPosts(
-            @AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.ok(mypageTipService.getMyPosts(user.getUsername()));
+    public ResponseEntity<PageResponseDTO<TipMyPostResponseDto>> getMyTipPosts(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        return ResponseEntity.ok(mypageTipService.getMyPosts(user.getEmail(), pageable));
     }
 }
