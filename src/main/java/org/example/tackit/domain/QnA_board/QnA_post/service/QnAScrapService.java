@@ -2,7 +2,6 @@ package org.example.tackit.domain.QnA_board.QnA_post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnACheckScrapResponseDto;
-import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAScrapResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -66,11 +66,15 @@ public class QnAScrapService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         Page<QnAScrap> page = qnAScrapRepository.findByUserAndQnaPost_Status(user,Status.ACTIVE, pageable);
+        List<QnAPost> posts = page.getContent().stream() // 실제 스크랩들 꺼냄
+                .map(QnAScrap::getQnaPost) // 각 스크랩에서 게시글 꺼냄
+                .toList(); // 게시글 리스트들 만들기
 
-        // Page -> PageResponseDTO로 변환
+        Map<Long, List<String>> tagMap = tagService.getTagNamesByPosts(posts);
+
         return PageResponseDTO.from(page, scrap -> {
             QnAPost post = scrap.getQnaPost();
-            List<String> tagNames = tagService.getTagNamesByPost(post);
+            List<String> tagNames = tagMap.getOrDefault(post.getId(), List.of());
             return QnACheckScrapResponseDto.fromEntity(post, Post.QnA, tagNames);
         });
     }
