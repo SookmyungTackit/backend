@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FreeTagRepository extends JpaRepository<FreeTag, Long> {
+public interface FreeTagRepository extends JpaRepository<FreeTag, Long>, FreeTagCustomRepository {
     Optional<QnATag> findByTagName(String tagName);
 }

@@ -12,13 +12,15 @@ import java.util.List;
 @Getter
 @Builder
 public class FreeTagPostResponseDto {
+    private final Long postId;
     private final String writer;
     private final String title;
     private final String content;
     private final List<String> tags;
     private final LocalDateTime createdAt;
 
-    public FreeTagPostResponseDto(FreePost post, List<String> tags) {
+    public FreeTagPostResponseDto(Long postId, FreePost post, List<String> tags) {
+        this.postId = postId;
         this.writer = post.getWriter().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();

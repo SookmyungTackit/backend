@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.example.tackit.domain.admin.model.ReportablePost;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,6 +37,10 @@ public class FreePost implements ReportablePost {
     @Enumerated(EnumType.STRING)
     private Status status;
     private int reportCount = 0;
+
+    // FreeTagMap 연관관계 추가
+    @OneToMany(mappedBy = "freePost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FreeTagMap> tagMaps = new ArrayList<>();
 
     public void update(String title, String content) {
         this.title = title;

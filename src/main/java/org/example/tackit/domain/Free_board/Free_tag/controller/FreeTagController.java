@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
+import org.example.tackit.domain.QnA_board.QnA_tag.dto.response.QnATagPostResponseDto;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +31,10 @@ public class FreeTagController {
 
     // 특정 태그가 포함된 게시글 리스트 조회
     @GetMapping("/{tagId}/posts")
-    public ResponseEntity<List<FreeTagPostResponseDto>> getPostsByTag(@PathVariable Long tagId) {
-        List<FreeTagPostResponseDto> posts = freeTagService.getPostsByTag(tagId);
-        return ResponseEntity.ok(posts);
+    public ResponseEntity<PageResponseDTO<FreeTagPostResponseDto>> getPostsByTag(
+            @PathVariable Long tagId,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(freeTagService.getFreePostsByTag(tagId, pageable));
     }
 }

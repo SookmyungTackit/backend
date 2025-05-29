@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="qna_tag", uniqueConstraints = @UniqueConstraint(name = "uq_tag_tagname", columnNames = "tagName") )
+@Table(name="qna_tag", uniqueConstraints = @UniqueConstraint(name = "qna_uq_tag_tagname", columnNames = "tagName") )
 public class QnATag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
