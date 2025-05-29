@@ -42,11 +42,14 @@ public class MypageFreeController {
         return ResponseEntity.ok(myPageFreeService.getMyPosts(user.getUsername(), pageable));
     }
 
-
     // 내가 쓴 댓글 조회
     @GetMapping("/free-comments")
-    public ResponseEntity<List<FreeMyCommentResponseDto>> getMyQnaComments(@AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.ok(myPageFreeService.getMyComments(user.getUsername()));
+    public ResponseEntity<PageResponseDTO<FreeMyCommentResponseDto>> getMyFreeComments(
+         @AuthenticationPrincipal CustomUserDetails user,
+         @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        return ResponseEntity.ok(myPageFreeService.getMyComments(user.getUsername(), pageable));
+
     }
 
 }

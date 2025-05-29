@@ -9,15 +9,12 @@ import org.example.tackit.domain.Free_board.Free_comment.dto.resp.FreeCommentRes
 import org.example.tackit.domain.Free_board.Free_comment.repository.FreeCommentRepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
-import org.example.tackit.domain.QnA_board.QnA_comment.dto.response.QnACommentResponseDto;
 import org.example.tackit.domain.entity.FreeComment;
 import org.example.tackit.domain.entity.FreePost;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.tackit.domain.entity.Post;
 
 import java.time.LocalDateTime;
 
@@ -16,4 +17,5 @@ public class FreeMyCommentResponseDto {
     private Long postId;
     private String content;
     private LocalDateTime createdAt;
+    private Post type;
 }
