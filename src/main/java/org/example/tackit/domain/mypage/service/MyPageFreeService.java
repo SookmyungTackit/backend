@@ -74,17 +74,19 @@ public class MyPageFreeService {
 
     // 내가 쓴 댓글 조회
     @Transactional(readOnly = true)
-    public List<FreeMyCommentResponseDto> getMyComments(String email) {
+    public PageResponseDTO<FreeMyCommentResponseDto> getMyComments(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        return freeCommentRepository.findByWriter(member).stream()
-                .map(comment -> FreeMyCommentResponseDto.builder()
-                        .commentId(comment.getId())
-                        .postId(comment.getFreePost().getId())
-                        .content(comment.getContent())
-                        .createdAt(comment.getCreatedAt())
-                        .build())
-                .toList();
+        Page<FreeComment> comments = freeCommentRepository.findByWriter(member, pageable);
+
+        return PageResponseDTO.from(comments, comment -> FreeMyCommentResponseDto.builder()
+                .commentId(comment.getId())
+                .postId(comment.getFreePost().getId())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .type(comment.getFreePost().getType())
+                .build()
+        );
     }
 }

@@ -1,6 +1,8 @@
 package org.example.tackit.domain.Free_board.Free_comment.repository;
 
 import org.example.tackit.domain.entity.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +19,5 @@ public interface FreeCommentRepository extends JpaRepository<FreeComment, Long> 
     List<FreePost> findDistinctPostsByWriter(@Param("writer")Member writer);
 
     List<FreeComment> findByWriter(Member member);
+    Page<FreeComment> findByWriter(Member member, Pageable pageable);
 }
