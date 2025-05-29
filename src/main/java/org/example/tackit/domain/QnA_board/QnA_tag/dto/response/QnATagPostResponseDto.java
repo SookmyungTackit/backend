@@ -17,13 +17,15 @@ public class QnATagPostResponseDto{
     private final String title;
     private final String content;
     private final LocalDateTime createdAt;
+    private List<String> tags;
 
-    @QueryProjection // querydsl에서 dto 반환
-    public QnATagPostResponseDto(Long postId, String writer, String title, String content, LocalDateTime createdAt) {
+    //@QueryProjection // querydsl에서 dto 반환
+    public QnATagPostResponseDto(Long postId, String writer, String title, String content, LocalDateTime createdAt, List<String> tags) {
         this.postId = postId;
         this.writer = writer;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
+        this.tags = tags;
     }
 }
