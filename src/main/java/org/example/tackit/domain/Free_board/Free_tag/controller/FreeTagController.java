@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
-import org.example.tackit.domain.QnA_board.QnA_tag.dto.response.QnATagPostResponseDto;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

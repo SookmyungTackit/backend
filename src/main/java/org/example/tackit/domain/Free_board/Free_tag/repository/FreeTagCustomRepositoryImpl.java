@@ -2,7 +2,6 @@ package org.example.tackit.domain.Free_board.Free_tag.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
-import org.example.tackit.domain.QnA_board.QnA_tag.dto.response.QnATagPostResponseDto;
 import org.example.tackit.domain.entity.FreePost;
 import org.example.tackit.domain.entity.FreeTagMap;
 import org.example.tackit.domain.entity.Status;
