@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class ReportedPostDTO {
+    private long id;
     private String title;
     private String nickname;
     private String organization;
@@ -17,6 +18,7 @@ public class ReportedPostDTO {
 
     public static ReportedPostDTO fromEntity(ReportablePost post){
         return new ReportedPostDTO(
+                post.getId(),
                 post.getTitle(),
                 post.getWriter().getNickname(),
                 post.getWriter().getOrganization(),
