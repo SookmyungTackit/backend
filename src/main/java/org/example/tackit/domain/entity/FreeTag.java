@@ -6,12 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "free_tag", uniqueConstraints = @UniqueConstraint(name = "uq_tag_tagname", columnNames = "tagName"))
+@Table(name = "free_tag", uniqueConstraints = @UniqueConstraint(name = "free_uq_tag_tagname", columnNames = "tagName"))
 public class FreeTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,4 +22,7 @@ public class FreeTag {
 
     @Column(nullable = false)
     private String tagName;
+
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FreeTagMap> tagMaps = new ArrayList<>();
 }
