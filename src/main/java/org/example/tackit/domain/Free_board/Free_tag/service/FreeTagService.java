@@ -32,8 +32,8 @@ public class FreeTagService {
 
     // 태그별 게시물 불러오기
     @Transactional(readOnly = true)
-    public PageResponseDTO<FreeTagPostResponseDto> getFreePostsByTag(Long tagId, Pageable pageable){
-        Page<FreeTagPostResponseDto> page = freeTagRepository.findPostsByTagId(tagId, pageable);
+    public PageResponseDTO<FreeTagPostResponseDto> getFreePostsByTag(Long tagId,  String organization , Pageable pageable){
+        Page<FreeTagPostResponseDto> page = freeTagRepository.findPostsByTagId(tagId, organization, pageable);
         return PageResponseDTO.from(page, Function.identity());
     }
 

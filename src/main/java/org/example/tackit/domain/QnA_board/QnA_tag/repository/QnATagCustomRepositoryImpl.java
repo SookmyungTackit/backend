@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import static org.example.tackit.domain.entity.QFreePost.freePost;
 import static org.example.tackit.domain.entity.QQnAPost.qnAPost;
 import static org.example.tackit.domain.entity.QQnATagMap.qnATagMap;
 import static org.example.tackit.domain.entity.QQnATag.qnATag;
@@ -31,7 +32,7 @@ public class QnATagCustomRepositoryImpl implements QnATagCustomRepository{
     }
 
     @Override
-    public Page<QnATagPostResponseDto> findPostsByTagId(Long tagId, Pageable pageable){
+    public Page<QnATagPostResponseDto> findPostsByTagId(Long tagId, String organization, Pageable pageable){
         // 1. 태그 ID로 해당 게시글 ID 조회
         List<Long> postIds = jpaQueryFactory
                 .select(qnATagMap.qnaPost.id)
@@ -47,7 +48,10 @@ public class QnATagCustomRepositoryImpl implements QnATagCustomRepository{
         List<QnAPost> posts = jpaQueryFactory
                 .selectFrom(qnAPost)
                 .join(qnAPost.writer, member).fetchJoin()
-                .where(qnAPost.id.in(postIds), qnAPost.status.eq(Status.ACTIVE))
+                .where(qnAPost.id.in(postIds),
+                        qnAPost.status.eq(Status.ACTIVE),
+                        qnAPost.writer.organization.eq(organization)
+                )
                 .orderBy(qnAPost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

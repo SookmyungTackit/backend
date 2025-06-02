@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.service.FreeTagService;
+import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +34,10 @@ public class FreeTagController {
     @GetMapping("/{tagId}/posts")
     public ResponseEntity<PageResponseDTO<FreeTagPostResponseDto>> getPostsByTag(
             @PathVariable Long tagId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(freeTagService.getFreePostsByTag(tagId, pageable));
+        String organization = userDetails.getOrganization();
+        return ResponseEntity.ok(freeTagService.getFreePostsByTag(tagId,organization, pageable));
     }
 }
