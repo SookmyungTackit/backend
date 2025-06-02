@@ -94,8 +94,8 @@ public class FreePostController {
     public ResponseEntity<String> scrapPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
-        freePostService.scrapPost(id, user.getId());
 
-        return ResponseEntity.ok("게시글을 스크랩하였습니다.");
+        String message = freePostService.toggleScrap(id, user.getId());
+        return ResponseEntity.ok(message);
     }
 }

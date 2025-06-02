@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -173,7 +174,7 @@ public class FreePostService {
 
     // [ 게시글 스크랩 ]
     @Transactional
-    public void scrapPost(Long id, Long userId) {
+    public String toggleScrap(Long id, Long userId) {
         // 1. 게시글 조회
         FreePost post = freePostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
@@ -182,15 +183,16 @@ public class FreePostService {
         Member member = freeMemberJPARepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
 
-        // 3. 중복 스크랩 방지
-        boolean alreadyScrapped = freeScrapJPARepository.existsByMemberAndFreePost(member, post);
-        if (alreadyScrapped) {
-            throw new IllegalStateException("이미 스크랩한 게시글입니다.");
-        }
+        Optional<FreeScrap> existing = freeScrapJPARepository.findByMemberAndFreePost(member, post);
 
-        // 4. 스크랩 저장
-        FreeScrap scrap = new FreeScrap(member, post);
-        freeScrapJPARepository.save(scrap);
+        if (existing.isPresent()) {
+            freeScrapJPARepository.delete(existing.get());
+            return "게시글 스크랩을 취소하였습니다.";
+        } else {
+            FreeScrap scrap = new FreeScrap(member, post);
+            freeScrapJPARepository.save(scrap);
+            return "게시글을 스크랩하였습니다.";
+        }
     }
 
 }

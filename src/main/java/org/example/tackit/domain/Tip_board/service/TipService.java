@@ -3,7 +3,7 @@ package org.example.tackit.domain.Tip_board.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
+import org.example.tackit.domain.Tip_board.repository.TipMemberJPARepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
@@ -19,12 +19,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
 public class TipService {
     private final TipPostJPARepository tipPostJPARepository;
-    private final FreeMemberJPARepository freeMemberJPARepository;
+    private final TipMemberJPARepository tipMemberJPARepository;
     private final TipScrapRepository tipScrapRepository;
 
 
@@ -61,7 +63,7 @@ public class TipService {
     @Transactional
     public TipPostDTO createPost(TipPostCreateDTO dto, CustomUserDetails user) {
         // 1. 유저 조회
-        Member writer = freeMemberJPARepository.findById(user.getId())
+        Member writer = tipMemberJPARepository.findById(user.getId())
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
         if (writer.getRole() != Role.SENIOR) {
@@ -105,24 +107,25 @@ public class TipService {
 
     // [ 게시글 스크랩 ]
     @Transactional
-    public void scrapPost(Long id, Long userId) {
+    public String toggleScrap(Long id, Long userId) {
         // 1. 게시글 조회
         TipPost post = tipPostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
 
         // 2. 멤버 조회
-        Member member = freeMemberJPARepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+        Member member = tipMemberJPARepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
 
-        // 3. 중복 스크랩 방지
-        boolean alreadyScrapped = tipScrapRepository.existsByMemberAndTipPost(member, post);
-        if (alreadyScrapped) {
-            throw new IllegalStateException("이미 스크랩한 게시글입니다.");
+        Optional<TipScrap> existing = tipScrapRepository.findByMemberAndTipPost(member, post);
+
+        if (existing.isPresent()) {
+            tipScrapRepository.delete(existing.get());
+            return "게시글 스크랩을 취소하였습니다.";
+        } else {
+            TipScrap scrap = new TipScrap(member, post);
+            tipScrapRepository.save(scrap);
+            return "게시글을 스크랩하였습니다.";
         }
-
-        // 4. 스크랩 저장
-        TipScrap scrap = new TipScrap(member, post);
-        tipScrapRepository.save(scrap);
     }
 
     // [ 게시글 신고 ]

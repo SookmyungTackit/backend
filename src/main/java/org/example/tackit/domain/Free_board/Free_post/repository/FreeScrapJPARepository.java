@@ -6,9 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public interface FreeScrapJPARepository extends JpaRepository<FreeScrap, Long> {
-    boolean existsByMemberAndFreePost(Member member, FreePost freePost);
     Page<FreeScrap> findByMemberAndType(Member member, Post type, Pageable pageable);
+    Optional<FreeScrap> findByMemberAndFreePost(Member member, FreePost freePost);
 }
