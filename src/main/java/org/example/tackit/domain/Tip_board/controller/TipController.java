@@ -1,7 +1,6 @@
 package org.example.tackit.domain.Tip_board.controller;
 
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.domain.mypage.service.MemberService;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostUpdateDTO;
 import org.example.tackit.domain.Tip_board.dto.response.TipPostDTO;
@@ -75,11 +74,12 @@ public class TipController {
 
     // 6. 게시글 스크랩
     @PostMapping("/{id}/scrap")
-    public ResponseEntity<Void> scrapPost(
+    public ResponseEntity<String> scrapPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
-        tipService.scrapPost(id, user.getId());
-        return ResponseEntity.ok().build();
+
+        String message = tipService.toggleScrap(id, user.getId());
+        return ResponseEntity.ok(message);
     }
 
     // 7. 게시글 신고
