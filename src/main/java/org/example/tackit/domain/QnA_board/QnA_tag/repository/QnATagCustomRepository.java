@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface QnATagCustomRepository {
-    Page<QnATagPostResponseDto> findPostsByTagId(Long tagId, Pageable pageable);
+    Page<QnATagPostResponseDto> findPostsByTagId(Long tagId, String organization, Pageable pageable);
 }

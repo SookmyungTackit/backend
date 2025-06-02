@@ -27,7 +27,7 @@ public class FreeTagCustomRepositoryImpl implements FreeTagCustomRepository{
     }
 
     @Override
-    public Page<FreeTagPostResponseDto> findPostsByTagId(Long tagId, Pageable pageable){
+    public Page<FreeTagPostResponseDto> findPostsByTagId(Long tagId, String organization, Pageable pageable){
         // 1. 태그 ID로 해당 게시글 ID 조회
         List<Long> postIds = jpaQueryFactory
                 .select(freeTagMap.freePost.id)
@@ -43,7 +43,10 @@ public class FreeTagCustomRepositoryImpl implements FreeTagCustomRepository{
         List<FreePost> posts = jpaQueryFactory
                 .selectFrom(freePost)
                 .join(freePost.writer, member).fetchJoin()
-                .where(freePost.id.in(postIds), freePost.status.eq(Status.ACTIVE))
+                .where(freePost.id.in(postIds),
+                        freePost.status.eq(Status.ACTIVE),
+                        freePost.writer.organization.eq(organization)
+                )
                 .orderBy(freePost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

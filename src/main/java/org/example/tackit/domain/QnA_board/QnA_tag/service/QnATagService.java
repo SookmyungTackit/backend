@@ -37,8 +37,8 @@ public class QnATagService {
 
     // 태그별 게시물 불러오기
     @Transactional(readOnly = true)
-    public PageResponseDTO<QnATagPostResponseDto> getPostsByTag(Long tagId, Pageable pageable) {
-        Page<QnATagPostResponseDto> page = qnATagRepository.findPostsByTagId(tagId, pageable);
+    public PageResponseDTO<QnATagPostResponseDto> getPostsByTag(Long tagId, String organization, Pageable pageable) {
+        Page<QnATagPostResponseDto> page = qnATagRepository.findPostsByTagId(tagId, organization, pageable);
         return PageResponseDTO.from(page, Function.identity()); // 이미 DTO라 변환이 필요 없음
     }
 
