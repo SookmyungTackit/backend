@@ -71,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN") // 관리자 페이지 role 추가
                         .requestMatchers("/auth/**") // 로그인, 회원가입은 열어주기
                         .permitAll()
+                        .requestMatchers("/api/actuator/**").permitAll() // actuator 경로 열기
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
