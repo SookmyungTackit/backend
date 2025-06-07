@@ -77,7 +77,7 @@ public class QnAPostController {
     @PostMapping("{QnAPostId}/report")
     public ResponseEntity<String> reportPost(@PathVariable long QnAPostId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         String org = userDetails.getOrganization();
-        qnAPostService.increasePostReportCount(QnAPostId, org);
-        return ResponseEntity.ok("게시글을 신고하였습니다.");
+        String message = qnAPostService.reportQnAPost(QnAPostId, userDetails.getId());
+        return ResponseEntity.ok(message);
     }
 }

@@ -5,6 +5,7 @@ import org.example.tackit.domain.QnA_board.QnA_post.dto.request.QnAPostRequestDt
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
+import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostReportRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.global.dto.PageResponseDTO;
@@ -25,6 +26,7 @@ public class QnAPostService {
     private final QnAPostRepository qnAPostRepository;
     private final QnAMemberRepository qnAMemberRepository;
     private final QnAPostTagService tagService;
+    private final QnAPostReportRepository qnAPostReportRepository;
 
     // 게시글 작성 (NEWBIE만 가능)
     @Transactional
@@ -127,14 +129,27 @@ public class QnAPostService {
 
     // 게시글 신고하기
     @Transactional
-    public void increasePostReportCount(Long id, String org) {
-        QnAPost post = qnAPostRepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        if (!post.getWriter().getOrganization().equals(org)) {
-            throw new AccessDeniedException("해당 조직의 게시글만 신고할 수 있습니다.");
+    public String reportQnAPost(Long postId, Long userId) {
+        QnAPost post = qnAPostRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        Member member = qnAMemberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        if (qnAPostReportRepository.existsByMemberAndQnaPost(member, post)) {
+            return "이미 신고한 게시글입니다.";
         }
+
+        qnAPostReportRepository.save(QnAReport.builder()
+                .member(member)
+                .qnaPost(post)
+                .build());
+
         post.increaseReportCount();
+
+        return "게시글을 신고하였습니다.";
     }
+
 
 
 }
