@@ -7,6 +7,7 @@ import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqD
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
+import org.example.tackit.domain.Free_board.Free_post.repository.FreePostReportRepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeScrapJPARepository;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
 import org.example.tackit.domain.entity.*;
@@ -31,6 +32,7 @@ public class FreePostService {
     private final FreePostTagService freeService;
     private final FreeScrapJPARepository freeScrapJPARepository;
     private final FreePostTagMapRepository freePostTagMapRepository;
+    private final FreePostReportRepository freePostReportRepository;
 
     // [ 게시글 전체 조회 ]
     @Transactional
@@ -164,13 +166,29 @@ public class FreePostService {
 
     // [ 게시글 신고 ]
     @Transactional
-    public void increasePostReportCount(Long id) {
-        FreePost post = freePostJPARepository.findById(id)
-                .orElseThrow( () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+    public String report(Long postId, Long userId) {
+        FreePost post = freePostJPARepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
 
+        Member member = freeMemberJPARepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
 
+        boolean alreadyReported = freePostReportRepository.existsByMemberAndFreePost(member, post);
+
+        if (alreadyReported) {
+            return "이미 신고한 게시글입니다.";
+        }
+        freePostReportRepository.save(
+                FreeReport.builder()
+                        .member(member)
+                        .freePost(post)
+                        .build()
+        );
+        // 신고 횟수 증가
         post.increaseReportCount();
+        return "게시글을 신고하였습니다.";
     }
+
 
     // [ 게시글 스크랩 ]
     @Transactional

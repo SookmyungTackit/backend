@@ -83,13 +83,13 @@ public class TipController {
     }
 
     // 7. 게시글 신고
-    @PostMapping("/{id}/report")
+    @PostMapping("{id}/report")
     public ResponseEntity<String> reportPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
         String org = user.getOrganization();
-        tipService.increasePostReportCount(id);
 
-        return ResponseEntity.ok("게시글을 신고하였습니다.");
+        String message = tipService.report(id, user.getId());
+        return ResponseEntity.ok(message);
     }
 }

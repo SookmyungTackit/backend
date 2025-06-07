@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Tip_board.repository.TipMemberJPARepository;
+import org.example.tackit.domain.Tip_board.repository.TipPostReportRepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
@@ -28,6 +29,7 @@ public class TipService {
     private final TipPostJPARepository tipPostJPARepository;
     private final TipMemberJPARepository tipMemberJPARepository;
     private final TipScrapRepository tipScrapRepository;
+    private final TipPostReportRepository tipPostReportRepository;
 
 
     public PageResponseDTO<TipPostDTO> getActivePostsByOrganization(String org, Pageable pageable) {
@@ -130,11 +132,27 @@ public class TipService {
 
     // [ 게시글 신고 ]
     @Transactional
-    public void increasePostReportCount(Long id) {
-        TipPost post = tipPostJPARepository.findById(id)
-                .orElseThrow( () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+    public String report(Long postId, Long userId) {
+        TipPost post = tipPostJPARepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
 
+        Member member = tipMemberJPARepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
+
+        boolean alreadyReported = tipPostReportRepository.existsByMemberAndTipPost(member, post);
+
+        if (alreadyReported) {
+            return "이미 신고한 게시글입니다.";
+        }
+        tipPostReportRepository.save(
+                TipReport.builder()
+                        .member(member)
+                        .tipPost(post)
+                        .build()
+        );
+        // 신고 횟수 증가
         post.increaseReportCount();
+        return "게시글을 신고하였습니다.";
     }
 
 }
