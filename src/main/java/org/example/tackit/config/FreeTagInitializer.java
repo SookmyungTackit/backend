@@ -17,9 +17,14 @@ public class FreeTagInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (tagRepository.count() == 0) {
             tagRepository.saveAll(List.of(
-                    FreeTag.builder().tagName("태그1").build(),
-                    FreeTag.builder().tagName("태그2").build(),
-                    FreeTag.builder().tagName("태그3").build()
+                    FreeTag.builder().tagName("회고").build(),
+                    FreeTag.builder().tagName("내가배운것").build(),
+                    FreeTag.builder().tagName("일상").build(),
+                    FreeTag.builder().tagName("공유").build(),
+                    FreeTag.builder().tagName("추천").build(),
+                    FreeTag.builder().tagName("맛집").build(),
+                    FreeTag.builder().tagName("사내편의").build(),
+                    FreeTag.builder().tagName("근처편의").build()
             ));
         }
     }
