@@ -17,9 +17,14 @@ public class QnATagInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (tagRepository.count() == 0) {
             tagRepository.saveAll(List.of(
-                    QnATag.builder().tagName("태그1").build(),
-                    QnATag.builder().tagName("태그2").build(),
-                    QnATag.builder().tagName("태그3").build()
+                    QnATag.builder().tagName("회사생활").build(),
+                    QnATag.builder().tagName("복지혜택").build(),
+                    QnATag.builder().tagName("조언구해요").build(),
+                    QnATag.builder().tagName("실수했어요").build(),
+                    QnATag.builder().tagName("추천해주세요").build(),
+                    QnATag.builder().tagName("도움요청").build(),
+                    QnATag.builder().tagName("초보").build(),
+                    QnATag.builder().tagName("프로세스").build()
             ));
         }
     }
