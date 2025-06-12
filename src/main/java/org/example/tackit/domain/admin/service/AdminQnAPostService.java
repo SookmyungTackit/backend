@@ -20,7 +20,8 @@ public class AdminQnAPostService implements ReportedPostService {
     // 비활성화 질문 게시글 전체 조회
     @Override
     public Page<ReportedPostDTO> getDeletedPosts(Pageable pageable) {
-        return adminQnAPostRepository.findAllByStatus(Status.DELETED, pageable)
+
+        return adminQnAPostRepository.findAllByStatusAndReportCountGreaterThanEqual(Status.DELETED, 3, pageable)
                 .map(ReportedPostDTO::fromEntity);
     }
 

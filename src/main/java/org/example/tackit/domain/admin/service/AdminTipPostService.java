@@ -20,7 +20,7 @@ public class AdminTipPostService implements ReportedPostService{
     // 비활성화 게시글 전체 조회
     @Override
     public Page<ReportedPostDTO> getDeletedPosts(Pageable pageable) {
-        return adminTipPostRepository.findAllByStatus(Status.DELETED, pageable)
+        return adminTipPostRepository.findAllByStatusAndReportCountGreaterThanEqual(Status.DELETED, 3, pageable)
                 .map(ReportedPostDTO::fromEntity);
     }
 

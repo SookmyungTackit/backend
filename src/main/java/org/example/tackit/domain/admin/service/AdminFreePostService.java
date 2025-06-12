@@ -22,7 +22,7 @@ public class AdminFreePostService implements ReportedPostService{
     // 비활성화 자유 게시글 전체 조회
     @Override
     public Page<ReportedPostDTO> getDeletedPosts(Pageable pageable) {
-        return adminFreePostRepository.findAllByStatus(Status.DELETED, pageable)
+        return adminFreePostRepository.findAllByStatusAndReportCountGreaterThanEqual(Status.DELETED, 3, pageable)
                 .map(ReportedPostDTO::fromEntity);
     }
 
