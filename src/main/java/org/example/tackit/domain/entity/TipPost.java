@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.example.tackit.domain.admin.model.ReportablePost;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +34,10 @@ public class TipPost implements ReportablePost {
     private Post type;
     private String organization;
     private int reportCount = 0;
+
+    // TipReport 연관관계 추가
+    @OneToMany(mappedBy = "tipPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TipReport> reports = new ArrayList<>();
 
     public void increaseReportCount() {
         this.reportCount++;
