@@ -53,7 +53,7 @@ public class MyPageFreeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Page<FreePost> page = freePostJPARepository.findByWriter(member, pageable);
+        Page<FreePost> page = freePostJPARepository.findByWriterAndStatus(member, Status.ACTIVE, pageable);
 
         return PageResponseDTO.from(page, post -> {
             List<String> tags = freePostTagMapRepository.findByFreePost(post).stream()

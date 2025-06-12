@@ -11,5 +11,7 @@ public interface AdminFreePostRepository extends JpaRepository<FreePost, Long> {
     // 비활성화된 게시글 목록
     Page<FreePost> findAllByStatus(Status status, Pageable pageable);
 
+    Page<FreePost> findAllByStatusAndReportCountGreaterThanEqual(Status status, int reportCount, Pageable pageable);
+
 
 }
