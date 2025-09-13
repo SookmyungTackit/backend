@@ -1,17 +1,17 @@
-package org.example.tackit.domain.Tip_board.service;
+package org.example.tackit.domain.Tip_board.Tip_post.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.Tip_board.repository.TipMemberJPARepository;
-import org.example.tackit.domain.Tip_board.repository.TipPostReportRepository;
+import org.example.tackit.domain.Tip_board.Tip_post.repository.TipMemberJPARepository;
+import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostReportRepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.*;
-import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
-import org.example.tackit.domain.Tip_board.dto.request.TipPostUpdateDTO;
-import org.example.tackit.domain.Tip_board.dto.response.TipPostDTO;
-import org.example.tackit.domain.Tip_board.repository.TipPostJPARepository;
-import org.example.tackit.domain.Tip_board.repository.TipScrapRepository;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostCreateDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostJPARepository;
+import org.example.tackit.domain.Tip_board.Tip_post.repository.TipScrapRepository;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +20,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -30,7 +31,7 @@ public class TipService {
     private final TipMemberJPARepository tipMemberJPARepository;
     private final TipScrapRepository tipScrapRepository;
     private final TipPostReportRepository tipPostReportRepository;
-
+    private final TipTagService tagService;
 
     public PageResponseDTO<TipPostDTO> getActivePostsByOrganization(String org, Pageable pageable) {
         Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
@@ -75,8 +76,12 @@ public class TipService {
         // 2. 게시글 생성 : 작성 글, 회원 데이터, 조직 정보
         TipPost newPost = dto.toEntity(writer, user.getOrganization());
 
+        tipPostJPARepository.save(newPost);
+
+        List<String> tagNames = tagService.assignTagsToPost(newPost, dto.getTagIds());
+
         // 3. 게시글 DB 저장 + TipPostDTO로 변환하여 반환
-        return TipPostDTO.fromEntity(tipPostJPARepository.save(newPost));
+        return TipPostDTO.fromEntity(newPost, tagNames);
     }
 
     // [ 게시글 수정 ]
@@ -90,7 +95,11 @@ public class TipService {
             throw new AccessDeniedException("해당 게시글을 수정할 권한이 없습니다.");
         }
         post.update(dto.getTitle(), dto.getContent());
-        return new TipPostDTO(post);
+
+        tagService.deleteTagsByPost(post);
+        List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
+
+        return TipPostDTO.fromEntity(post, tagNames);
     }
 
     // [ 게시글 삭제 ]
@@ -103,7 +112,6 @@ public class TipService {
         if(!post.getWriter().getId().equals(user.getId())) {
             throw new AccessDeniedException("해당 게시글을 수정할 권한이 없습니다.");
         }
-
         post.delete();
     }
 

@@ -1,4 +1,4 @@
-package org.example.tackit.domain.Tip_board.dto.request;
+package org.example.tackit.domain.Tip_board.Tip_post.dto.request;
 
 import lombok.Getter;
 import org.example.tackit.domain.entity.Member;
@@ -7,11 +7,13 @@ import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.entity.TipPost;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class TipPostCreateDTO {
     private String title;
     private String content;
+    private List<Long> tagIds;
 
     public TipPost toEntity(Member writer, String org) {
         return TipPost.builder()
