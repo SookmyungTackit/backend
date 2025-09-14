@@ -1,10 +1,10 @@
-package org.example.tackit.domain.Tip_board.controller;
+package org.example.tackit.domain.Tip_board.Tip_post.controller;
 
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.domain.Tip_board.dto.request.TipPostCreateDTO;
-import org.example.tackit.domain.Tip_board.dto.request.TipPostUpdateDTO;
-import org.example.tackit.domain.Tip_board.dto.response.TipPostDTO;
-import org.example.tackit.domain.Tip_board.service.TipService;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostCreateDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.service.TipService;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

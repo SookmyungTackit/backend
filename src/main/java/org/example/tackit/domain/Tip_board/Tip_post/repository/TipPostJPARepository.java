@@ -1,4 +1,4 @@
-package org.example.tackit.domain.Tip_board.repository;
+package org.example.tackit.domain.Tip_board.Tip_post.repository;
 
 
 import org.example.tackit.domain.entity.Member;

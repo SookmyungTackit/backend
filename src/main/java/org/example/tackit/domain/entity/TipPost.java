@@ -35,6 +35,10 @@ public class TipPost implements ReportablePost {
     private String organization;
     private int reportCount = 0;
 
+    // TipTagMap 연관관계 추가
+    @OneToMany(mappedBy = "tipPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TipTagMap> tagMaps = new ArrayList<>();
+
     // TipReport 연관관계 추가
     @OneToMany(mappedBy = "tipPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TipReport> reports = new ArrayList<>();
