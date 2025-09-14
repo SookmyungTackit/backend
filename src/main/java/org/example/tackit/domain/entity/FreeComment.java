@@ -1,6 +1,8 @@
 package org.example.tackit.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +11,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "free_comment")
 public class FreeComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +21,19 @@ public class FreeComment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User writer;
+    private Member writer;
 
     @ManyToOne
     @JoinColumn(name = "free_id", nullable = false)
-    private FreePost freeId;
+    // 게시글 Id
+    private FreePost freePost;
 
     private String content;
     private LocalDateTime createdAt;
+    private int reportCount;
+
+    public void updateContent(String content) { this.content = content; }
+    public void increaseReportCount() {
+        this.reportCount++;
+    }
 }

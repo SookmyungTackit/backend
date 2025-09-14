@@ -1,32 +1,72 @@
 package org.example.tackit.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.tackit.domain.admin.model.ReportablePost;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "qna_post")
-public class QnAPost {
+public class QnAPost implements ReportablePost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User writer;
+    private Member writer;
 
     private String title;
     private String content;
     private LocalDateTime createdAt;
     private Post type;
+    private String organization;
 
-    @Column(nullable = true)
-    private String tag;
+    @Enumerated(EnumType.STRING)
     private Status status;
     private int reportCount;
+
+    // QnATagMap 연관관계 추가
+    @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QnATagMap> tagMaps = new ArrayList<>();
+
+    // QnAReport 연관관계 추가
+    @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<QnAReport> reports = new ArrayList<>();
+
+    public void update(String title, String content){
+        this.title = title;
+        this.content = content;
+    }
+
+    public void markAsDeleted() {
+        this.status = Status.DELETED;
+    }
+
+    public void increaseReportCount() {
+        this.reportCount++;
+        if (this.reportCount >= 3) {
+            this.status = Status.DELETED;
+        }
+    }
+
+    public void activate(){
+        if (this.status != Status.DELETED) {
+            throw new IllegalStateException("삭제되지 않은 게시글은 활성화할 수 없습니다.");
+        }
+
+        this.status = Status.ACTIVE;
+        this.reportCount = 0;
+    }
 
 }
