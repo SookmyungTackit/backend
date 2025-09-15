@@ -15,5 +15,7 @@ public interface UserRepository extends JpaRepository<Member, Long> {
     boolean existsByEmailAndStatus(String email, Status status); // 이메일+상태 존재 확인
     Optional<Member> findByEmailAndStatus(String email, Status status); // 이메일+상태 정보 추출
     void deleteByEmail(String email); // 직접 삭제용
+
+    Optional<Member> findByEmailAndOrganization(String email, String organization);
 }
 
