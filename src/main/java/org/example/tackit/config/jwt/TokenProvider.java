@@ -9,6 +9,7 @@ import org.example.tackit.config.Redis.RedisUtil;
 import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
+import org.example.tackit.domain.entity.Status;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.example.tackit.domain.auth.login.dto.TokenDto;
@@ -152,9 +153,13 @@ public class TokenProvider {
         // 이메일로 Member 조회
         String email = claims.getSubject();
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow( () -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // CustomUserDetails 생성
+        // 탈퇴 회원 차단
+        if (member.getStatus() == Status.DELETED) {
+            throw new RuntimeException("탈퇴한 회원입니다.");
+        }
+
         CustomUserDetails customUserDetails = new CustomUserDetails(
                 member.getId(),
                 member.getEmail(),
@@ -164,16 +169,18 @@ public class TokenProvider {
         );
 
         return new UsernamePasswordAuthenticationToken(customUserDetails, "", authorities);
-        /* [ 기존 방법 ]
-        // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-         */
     }
+
 
     public boolean validateToken(String token) {
         try {
+            // 1. 블랙리스트 확인
+            if (redisUtil.isBlackList(token)) {
+                log.info("블랙리스트에 포함된 토큰입니다.");
+                return false;
+            }
+
+            // 2. 서명/만료 검사
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
@@ -187,6 +194,7 @@ public class TokenProvider {
         }
         return false;
     }
+
 
     private Claims parseClaims(String accessToken) {
         try {

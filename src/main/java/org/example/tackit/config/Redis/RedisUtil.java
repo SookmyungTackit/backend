@@ -30,4 +30,9 @@ public class RedisUtil {
     public void setBlackList(String token, String value, long expirationMillis) {
         redisTemplate.opsForValue().set(token, value, expirationMillis, TimeUnit.MILLISECONDS);
     }
+
+    // 블랙리스트 확인
+    public boolean isBlackList(String token) {
+        return redisTemplate.hasKey(token);
+    }
 }
