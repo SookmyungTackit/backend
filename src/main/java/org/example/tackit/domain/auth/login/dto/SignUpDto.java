@@ -3,7 +3,6 @@ package org.example.tackit.domain.auth.login.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.tackit.domain.entity.Role;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +12,6 @@ public class SignUpDto {
     private String password;
     private String nickname;
     private String organization;
-    private Role role;
+    private int joinedYear;
 }
 

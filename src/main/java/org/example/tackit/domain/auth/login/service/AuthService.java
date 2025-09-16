@@ -45,14 +45,18 @@ public class AuthService {
         }
 
         int currentYear = LocalDate.now().getYear();
+        int joinedYear = signUpDto.getJoinedYear(); // 회원가입 기준으로 설정
+
+        // 가입 연도 기준으로 역할 부여
+        Role role = (joinedYear == currentYear) ? Role.NEWBIE : Role.SENIOR;
 
         Member member = Member.builder()
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .nickname(signUpDto.getNickname())
                 .organization(signUpDto.getOrganization())
-                .role(signUpDto.getRole())
-                .joinedYear(currentYear)
+                .joinedYear(signUpDto.getJoinedYear())
+                .role(role)
                 .status(Status.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
