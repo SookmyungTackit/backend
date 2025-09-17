@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.auth.login.repository.UserRepository;
+import org.example.tackit.domain.entity.Status;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -23,9 +24,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .map(this::createUserDetails)
+        Member member = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email + " -> 데이터베이스에서 찾을 수 없습니다."));
+
+        // 상태 확인 추가
+        if (member.getStatus() == Status.DELETED) {
+            throw new UsernameNotFoundException(email + " -> 탈퇴한 회원입니다.");
+        }
+
+        return createUserDetails(member);
     }
 
     // DB에 Member 값이 존재한다면 UserDetails 객체로 만들어서 리턴
