@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @Builder
-public class TipPostDTO {
+public class TipPostDto {
     private Long id;
     private final String writer;
     private final String title;
@@ -19,7 +19,7 @@ public class TipPostDTO {
     private final LocalDateTime createdAt;
     private final List<String> tags;
 
-    public TipPostDTO(TipPost post, List<String> tags) {
+    public TipPostDto(TipPost post, List<String> tags) {
         this.id = post.getId();
         this.writer = post.getWriter().getNickname();
         this.title = post.getTitle();
@@ -29,13 +29,13 @@ public class TipPostDTO {
     }
 
     // 태그 X ) 기존 fromEntity
-    public static TipPostDTO fromEntity(TipPost post) {
-        return new TipPostDTO(post, List.of()); // 태그 없는 경우 빈 리스트
+    public static TipPostDto fromEntity(TipPost post) {
+        return new TipPostDto(post, List.of()); // 태그 없는 경우 빈 리스트
     }
 
     // 태그 O ) 정적 팩토리 메서드
-    public static TipPostDTO fromEntity(TipPost post, List<String> tags) {
-        return new TipPostDTO(post, tags);
+    public static TipPostDto fromEntity(TipPost post, List<String> tags) {
+        return new TipPostDto(post, tags);
     }
 
 }
