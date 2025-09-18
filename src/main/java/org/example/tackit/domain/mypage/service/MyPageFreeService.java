@@ -27,7 +27,7 @@ public class MyPageFreeService {
     private final FreePostTagMapRepository freePostTagMapRepository;
     private final FreeCommentRepository freeCommentRepository;
 
-    // 스크랩한 free 게시글 조회
+    // 스크랩한 자유 게시글 조회
     @Transactional
     public PageResponseDTO<FreeScrapResponse> getScrapListByMember(String email, Pageable pageable) {
         Member member = memberRepository.findByEmail(email)
