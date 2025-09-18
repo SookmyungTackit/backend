@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class TipPostUpdateDTO {
+public class TipPostUpdateDto {
     private String title;
     private String content;
     private List<Long> tagIds;

@@ -3,13 +3,14 @@ package org.example.tackit.domain.Tip_board.Tip_post.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipMemberJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostReportRepository;
+import org.example.tackit.domain.Tip_board.Tip_tag.repository.TipPostTagMapRepository;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.*;
-import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostCreateDTO;
-import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDTO;
-import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostDTO;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostReqDto;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipScrapRepository;
 import org.example.tackit.global.dto.PageResponseDTO;
@@ -20,28 +21,43 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
-public class TipService {
+public class TipPostService {
     private final TipPostJPARepository tipPostJPARepository;
     private final TipMemberJPARepository tipMemberJPARepository;
     private final TipScrapRepository tipScrapRepository;
     private final TipPostReportRepository tipPostReportRepository;
+    private final TipPostTagMapRepository tipPostTagMapRepository;
     private final TipTagService tagService;
 
-    public PageResponseDTO<TipPostDTO> getActivePostsByOrganization(String org, Pageable pageable) {
+    public PageResponseDTO<TipPostRespDto> getActivePostsByOrganization(String org, Pageable pageable) {
         Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
 
-        return PageResponseDTO.from(page, TipPostDTO::fromEntity);
+        return PageResponseDTO.from(page, post -> {
+                    List<String> tags = tipPostTagMapRepository.findByTipPost(post).stream()
+                            .map(mapping -> mapping.getTag().getTagName())
+                            .toList();
+
+                    return TipPostRespDto.builder()
+                            .id(post.getId())
+                            .writer(post.getWriter().getNickname())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .createdAt(post.getCreatedAt())
+                            .tags(tags)
+                            .build();
+        });
     }
 
     // [ 게시글 상세 조회 ]
     @Transactional
-    public TipPostDTO getPostById(Long id, String org) {
+    public TipPostRespDto getPostById(Long id, String org) {
         TipPost tipPost = tipPostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
@@ -53,53 +69,83 @@ public class TipService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
 
-        return TipPostDTO.builder()
+        List<String> tagNames = tagService.getTagNamesByPost(tipPost);
+
+        return TipPostRespDto.builder()
                 .id(tipPost.getId())
                 .writer(tipPost.getWriter().getNickname())
                 .title(tipPost.getTitle())
                 .content(tipPost.getContent())
+                .tags(tagNames)
                 .createdAt(tipPost.getCreatedAt())
                 .build();
     }
 
     // [ 게시글 작성 ] : 선임자만 가능
     @Transactional
-    public TipPostDTO createPost(TipPostCreateDTO dto, CustomUserDetails user) {
+    public TipPostRespDto createPost(TipPostReqDto dto, String email, String org) {
         // 1. 유저 조회
-        Member writer = tipMemberJPARepository.findById(user.getId())
-                .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
+        Member member = tipMemberJPARepository.findByEmailAndOrganization(email, org)
+                .orElseThrow(() -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
 
-        if (writer.getRole() != Role.SENIOR) {
+        if (member.getRole() != Role.SENIOR) {
             throw new AccessDeniedException("SENIOR만 게시글을 작성할 수 있습니다.");
         }
 
-        // 2. 게시글 생성 : 작성 글, 회원 데이터, 조직 정보
-        TipPost newPost = dto.toEntity(writer, user.getOrganization());
+        // 2. 게시글 생성
+        TipPost post = TipPost.builder()
+                .writer(member)
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .createdAt(LocalDateTime.now())
+                .type(Post.Tip)
+                .status(Status.ACTIVE)
+                .reportCount(0)
+                .organization(org)
+                .build();
 
-        tipPostJPARepository.save(newPost);
+        tipPostJPARepository.save(post);
 
-        List<String> tagNames = tagService.assignTagsToPost(newPost, dto.getTagIds());
+        List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
-        // 3. 게시글 DB 저장 + TipPostDTO로 변환하여 반환
-        return TipPostDTO.fromEntity(newPost, tagNames);
+        return TipPostRespDto.builder()
+                .id(post.getId())
+                .writer(member.getNickname())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .tags(tagNames)
+                .build();
     }
 
-    // [ 게시글 수정 ]
+    // [ 게시글 수정 ] : 작성자만
     @Transactional
-    public TipPostDTO updatePost(Long id, TipPostUpdateDTO dto, CustomUserDetails user) {
-        TipPost post = tipPostJPARepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다.") );
+    public TipPostRespDto update(Long id, TipPostUpdateDto dto, String email, String org) {
+        Member member = tipMemberJPARepository.findByEmailAndOrganization(email, org)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        // 권한 체크 : 요청 유저가 작성자인지
-        if(!post.getWriter().getId().equals(user.getId())) {
-            throw new AccessDeniedException("해당 게시글을 수정할 권한이 없습니다.");
+        TipPost post = tipPostJPARepository.findById(id)
+                .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        boolean isWriter = post.getWriter().getId().equals(member.getId());
+
+        if (!isWriter) {
+            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
         }
+
         post.update(dto.getTitle(), dto.getContent());
 
         tagService.deleteTagsByPost(post);
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
-        return TipPostDTO.fromEntity(post, tagNames);
+        return TipPostRespDto.builder()
+                .id(post.getId())
+                .writer(post.getWriter().getNickname())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .tags(tagNames)
+                .build();
     }
 
     // [ 게시글 삭제 ]

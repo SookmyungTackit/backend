@@ -1,10 +1,11 @@
 package org.example.tackit.domain.Tip_board.Tip_post.controller;
 
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostCreateDTO;
-import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDTO;
-import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostDTO;
-import org.example.tackit.domain.Tip_board.Tip_post.service.TipService;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostReqDto;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDto;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostDto;
+import org.example.tackit.domain.Tip_board.Tip_post.service.TipPostService;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,48 +19,54 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/tip-posts")
 public class TipController {
-    private final TipService tipService;
+    private final TipPostService tipService;
 
-    public TipController(final TipService tipService) {
+    public TipController(final TipPostService tipService) {
         this.tipService = tipService;
     }
 
     // 1. 게시글 전체 조회
     @GetMapping
-    public ResponseEntity<PageResponseDTO<TipPostDTO>> getAllPosts(
+    public ResponseEntity<PageResponseDTO<TipPostRespDto>> getAllPosts(
             @AuthenticationPrincipal CustomUserDetails user,
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String org = user.getOrganization();
-        PageResponseDTO<TipPostDTO> pageResponse = tipService.getActivePostsByOrganization(org, pageable);
+        PageResponseDTO<TipPostRespDto> pageResponse = tipService.getActivePostsByOrganization(org, pageable);
         return ResponseEntity.ok(pageResponse);
     }
 
     // 2. 게시글 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<TipPostDTO> getPostById(
+    public ResponseEntity<TipPostRespDto> getPostById(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
         String org = user.getOrganization();
-        TipPostDTO post = tipService.getPostById(id, org);
+        TipPostRespDto post = tipService.getPostById(id, org);
         return ResponseEntity.ok(post);
     }
 
     // 3. 게시글 작성
     @PostMapping
-    public ResponseEntity<TipPostDTO> create(
-            @RequestBody TipPostCreateDTO dto,
+    public ResponseEntity<TipPostRespDto> create(
+            @RequestBody TipPostReqDto dto,
             @AuthenticationPrincipal CustomUserDetails user) {
-        TipPostDTO post = tipService.createPost(dto, user);
+        String email = user.getEmail();
+        String org = user.getOrganization();
+        TipPostRespDto post = tipService.createPost(dto, email, org);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     // 4. 게시글 수정
     @PutMapping("/{id}")
-    public ResponseEntity<TipPostDTO> update(
+    public ResponseEntity<TipPostRespDto> update(
             @PathVariable Long id,
-            @RequestBody TipPostUpdateDTO dto,
+            @RequestBody TipPostUpdateDto dto,
             @AuthenticationPrincipal CustomUserDetails user) {
-        TipPostDTO updatedPost = tipService.updatePost(id, dto, user);
+
+        String email = user.getEmail();
+        String org = user.getOrganization();
+        TipPostRespDto updatedPost = tipService.update(id, dto, email, org);
+
         return ResponseEntity.ok(updatedPost);
     }
 

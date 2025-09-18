@@ -20,7 +20,11 @@ public class TipTagInitializer implements CommandLineRunner {
                     TipTag.builder().tagName("업무팁").build(),
                     TipTag.builder().tagName("인수인계").build(),
                     TipTag.builder().tagName("꼭지켜주세요").build(),
-                    TipTag.builder().tagName("조직문화").build()
+                    TipTag.builder().tagName("조직문화").build(),
+                    TipTag.builder().tagName("신입FAQ").build(),
+                    TipTag.builder().tagName("업무절차").build(),
+                    TipTag.builder().tagName("현장노하우").build(),
+                    TipTag.builder().tagName("실무경험담").build()
             ));
         }
     }
