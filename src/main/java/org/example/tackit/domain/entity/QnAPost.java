@@ -36,6 +36,10 @@ public class QnAPost implements ReportablePost {
     private Status status;
     private int reportCount;
 
+    private Long viewCount = 0L;
+    private Long scrapCount = 0L;
+
+
     // QnATagMap 연관관계 추가
     @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QnATagMap> tagMaps = new ArrayList<>();
