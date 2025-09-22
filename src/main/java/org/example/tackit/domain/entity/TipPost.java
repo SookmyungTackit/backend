@@ -22,7 +22,7 @@ public class TipPost implements ReportablePost {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member writer;
 
     private String title;
@@ -34,6 +34,9 @@ public class TipPost implements ReportablePost {
     private Post type;
     private String organization;
     private int reportCount = 0;
+    private Long viewCount = 0L;
+    private Long scrapCount = 0L;
+
 
     // TipTagMap 연관관계 추가
     @OneToMany(mappedBy = "tipPost", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -23,7 +23,7 @@ public class QnAPost implements ReportablePost {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member writer;
 
     private String title;
@@ -35,6 +35,10 @@ public class QnAPost implements ReportablePost {
     @Enumerated(EnumType.STRING)
     private Status status;
     private int reportCount;
+
+    private Long viewCount = 0L;
+    private Long scrapCount = 0L;
+
 
     // QnATagMap 연관관계 추가
     @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)

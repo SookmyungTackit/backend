@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface TipMemberJPARepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
+    Optional<Member> findByEmailAndOrganization(String email, String organization);
 }

@@ -29,7 +29,7 @@ import java.util.Optional;
 public class FreePostService {
     private final FreePostJPARepository freePostJPARepository;
     private final FreeMemberJPARepository freeMemberJPARepository;
-    private final FreePostTagService freeService;
+    private final FreePostTagService tagService;
     private final FreeScrapJPARepository freeScrapJPARepository;
     private final FreePostTagMapRepository freePostTagMapRepository;
     private final FreePostReportRepository freePostReportRepository;
@@ -69,7 +69,7 @@ public class FreePostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
 
-        List<String> tagNames = freeService.getTagNamesByPost(post);
+        List<String> tagNames = tagService.getTagNamesByPost(post);
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -102,7 +102,7 @@ public class FreePostService {
 
         freePostJPARepository.save(post);
 
-        List<String> tagNames = freeService.assignTagsToPost(post, dto.getTagIds());
+        List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -132,8 +132,8 @@ public class FreePostService {
 
         post.update(req.getTitle(), req.getContent());
 
-        freeService.deleteTagsByPost(post);
-        List<String> tagNames = freeService.assignTagsToPost(post, req.getTagIds());
+        tagService.deleteTagsByPost(post);
+        List<String> tagNames = tagService.assignTagsToPost(post, req.getTagIds());
 
         return FreePostRespDto.builder()
                 .id(post.getId())
