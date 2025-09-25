@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - ./gradlew build
+artifacts:
+  files:
+    - build/libs/*[!plain].jar
+    - appspec.yml
+    - scripts/**/*
