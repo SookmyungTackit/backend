@@ -49,6 +49,10 @@ public class FreePost implements ReportablePost {
     @OneToMany(mappedBy = "freePost", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FreeReport> reports = new ArrayList<>();
 
+    // 이미지 연관관계 추가
+    @OneToMany(mappedBy = "freePost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FreePostImage> images = new ArrayList<>();
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;

@@ -48,6 +48,10 @@ public class QnAPost implements ReportablePost {
     @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<QnAReport> reports = new ArrayList<>();
 
+    // 이미지 연관관계 추가
+    @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QnAPostImage> images = new ArrayList<>();
+
     public void update(String title, String content){
         this.title = title;
         this.content = content;
