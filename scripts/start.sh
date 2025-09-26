@@ -4,4 +4,4 @@
 pkill -f '.*\.jar'
 
 # 새 .jar 파일 실행 (로그는 nohup.out에 기록됨)
-nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/nohup.out 2>&1 &
+nohup /usr/bin/java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/nohup.out 2>&1 &
