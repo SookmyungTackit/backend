@@ -3,17 +3,10 @@ version: 0.2
 phases:
   build:
     commands:
-      - ./gradlew clean
-      - echo Build started on `date`
       - ./gradlew build -x test
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo "Listen files in the directory:"
-      - ls -lR
 
 artifacts:
   files:
-    - build/libs/*.jar
+    - build/libs/*[!plain].jar
     - appspec.yml
     - scripts/**/*
