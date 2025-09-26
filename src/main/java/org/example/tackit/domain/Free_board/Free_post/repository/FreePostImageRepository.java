@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface FreePostImageRepository extends JpaRepository<FreePostImage, Long> {
     List<FreePostImage> findByFreePostId(Long freePostId);
-    void deleteByFreePostId(Long freePostId);
 }

@@ -62,9 +62,11 @@ public class FreePostController {
     @PutMapping("/{id}")
     public ResponseEntity<FreePostRespDto> updateFreePost(
             @PathVariable Long id,
-            @RequestBody UpdateFreeReqDto req,
-            @AuthenticationPrincipal CustomUserDetails user) {
+            @RequestPart("req") UpdateFreeReqDto req,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
 
+        req.setImage(image);
         String email = user.getEmail();
         String org = user.getOrganization();
         FreePostRespDto updateResp = freePostService.update(id, req, email, org);

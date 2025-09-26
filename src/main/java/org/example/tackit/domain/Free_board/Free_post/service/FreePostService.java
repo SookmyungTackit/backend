@@ -132,7 +132,7 @@ public class FreePostService {
 
     // [ 게시글 수정 ] : 작성자만
     @Transactional
-    public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) {
+    public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) throws IOException {
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -150,6 +150,43 @@ public class FreePostService {
         tagService.deleteTagsByPost(post);
         List<String> tagNames = tagService.assignTagsToPost(post, req.getTagIds());
 
+        String imageUrl = null;
+        // 1. "이미지 제거" 요청
+        if (req.isRemoveImage()) {
+            freePostImageRepository.findByFreePostId(post.getId())
+                    .forEach(oldImage -> {
+                        s3UploadService.deleteImage(oldImage.getImageUrl()); // S3 삭제
+                        freePostImageRepository.delete(oldImage);           // DB 삭제
+                    });
+        }
+
+        // 2. 새 이미지 업로드
+        else if (req.getImage() != null && !req.getImage().isEmpty()) {
+            // 기존 이미지 제거
+            freePostImageRepository.findByFreePostId(post.getId())
+                    .forEach(oldImage -> {
+                        s3UploadService.deleteImage(oldImage.getImageUrl());
+                        freePostImageRepository.delete(oldImage);
+                    });
+
+            // 새 이미지 저장
+            imageUrl = s3UploadService.saveFile(req.getImage());
+            FreePostImage newImage = FreePostImage.builder()
+                    .imageUrl(imageUrl)
+                    .freePost(post)
+                    .build();
+
+            freePostImageRepository.save(newImage);
+        }
+
+        // 3. 아무 요청 없으면 기존 이미지 유지
+        else {
+            List<FreePostImage> images = freePostImageRepository.findByFreePostId(post.getId());
+            if (!images.isEmpty()) {
+                imageUrl = images.get(0).getImageUrl();
+            }
+        }
+
         return FreePostRespDto.builder()
                 .id(post.getId())
                 .writer(post.getWriter().getNickname())
@@ -157,6 +194,7 @@ public class FreePostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .tags(tagNames)
+                .imageUrl(imageUrl)
                 .build();
     }
 

@@ -50,7 +50,12 @@ public class S3UploadService {
     }
 
     // 파일 삭제
-    public void deleteImage(String originalFilename)  {
-        amazonS3.deleteObject(bucket, originalFilename);
+    public void deleteImage(String imageUrl) {
+        String key = extractKeyFromUrl(imageUrl);
+        amazonS3.deleteObject(bucket, key);
+    }
+
+    private String extractKeyFromUrl(String url) {
+        return url.substring(url.lastIndexOf("/") + 1);
     }
 }
