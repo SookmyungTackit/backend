@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 기존에 실행되던 앱 종료
+# 기존 실행 앱 종료
 pkill -f '.*\.jar'
 
 # 새 .jar 파일 실행 (로그는 nohup.out에 기록)
