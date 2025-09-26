@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# 기존 실행 앱 종료
-pkill -f '.*\.jar'
+# Systemd가 새로운 서비스 파일을 인식하도록 리로드
+sudo systemctl daemon-reload
 
-# 새 .jar 파일 실행 (로그는 nohup.out에 기록)
-nohup /usr/bin/java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/nohup.out 2>&1 &
+# tackit 서비스를 활성화하여 서버 부팅 시 자동 시작되도록 설정
+sudo systemctl enable smwu-tackit.service
+
+# tackit 서비스를 재시작 (기존 프로세스는 자동 종료)
+sudo systemctl restart smwu-tackit.service
