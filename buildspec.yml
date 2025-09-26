@@ -6,16 +6,16 @@ phases:
       - ./gradlew build -x test
   post_build:
     commands:
-      # 'artifact_files' 라는 임시 폴더를 만들고 모든 결과물을 이곳으로 복사합니다.
+      # 'artifact_files' 라는 임시 폴더 생성 후 모든 결과물을 이곳으로 복사
       - mkdir -p artifact_files
-      # find 명령어로 실행가능한 jar 파일을 찾아서 artifact_files 폴더로 복사합니다.
+      # find 명령어로 실행가능한 jar 파일을 찾아서 artifact_files 폴더로 복사
       - find . -type f -name "*[!plain].jar" -exec cp {} artifact_files/ \;
-      # 나머지 파일들도 artifact_files 폴더로 복사합니다.
+      # 나머지 파일들도 artifact_files 폴더로 복사
       - cp appspec.yml artifact_files/
       - cp -r scripts artifact_files/
 
 artifacts:
-  # 'artifact_files' 폴더 안의 모든 내용을 최종 결과물로 지정합니다.
+  # 'artifact_files' 폴더 안의 모든 내용을 최종 결과물로 지정
   base-directory: artifact_files
   files:
     - '**/*'
