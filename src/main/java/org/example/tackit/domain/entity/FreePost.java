@@ -89,4 +89,9 @@ public class FreePost implements ReportablePost {
         this.status = Status.ACTIVE;
         this.reportCount = 0;
     }
+
+    public void addImage(FreePostImage image) {
+        images.add(image);
+        image.setFreePost(this);
+    }
 }

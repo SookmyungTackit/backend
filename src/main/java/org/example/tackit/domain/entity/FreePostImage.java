@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class FreePostImage {
-    @Id @GeneratedValue
+    @Id  @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String imageUrl;
@@ -20,4 +20,8 @@ public class FreePostImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "free_post_id")
     private FreePost freePost;
+
+    public void setFreePost(FreePost freePost) {
+        this.freePost = freePost;
+    }
 }

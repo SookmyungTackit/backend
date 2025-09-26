@@ -8,7 +8,6 @@ import org.example.tackit.domain.entity.FreePost;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
 @Builder
 public class FreePostRespDto {
@@ -18,13 +17,5 @@ public class FreePostRespDto {
     private final String content;
     private final List<String> tags;
     private final LocalDateTime createdAt;
-
-    public FreePostRespDto(FreePost post, List<String> tags) {
-        this.id = post.getId();
-        this.writer = post.getWriter().getNickname();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.tags = tags;
-        this.createdAt = post.getCreatedAt();
-    }
+    private String imageUrl;
 }
