@@ -2,13 +2,11 @@ package org.example.tackit.domain.Free_board.Free_post.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
-import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
-import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
-import org.example.tackit.domain.Free_board.Free_post.repository.FreePostReportRepository;
-import org.example.tackit.domain.Free_board.Free_post.repository.FreeScrapJPARepository;
+import org.example.tackit.domain.Free_board.Free_post.repository.*;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.global.dto.PageResponseDTO;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +32,8 @@ public class FreePostService {
     private final FreeScrapJPARepository freeScrapJPARepository;
     private final FreePostTagMapRepository freePostTagMapRepository;
     private final FreePostReportRepository freePostReportRepository;
+    private final S3UploadService s3UploadService;
+    private final FreePostImageRepository freePostImageRepository;
 
     // [ 게시글 전체 조회 ]
     @Transactional
@@ -83,7 +84,7 @@ public class FreePostService {
 
     // [ 게시글 작성 ]
     @Transactional
-    public FreePostRespDto createPost(FreePostReqDto dto, String email, String org) {
+    public FreePostRespDto createPost(FreePostReqDto dto, String email, String org) throws IOException {
         // 1. 유저 조회
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
@@ -102,6 +103,19 @@ public class FreePostService {
 
         freePostJPARepository.save(post);
 
+        // 3. 이미지 업로드 → PostImage 저장
+        String imageUrl = null;
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            imageUrl = s3UploadService.saveFile(dto.getImage());
+
+            FreePostImage image = FreePostImage.builder()
+                    .imageUrl(imageUrl)
+                    .freePost(post)
+                    .build();
+
+            freePostImageRepository.save(image); // 따로 JPARepository 필요
+        }
+
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
         return FreePostRespDto.builder()
@@ -111,13 +125,14 @@ public class FreePostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .tags(tagNames)
+                .imageUrl(imageUrl)
                 .build();
 
     }
 
     // [ 게시글 수정 ] : 작성자만
     @Transactional
-    public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) {
+    public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) throws IOException {
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -135,6 +150,43 @@ public class FreePostService {
         tagService.deleteTagsByPost(post);
         List<String> tagNames = tagService.assignTagsToPost(post, req.getTagIds());
 
+        String imageUrl = null;
+        // 1. "이미지 제거" 요청
+        if (req.isRemoveImage()) {
+            freePostImageRepository.findByFreePostId(post.getId())
+                    .forEach(oldImage -> {
+                        s3UploadService.deleteImage(oldImage.getImageUrl()); // S3 삭제
+                        freePostImageRepository.delete(oldImage);           // DB 삭제
+                    });
+        }
+
+        // 2. 새 이미지 업로드
+        else if (req.getImage() != null && !req.getImage().isEmpty()) {
+            // 기존 이미지 제거
+            freePostImageRepository.findByFreePostId(post.getId())
+                    .forEach(oldImage -> {
+                        s3UploadService.deleteImage(oldImage.getImageUrl());
+                        freePostImageRepository.delete(oldImage);
+                    });
+
+            // 새 이미지 저장
+            imageUrl = s3UploadService.saveFile(req.getImage());
+            FreePostImage newImage = FreePostImage.builder()
+                    .imageUrl(imageUrl)
+                    .freePost(post)
+                    .build();
+
+            freePostImageRepository.save(newImage);
+        }
+
+        // 3. 아무 요청 없으면 기존 이미지 유지
+        else {
+            List<FreePostImage> images = freePostImageRepository.findByFreePostId(post.getId());
+            if (!images.isEmpty()) {
+                imageUrl = images.get(0).getImageUrl();
+            }
+        }
+
         return FreePostRespDto.builder()
                 .id(post.getId())
                 .writer(post.getWriter().getNickname())
@@ -142,6 +194,7 @@ public class FreePostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .tags(tagNames)
+                .imageUrl(imageUrl)
                 .build();
     }
 
