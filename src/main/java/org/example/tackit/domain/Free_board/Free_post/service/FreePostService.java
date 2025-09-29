@@ -45,6 +45,9 @@ public class FreePostService {
                     .map(mapping -> mapping.getTag().getTagName())
                     .toList();
 
+            String imageUrl = post.getImages().isEmpty() ? null
+                    : post.getImages().get(0).getImageUrl();
+
             return FreePostRespDto.builder()
                     .id(post.getId())
                     .writer(post.getWriter().getNickname())
@@ -52,6 +55,7 @@ public class FreePostService {
                     .content(post.getContent())
                     .createdAt(post.getCreatedAt())
                     .tags(tags)
+                    .imageUrl(imageUrl)
                     .build();
         });
     }
@@ -72,12 +76,16 @@ public class FreePostService {
 
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
+        String imageUrl = post.getImages().isEmpty() ? null
+                : post.getImages().get(0).getImageUrl();
+
         return FreePostRespDto.builder()
                 .id(post.getId())
                 .writer(post.getWriter().getNickname())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tags(tagNames)
+                .imageUrl(imageUrl)
                 .createdAt(post.getCreatedAt())
                 .build();
     }
