@@ -21,6 +21,7 @@ public class QnAMyPostResponseDto {
     private LocalDateTime createdAt;
     private List<String> tags;
     private Post type;
+    private String imageUrl;
 
     public static QnAMyPostResponseDto fromEntity(QnAPost post, List<String> tags) {
         return QnAMyPostResponseDto.builder()
@@ -30,6 +31,7 @@ public class QnAMyPostResponseDto {
                 .createdAt(post.getCreatedAt())
                 .tags(tags)
                 .type(post.getType())
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
     }
 }

@@ -58,16 +58,9 @@ public class MyPageTipService {
                     .map(mapping -> mapping.getTag().getTagName())
                     .toList();
 
-            return TipMyPostResponseDto.builder()
-                    .id(post.getId())
-                    .writer(post.getWriter().getNickname())
-                    .title(post.getTitle())
-                    .content(post.getContent())
-                    .tags(tags)
-                    .type(post.getType())
-                    .createdAt(post.getCreatedAt())
-                    .build();
+            return TipMyPostResponseDto.from(post, tags);
         });
+
     }
 
 }
