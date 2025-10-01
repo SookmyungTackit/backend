@@ -64,15 +64,17 @@ public class TipController {
     @PutMapping("/{id}")
     public ResponseEntity<TipPostRespDto> update(
             @PathVariable Long id,
-            @RequestBody TipPostUpdateDto dto,
-            @AuthenticationPrincipal CustomUserDetails user) {
+            @RequestPart("dto") TipPostUpdateDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
 
         String email = user.getEmail();
         String org = user.getOrganization();
-        TipPostRespDto updatedPost = tipService.update(id, dto, email, org);
 
+        TipPostRespDto updatedPost = tipService.update(id, dto, email, org, image);
         return ResponseEntity.ok(updatedPost);
     }
+
 
     // 5. 게시글 삭제
     @DeleteMapping("{id}")
