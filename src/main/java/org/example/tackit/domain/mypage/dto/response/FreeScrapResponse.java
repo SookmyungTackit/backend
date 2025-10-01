@@ -21,6 +21,7 @@ public class FreeScrapResponse {
     private LocalDateTime createdAt;
     private Post type;
     private List<String> tags;
+    private String imageUrl;
 
     public static FreeScrapResponse from(FreeScrap scrap, List<String> tags) {
         FreePost post = scrap.getFreePost();
@@ -35,6 +36,7 @@ public class FreeScrapResponse {
                 .createdAt(post.getCreatedAt())
                 .type(scrap.getType())
                 .tags(tags)
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
 
 
