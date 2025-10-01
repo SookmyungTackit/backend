@@ -21,4 +21,12 @@ public class QnAPostImage {
     @JoinColumn(name = "qna_post_id")
     private QnAPost qnaPost;
 
+    public void setPost(QnAPost qnaPost) {
+        this.qnaPost = qnaPost;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
 }

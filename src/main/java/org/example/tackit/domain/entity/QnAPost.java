@@ -42,14 +42,17 @@ public class QnAPost implements ReportablePost {
 
     // QnATagMap 연관관계 추가
     @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<QnATagMap> tagMaps = new ArrayList<>();
 
     // QnAReport 연관관계 추가
     @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
     private List<QnAReport> reports = new ArrayList<>();
 
     // 이미지 연관관계 추가
     @OneToMany(mappedBy = "qnaPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<QnAPostImage> images = new ArrayList<>();
 
     public void update(String title, String content){
@@ -75,6 +78,16 @@ public class QnAPost implements ReportablePost {
 
         this.status = Status.ACTIVE;
         this.reportCount = 0;
+    }
+
+    public void addImage(QnAPostImage image) {
+        images.add(image);
+        image.setPost(this);
+    }
+
+    public void clearImages() {
+        images.forEach(img -> img.setPost(null));
+        images.clear();
     }
 
 }
