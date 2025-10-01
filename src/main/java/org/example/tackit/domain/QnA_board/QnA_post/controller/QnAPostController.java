@@ -103,4 +103,5 @@ public class QnAPostController {
         String message = qnAPostService.reportQnAPost(QnAPostId, userDetails.getId());
         return ResponseEntity.ok(message);
     }
+    
 }
