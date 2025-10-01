@@ -3,6 +3,7 @@ package org.example.tackit.domain.Tip_board.Tip_post.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipMemberJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostReportRepository;
@@ -19,8 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +38,7 @@ public class TipPostService {
     private final TipPostReportRepository tipPostReportRepository;
     private final TipPostTagMapRepository tipPostTagMapRepository;
     private final TipTagService tagService;
+    private final S3UploadService s3UploadService;
 
     public PageResponseDTO<TipPostRespDto> getActivePostsByOrganization(String org, Pageable pageable) {
         Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
@@ -83,7 +87,7 @@ public class TipPostService {
 
     // [ 게시글 작성 ] : 선임자만 가능
     @Transactional
-    public TipPostRespDto createPost(TipPostReqDto dto, String email, String org) {
+    public TipPostRespDto createPost(TipPostReqDto dto, String email, String org, MultipartFile image) throws IOException {
         // 1. 유저 조회
         Member member = tipMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
@@ -104,10 +108,20 @@ public class TipPostService {
                 .organization(org)
                 .build();
 
+        // 3. 이미지 업로드 & 연관관계 매핑 (단일 파일만)
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = s3UploadService.saveFile(image);
+            TipPostImage imageEntity = TipPostImage.builder()
+                    .imageUrl(imageUrl)
+                    .build();
+            post.addImage(imageEntity); // 기존 이미지 clear 후 하나만 저장
+        }
+
         tipPostJPARepository.save(post);
 
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
+        // 응답 DTO 구성 (imageUrl 하나만)
         return TipPostRespDto.builder()
                 .id(post.getId())
                 .writer(member.getNickname())
@@ -115,8 +129,11 @@ public class TipPostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .tags(tagNames)
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
     }
+
+
 
     // [ 게시글 수정 ] : 작성자만
     @Transactional

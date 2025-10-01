@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @RestController
@@ -48,11 +51,12 @@ public class TipController {
     // 3. 게시글 작성
     @PostMapping
     public ResponseEntity<TipPostRespDto> create(
-            @RequestBody TipPostReqDto dto,
-            @AuthenticationPrincipal CustomUserDetails user) {
+            @RequestPart("dto") TipPostReqDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
         String email = user.getEmail();
         String org = user.getOrganization();
-        TipPostRespDto post = tipService.createPost(dto, email, org);
+        TipPostRespDto post = tipService.createPost(dto, email, org, image);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
