@@ -60,15 +60,7 @@ public class MyPageFreeService {
                     .map(mapping -> mapping.getTag().getTagName())
                     .toList();
 
-            return FreeMyPostResponseDto.builder()
-                    .id(post.getId())
-                    .writer(post.getWriter().getNickname())
-                    .title(post.getTitle())
-                    .content(post.getContent())
-                    .tags(tags)
-                    .type(post.getType())
-                    .createdAt(post.getCreatedAt())
-                    .build();
+            return FreeMyPostResponseDto.from(post, tags);
         });
     }
 

@@ -19,6 +19,7 @@ public class TipScrapResponse {
     private LocalDateTime createdAt;
     private Post type;
     private List<String> tags;
+    private String imageUrl;
 
     public static TipScrapResponse from(TipScrap scrap, List<String> tags) {
         TipPost post = scrap.getTipPost();
@@ -33,6 +34,7 @@ public class TipScrapResponse {
                 .createdAt(post.getCreatedAt())
                 .type(scrap.getType())
                 .tags(tags)
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
     }
 }

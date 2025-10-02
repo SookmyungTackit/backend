@@ -18,6 +18,7 @@ public class TipPostDto {
     private final String content;
     private final LocalDateTime createdAt;
     private final List<String> tags;
+    private final String imageUrl;
 
     public TipPostDto(TipPost post, List<String> tags) {
         this.id = post.getId();
@@ -26,6 +27,7 @@ public class TipPostDto {
         this.content = post.getContent();
         this.createdAt = post.getCreatedAt();
         this.tags = tags;
+        this.imageUrl = post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl();
     }
 
     // 태그 X ) 기존 fromEntity

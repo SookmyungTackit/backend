@@ -11,4 +11,5 @@ public class TipPostUpdateDto {
     private String title;
     private String content;
     private List<Long> tagIds;
+    private Boolean removeImage; // true 면 이미지 삭제
 }

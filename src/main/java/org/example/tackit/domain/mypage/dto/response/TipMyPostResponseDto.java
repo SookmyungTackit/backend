@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.tackit.domain.entity.Post;
+import org.example.tackit.domain.entity.TipPost;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,4 +22,18 @@ public class TipMyPostResponseDto {
     private List<String> tags;
     private Post type;
     private LocalDateTime createdAt;
+    private String imageUrl;
+
+    public static TipMyPostResponseDto from(TipPost post, List<String> tags) {
+        return TipMyPostResponseDto.builder()
+                .id(post.getId())
+                .writer(post.getWriter().getNickname())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .tags(tags)
+                .type(post.getType())
+                .createdAt(post.getCreatedAt())
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl()) // ✅ 첫 번째 이미지
+                .build();
+    }
 }

@@ -60,6 +60,18 @@ public class TipPost implements ReportablePost {
         }
     }
 
+    public void addImage(TipPostImage image) {
+        images.add(image);
+        image.setTipPost(this);
+    }
+
+    public void clearImages() {
+        for (TipPostImage image : images) {
+            image.setTipPost(null);
+        }
+        images.clear();
+    }
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;

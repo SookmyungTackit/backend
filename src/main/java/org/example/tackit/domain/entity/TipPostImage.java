@@ -21,4 +21,7 @@ public class TipPostImage {
     @JoinColumn(name = "tip_post_id")
     private TipPost tipPost;
 
+    public void setTipPost(TipPost tipPost) {
+        this.tipPost = tipPost;
+    }
 }
