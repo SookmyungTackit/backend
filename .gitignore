@@ -41,3 +41,5 @@ backend.git/
 
 ### redis ###
 dump.rdb
+
+/k6/
