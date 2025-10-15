@@ -70,6 +70,7 @@ public class FreeTagCustomRepositoryImpl implements FreeTagCustomRepository{
                         Collectors.mapping(m -> m.getTag().getTagName(), Collectors.toList())
                 ));
 
+        // 이미지 조회
         List<FreePostImage> images = jpaQueryFactory
                 .selectFrom(freePostImage)
                 .where(freePostImage.freePost.id.in(pagedPostIds))
