@@ -3,6 +3,7 @@ package org.example.tackit.domain.Free_board.Free_tag.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
 import org.example.tackit.domain.entity.FreePost;
+import org.example.tackit.domain.entity.FreePostImage;
 import org.example.tackit.domain.entity.FreeTagMap;
 import org.example.tackit.domain.entity.Status;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.example.tackit.domain.entity.QFreePostImage.freePostImage;
 import static org.example.tackit.domain.entity.QMember.member;
 import static org.example.tackit.domain.entity.QFreePost.freePost;
 import static org.example.tackit.domain.entity.QFreeTag.freeTag;
@@ -68,6 +70,18 @@ public class FreeTagCustomRepositoryImpl implements FreeTagCustomRepository{
                         Collectors.mapping(m -> m.getTag().getTagName(), Collectors.toList())
                 ));
 
+        List<FreePostImage> images = jpaQueryFactory
+                .selectFrom(freePostImage)
+                .where(freePostImage.freePost.id.in(pagedPostIds))
+                .fetch();
+
+        Map<Long, String> imageMap = images.stream()
+                .collect(Collectors.toMap(
+                        img -> img.getFreePost().getId(),
+                        FreePostImage::getImageUrl,
+                        (existing, duplicate) -> existing // 중복 시 첫 번째만 유지
+                ));
+
         // 4. DTO 변환
         List<FreeTagPostResponseDto> content = posts.stream()
                 .map(post -> new FreeTagPostResponseDto(
@@ -76,7 +90,8 @@ public class FreeTagCustomRepositoryImpl implements FreeTagCustomRepository{
                         post.getTitle(),
                         post.getContent(),
                         tagMap.getOrDefault(post.getId(), List.of()),
-                        post.getCreatedAt()
+                        post.getCreatedAt(),
+                        imageMap.get(post.getId())
                 ))
                 .toList();
 
