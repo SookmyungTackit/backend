@@ -18,13 +18,15 @@ public class FreeTagPostResponseDto {
     private final String content;
     private final List<String> tags;
     private final LocalDateTime createdAt;
+    private final String imageUrl;
 
-    public FreeTagPostResponseDto(Long postId, FreePost post, List<String> tags) {
+    public FreeTagPostResponseDto(Long postId, FreePost post, List<String> tags, String imageUrl) {
         this.postId = postId;
         this.writer = post.getWriter().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = tags;
         this.createdAt = post.getCreatedAt();
+        this.imageUrl = imageUrl;
     }
 }

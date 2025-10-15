@@ -3,6 +3,7 @@ package org.example.tackit.domain.QnA_board.QnA_tag.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.example.tackit.domain.QnA_board.QnA_tag.dto.response.QnATagPostResponseDto;
 import org.example.tackit.domain.entity.QnAPost;
+import org.example.tackit.domain.entity.QnAPostImage;
 import org.example.tackit.domain.entity.QnATagMap;
 import org.example.tackit.domain.entity.Status;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import static org.example.tackit.domain.entity.QFreePost.freePost;
 import static org.example.tackit.domain.entity.QQnAPost.qnAPost;
+import static org.example.tackit.domain.entity.QQnAPostImage.qnAPostImage;
 import static org.example.tackit.domain.entity.QQnATagMap.qnATagMap;
 import static org.example.tackit.domain.entity.QQnATag.qnATag;
 import static org.example.tackit.domain.entity.QMember.member;
@@ -73,6 +75,19 @@ public class QnATagCustomRepositoryImpl implements QnATagCustomRepository{
                         Collectors.mapping(m -> m.getTag().getTagName(), Collectors.toList())
                 ));
 
+        // 이미지 조회
+        List<QnAPostImage> images = jpaQueryFactory
+                .selectFrom(qnAPostImage)
+                .where(qnAPostImage.qnaPost.id.in(pagedPostIds))
+                .fetch();
+
+        Map<Long, String> imageMap = images.stream()
+                .collect(Collectors.toMap(
+                        img -> img.getQnaPost().getId(),
+                        QnAPostImage::getImageUrl,
+                        (existing, duplicate) -> existing // 중복 시 첫 번째 이미지 유지
+                ));
+
         // 4. DTO 변환
         List<QnATagPostResponseDto> content = posts.stream()
                 .map(post -> new QnATagPostResponseDto(
@@ -81,7 +96,8 @@ public class QnATagCustomRepositoryImpl implements QnATagCustomRepository{
                         post.getTitle(),
                         post.getContent(),
                         post.getCreatedAt(),
-                        tagMap.getOrDefault(post.getId(), List.of())
+                        tagMap.getOrDefault(post.getId(), List.of()),
+                        imageMap.get(post.getId())
                 ))
                 .toList();
 
