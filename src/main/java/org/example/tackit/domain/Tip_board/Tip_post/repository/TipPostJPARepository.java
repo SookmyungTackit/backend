@@ -11,10 +11,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TipPostJPARepository extends JpaRepository<TipPost, Long> {
-    List<TipPost> findByWriter(Member member);
 
     Page<TipPost> findByOrganizationAndStatus(String organization, Status status, Pageable pageable);
 
     Page<TipPost> findByWriterAndStatus(Member writer, Status status, Pageable pageable );
+
+    long countByStatus(Status status);
 
 }
