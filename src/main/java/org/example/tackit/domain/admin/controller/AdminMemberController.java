@@ -1,11 +1,13 @@
 package org.example.tackit.domain.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.admin.dto.DeletedMemberResp;
 import org.example.tackit.domain.admin.dto.MemberDTO;
-import org.example.tackit.domain.admin.dto.MemberStatisticsDTO;
 import org.example.tackit.domain.admin.service.AdminMemberService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -13,22 +15,20 @@ import java.util.List;
 @RequestMapping("/api/admin/members")
 @RequiredArgsConstructor
 public class AdminMemberController {
+
     private final AdminMemberService adminMemberService;
 
-    // 1. 전체 유저 조회
+    // [ 전체 유저 조회 ]
     @GetMapping
     public ResponseEntity<List<MemberDTO>> getAllUsers() {
         List<MemberDTO> users = adminMemberService.getAllMembersOrderByStatus();
         return ResponseEntity.ok(users);
     }
 
-    // 2. 전체 유저, 이번 달 가입 유저, 이번 주 가입 유저
-    @GetMapping("/statistics")
-    public ResponseEntity<MemberStatisticsDTO> getMemberStatistics() {
-        MemberStatisticsDTO stats = adminMemberService.getMemberStatistics();
-        return ResponseEntity.ok(stats);
-
+    // [ 탈퇴 계정 ]
+    @GetMapping("/deleted")
+    public ResponseEntity<DeletedMemberResp> getDeletedMembers() {
+        DeletedMemberResp deletedMembers = adminMemberService.getDeletedMembers();
+        return ResponseEntity.ok(deletedMembers);
     }
-
-
 }
