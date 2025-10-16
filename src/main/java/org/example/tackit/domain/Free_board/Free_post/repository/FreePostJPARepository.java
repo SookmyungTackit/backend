@@ -12,4 +12,6 @@ public interface FreePostJPARepository extends JpaRepository<FreePost, Long> {
     Page<FreePost> findByWriterAndStatus(Member member, Status status, Pageable pageable);
 
     Page<FreePost> findByOrganizationAndStatus(String organization, Status status, Pageable pageable);
+
+    long countByStatus(Status status);
 }

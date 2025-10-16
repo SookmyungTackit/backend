@@ -18,6 +18,7 @@ public class TipPostRespDto {
     private final String content;
     private final List<String> tags;
     private final LocalDateTime createdAt;
+    private final String imageUrl;
 
     public TipPostRespDto(TipPost post, List<String> tags) {
         this.id = post.getId();
@@ -26,5 +27,6 @@ public class TipPostRespDto {
         this.content = post.getContent();
         this.tags = tags;
         this.createdAt = post.getCreatedAt();
+        this.imageUrl = post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl();
     }
 }

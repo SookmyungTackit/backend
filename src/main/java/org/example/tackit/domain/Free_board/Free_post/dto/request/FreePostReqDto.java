@@ -4,15 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FreePostReqDto {
     private String title;
     private String content;
     private List<Long> tagIds;
+    private MultipartFile image;
+
+    public void setImage(MultipartFile image) {
+        this.image = image;
+    }
 }

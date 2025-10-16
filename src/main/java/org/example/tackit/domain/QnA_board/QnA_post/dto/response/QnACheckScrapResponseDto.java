@@ -21,6 +21,7 @@ public class QnACheckScrapResponseDto {
     private final List<String> tags;
     private final LocalDateTime createdAt;
     private final Post type;
+    private final String imageUrl;
 
     public static QnACheckScrapResponseDto fromEntity(QnAPost post, Post type, List<String> tagNames) {
         String content = post.getContent();
@@ -36,6 +37,7 @@ public class QnACheckScrapResponseDto {
                 .tags(tagNames)
                 .createdAt(post.getCreatedAt())
                 .type(type)
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
     }
 

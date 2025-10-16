@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -26,18 +28,30 @@ public class QnAPostController {
 
     // 게시글 생성
     @PostMapping("/create")
-    public ResponseEntity<QnAPostResponseDto> createQnAPost(@RequestBody QnAPostRequestDto dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<QnAPostResponseDto> createQnAPost(
+            @RequestPart("request") QnAPostRequestDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) throws IOException {
         String email = userDetails.getUsername(); // userDetails로부터 이메일 획득
         String org = userDetails.getOrganization();
+
+        dto.setImageUrl(image);
         QnAPostResponseDto response = qnAPostService.createPost(dto, email, org);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 게시글 수정
     @PutMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> updateQnAPost(@PathVariable("QnAPostId") long QnAPostId, @RequestBody UpdateQnARequestDto request, @AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<QnAPostResponseDto> updateQnAPost(
+            @PathVariable("QnAPostId") long QnAPostId,
+            @RequestPart("request") UpdateQnARequestDto request,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) throws IOException {
         String email = userDetails.getUsername();
         String org = userDetails.getOrganization();
+        request.setImage(image);
         QnAPostResponseDto updateResponse = qnAPostService.update(QnAPostId, request, email, org);
 
         return ResponseEntity.ok().body(updateResponse);
@@ -45,7 +59,10 @@ public class QnAPostController {
 
     // 게시글 삭제
     @DeleteMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(@PathVariable("QnAPostId") long QnAPostId, @AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<QnAPostResponseDto> deleteQnAPost(
+            @PathVariable("QnAPostId") long QnAPostId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
         String email = userDetails.getUsername();
         String org = userDetails.getOrganization();
         qnAPostService.delete(QnAPostId, email, org);
@@ -67,7 +84,10 @@ public class QnAPostController {
 
     // 게시글 상세 조회
     @GetMapping("/{QnAPostId}")
-    public ResponseEntity<QnAPostResponseDto> findQnAPost(@PathVariable("QnAPostId") long QnAPostId , @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<QnAPostResponseDto> findQnAPost(
+            @PathVariable("QnAPostId") long QnAPostId ,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         String org = userDetails.getOrganization();
         QnAPostResponseDto post = qnAPostService.getPostById(QnAPostId, org);
         return ResponseEntity.ok(post);
@@ -75,9 +95,13 @@ public class QnAPostController {
 
     // 게시글 신고
     @PostMapping("{QnAPostId}/report")
-    public ResponseEntity<String> reportPost(@PathVariable long QnAPostId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<String> reportPost(
+            @PathVariable long QnAPostId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         String org = userDetails.getOrganization();
         String message = qnAPostService.reportQnAPost(QnAPostId, userDetails.getId());
         return ResponseEntity.ok(message);
     }
+    
 }

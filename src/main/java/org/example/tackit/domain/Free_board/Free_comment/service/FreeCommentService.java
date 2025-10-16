@@ -9,10 +9,8 @@ import org.example.tackit.domain.Free_board.Free_comment.dto.resp.FreeCommentRes
 import org.example.tackit.domain.Free_board.Free_comment.repository.FreeCommentRepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreeMemberJPARepository;
 import org.example.tackit.domain.Free_board.Free_post.repository.FreePostJPARepository;
-import org.example.tackit.domain.entity.FreeComment;
-import org.example.tackit.domain.entity.FreePost;
-import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.Role;
+import org.example.tackit.domain.entity.*;
+import org.example.tackit.domain.notification.service.NotificationService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +23,7 @@ public class FreeCommentService {
     private final FreeCommentRepository freeCommentRepository;
     private final FreePostJPARepository freePostJPARepository;
     private final FreeMemberJPARepository freeMemberJPARepository;
+    private final NotificationService notificationService;
 
     // [ 댓글 생성 ]
     @Transactional
@@ -42,7 +41,29 @@ public class FreeCommentService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return new FreeCommentRespDto(freeCommentRepository.save(comment));
+        // 1. 댓글 DB 저장
+        FreeComment savedComment = freeCommentRepository.save(comment);
+
+        // 2. 알림 전송
+        if(!post.getWriter().getId().equals(member.getId())){
+            Member postWriter = post.getWriter(); // 알림 받을 대상(게시글 작성자)
+            String message = member.getNickname() + "님이 글에 댓글을 남겼습니다.";
+            String url = "/api/free-posts/" + post.getId();
+
+            // 3. 알림 엔티티 생성
+            Notification notification = Notification.builder()
+                    .member(postWriter)
+                    .type(NotificationType.COMMENT)
+                    .message(message)
+                    .relatedUrl(url)
+                    .fromMemberId(member.getId())
+                    .build();
+
+            // 4. 알림 저장 및 전송을 위해 NotificationService 호출
+            notificationService.send(notification);
+        }
+
+        return new FreeCommentRespDto(savedComment);
     }
 
     // [ 게시글 댓글 조회 ]

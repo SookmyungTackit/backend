@@ -1,6 +1,7 @@
 package org.example.tackit.domain.QnA_board.QnA_post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.QnAPostRequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
@@ -14,7 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +30,11 @@ public class QnAPostService {
     private final QnAMemberRepository qnAMemberRepository;
     private final QnAPostTagService tagService;
     private final QnAPostReportRepository qnAPostReportRepository;
+    private final S3UploadService s3UploadService;
 
     // 게시글 작성 (NEWBIE만 가능)
     @Transactional
-    public QnAPostResponseDto createPost(QnAPostRequestDto dto, String email, String org) {
+    public QnAPostResponseDto createPost(QnAPostRequestDto dto, String email, String org) throws IOException {
         Member member = qnAMemberRepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -49,6 +53,15 @@ public class QnAPostService {
                 .reportCount(0)
                 .build();
 
+        // 이미지가 있으면 추가
+        if (dto.getImageUrl() != null && !dto.getImageUrl().isEmpty()) {
+            String imageUrl = s3UploadService.saveFile(dto.getImageUrl());
+            QnAPostImage image = new QnAPostImage();
+            image.setImageUrl(imageUrl);
+            image.setPost(post);
+            post.addImage(image);
+        }
+
         qnAPostRepository.save(post);
 
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
@@ -58,7 +71,7 @@ public class QnAPostService {
 
     // 게시글 수정 (작성자만 가능)
     @Transactional
-    public QnAPostResponseDto update(long id, UpdateQnARequestDto request, String email, String org){
+    public QnAPostResponseDto update(long id, UpdateQnARequestDto request, String email, String org) throws IOException {
         Member member = qnAMemberRepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -76,6 +89,26 @@ public class QnAPostService {
 
         tagService.deleteTagsByPost(post); // 기존 태그 삭제
         List<String> tagNames = tagService.assignTagsToPost(post, request.getTagIds()); // 새 태그 등록
+
+        // 이미지 수정 로직
+        if (Boolean.TRUE.equals(request.getRemoveImage())) {
+            // 이미지 삭제
+            post.getImages().forEach(img -> {
+                if (img.getImageUrl() != null) {
+                    s3UploadService.deleteImage(img.getImageUrl());
+                }
+            });
+            post.clearImages();
+
+        } else if (request.getImage() != null && !request.getImage().isEmpty()) {
+            // 이미지 교체/추가
+            post.clearImages();
+            String imageUrl = s3UploadService.saveFile(request.getImage());
+            QnAPostImage image = new QnAPostImage();
+            image.setImageUrl(imageUrl);
+            image.setPost(post);
+            post.addImage(image);
+        } // 이미지 유지
 
         return QnAPostResponseDto.fromEntity(post, tagNames);
     }

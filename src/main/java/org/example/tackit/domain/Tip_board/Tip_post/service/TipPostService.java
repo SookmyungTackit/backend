@@ -3,6 +3,7 @@ package org.example.tackit.domain.Tip_board.Tip_post.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipMemberJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostReportRepository;
@@ -19,12 +20,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class TipPostService {
     private final TipPostReportRepository tipPostReportRepository;
     private final TipPostTagMapRepository tipPostTagMapRepository;
     private final TipTagService tagService;
+    private final S3UploadService s3UploadService;
 
     public PageResponseDTO<TipPostRespDto> getActivePostsByOrganization(String org, Pageable pageable) {
         Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
@@ -51,6 +54,7 @@ public class TipPostService {
                             .content(post.getContent())
                             .createdAt(post.getCreatedAt())
                             .tags(tags)
+                            .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                             .build();
         });
     }
@@ -77,13 +81,14 @@ public class TipPostService {
                 .title(tipPost.getTitle())
                 .content(tipPost.getContent())
                 .tags(tagNames)
+                .imageUrl(tipPost.getImages().isEmpty() ? null : tipPost.getImages().get(0).getImageUrl())
                 .createdAt(tipPost.getCreatedAt())
                 .build();
     }
 
     // [ 게시글 작성 ] : 선임자만 가능
     @Transactional
-    public TipPostRespDto createPost(TipPostReqDto dto, String email, String org) {
+    public TipPostRespDto createPost(TipPostReqDto dto, String email, String org, MultipartFile image) throws IOException {
         // 1. 유저 조회
         Member member = tipMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
@@ -104,10 +109,20 @@ public class TipPostService {
                 .organization(org)
                 .build();
 
+        // 3. 이미지 업로드 & 연관관계 매핑 (단일 파일만)
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = s3UploadService.saveFile(image);
+            TipPostImage imageEntity = TipPostImage.builder()
+                    .imageUrl(imageUrl)
+                    .build();
+            post.addImage(imageEntity); // 기존 이미지 clear 후 하나만 저장
+        }
+
         tipPostJPARepository.save(post);
 
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
+        // 응답 DTO 구성 (imageUrl 하나만)
         return TipPostRespDto.builder()
                 .id(post.getId())
                 .writer(member.getNickname())
@@ -115,26 +130,53 @@ public class TipPostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .tags(tagNames)
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
     }
 
+
+
     // [ 게시글 수정 ] : 작성자만
     @Transactional
-    public TipPostRespDto update(Long id, TipPostUpdateDto dto, String email, String org) {
+    public TipPostRespDto update(Long id, TipPostUpdateDto dto, String email, String org, MultipartFile image) throws IOException {
         Member member = tipMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         TipPost post = tipPostJPARepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        boolean isWriter = post.getWriter().getId().equals(member.getId());
-
-        if (!isWriter) {
+        if (!post.getWriter().getId().equals(member.getId())) {
             throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
         }
 
+        // 기본 정보 수정
         post.update(dto.getTitle(), dto.getContent());
 
+        // 이미지 수정 로직
+        String currentImageUrl = post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl();
+
+        // 1) 삭제 요청
+        if (Boolean.TRUE.equals(dto.getRemoveImage())) {
+            if (currentImageUrl != null) {
+                s3UploadService.deleteImage(currentImageUrl);
+            }
+            post.clearImages();
+        }
+
+        // 2) 새 이미지 업로드 (교체 or 추가)
+        if (image != null && !image.isEmpty()) {
+            if (currentImageUrl != null) {
+                s3UploadService.deleteImage(currentImageUrl);
+                post.clearImages();
+            }
+            String newImageUrl = s3UploadService.saveFile(image);
+            TipPostImage newImage = TipPostImage.builder()
+                    .imageUrl(newImageUrl)
+                    .build();
+            post.addImage(newImage);
+        }
+
+        // 태그 다시 매핑
         tagService.deleteTagsByPost(post);
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
@@ -145,8 +187,10 @@ public class TipPostService {
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())
                 .tags(tagNames)
+                .imageUrl(post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl())
                 .build();
     }
+
 
     // [ 게시글 삭제 ]
     @Transactional

@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @RestController
@@ -45,10 +48,12 @@ public class FreePostController {
     // 3. 게시글 작성
     @PostMapping
     public ResponseEntity<FreePostRespDto> createFreePost(
-            @RequestBody FreePostReqDto dto,
-            @AuthenticationPrincipal CustomUserDetails user) {
+            @RequestPart("dto") FreePostReqDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
         String email = user.getEmail();
         String org = user.getOrganization();
+        dto.setImage(image);
         FreePostRespDto resp = freePostService.createPost(dto, email, org);
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
@@ -57,9 +62,11 @@ public class FreePostController {
     @PutMapping("/{id}")
     public ResponseEntity<FreePostRespDto> updateFreePost(
             @PathVariable Long id,
-            @RequestBody UpdateFreeReqDto req,
-            @AuthenticationPrincipal CustomUserDetails user) {
+            @RequestPart("req") UpdateFreeReqDto req,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
 
+        req.setImage(image);
         String email = user.getEmail();
         String org = user.getOrganization();
         FreePostRespDto updateResp = freePostService.update(id, req, email, org);

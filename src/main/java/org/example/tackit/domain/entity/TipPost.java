@@ -40,17 +40,36 @@ public class TipPost implements ReportablePost {
 
     // TipTagMap 연관관계 추가
     @OneToMany(mappedBy = "tipPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TipTagMap> tagMaps = new ArrayList<>();
 
     // TipReport 연관관계 추가
     @OneToMany(mappedBy = "tipPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
     private List<TipReport> reports = new ArrayList<>();
+
+    // 이미지 연관관계 추가
+    @OneToMany(mappedBy = "tipPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TipPostImage> images = new ArrayList<>();
 
     public void increaseReportCount() {
         this.reportCount++;
         if (this.reportCount >= 3) {
             this.status = Status.DELETED;
         }
+    }
+
+    public void addImage(TipPostImage image) {
+        images.add(image);
+        image.setTipPost(this);
+    }
+
+    public void clearImages() {
+        for (TipPostImage image : images) {
+            image.setTipPost(null);
+        }
+        images.clear();
     }
 
     public void update(String title, String content) {

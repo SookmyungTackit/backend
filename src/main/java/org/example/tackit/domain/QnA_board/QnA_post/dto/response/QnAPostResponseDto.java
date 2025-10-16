@@ -19,8 +19,12 @@ public class QnAPostResponseDto {
     private final String content;
     private final List<String> tags;
     private final LocalDateTime createdAt;
+    private String imageUrl;
 
     public static QnAPostResponseDto fromEntity(QnAPost post, List<String> tagNames) {
+        String imageUrl = post.getImages().isEmpty() ? null
+                : post.getImages().get(0).getImageUrl();
+
         return QnAPostResponseDto.builder()
                 .postId(post.getId())
                 .writer(post.getWriter().getNickname())
@@ -28,6 +32,7 @@ public class QnAPostResponseDto {
                 .content(post.getContent())
                 .tags(tagNames)
                 .createdAt(post.getCreatedAt())
+                .imageUrl(imageUrl)
                 .build();
     }
 }

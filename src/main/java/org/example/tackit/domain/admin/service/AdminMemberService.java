@@ -1,10 +1,15 @@
 package org.example.tackit.domain.admin.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.domain.admin.dto.DeletedMemberDTO;
+import org.example.tackit.domain.admin.dto.DeletedMemberResp;
 import org.example.tackit.domain.admin.dto.MemberDTO;
 import org.example.tackit.domain.admin.dto.MemberStatisticsDTO;
 import org.example.tackit.domain.admin.repository.MemberRepository;
+import org.example.tackit.domain.entity.Member;
+import org.example.tackit.domain.entity.Status;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -17,6 +22,8 @@ import java.util.stream.Collectors;
 public class AdminMemberService {
     private final MemberRepository memberRepository;
 
+    // [ 모든 멤버 조회 ]
+    @Transactional(readOnly = true)
     public List<MemberDTO> getAllMembersOrderByStatus() {
         return memberRepository.findAllOrderByStatus().stream()
                 .map(member -> MemberDTO.builder()
@@ -29,6 +36,8 @@ public class AdminMemberService {
                 .collect(Collectors.toList());
     }
 
+    // [ 총 회원 수, 이번 달 신규 회원 수, 이번 주 신규 회원 수 ]
+    @Transactional(readOnly = true)
     public MemberStatisticsDTO getMemberStatistics() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfMonth = now.withDayOfMonth(1).with(LocalTime.MIN);
@@ -39,7 +48,20 @@ public class AdminMemberService {
         long weeklyCount = memberRepository.countJoinedAfter(startOfWeek);
 
         return new MemberStatisticsDTO(totalCount, monthlyCount, weeklyCount);
+    }
 
+    // [ 탈퇴 회원 수 조회 ]
+    @Transactional(readOnly = true)
+    public DeletedMemberResp getDeletedMembers() {
+        List<Member> deletedMembers = memberRepository.findByStatus(Status.DELETED);
+
+        List<DeletedMemberDTO> deletedMemberDTOS = deletedMembers.stream()
+                .map(member -> DeletedMemberDTO.from(member))
+                .collect(Collectors.toList());
+
+        Long deletedCount = (long) deletedMembers.size();
+
+        return new DeletedMemberResp(deletedMemberDTOS, deletedCount);
     }
 
 
