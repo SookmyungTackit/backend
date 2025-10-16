@@ -21,6 +21,14 @@ import java.util.Map;
 public class AdminPostController {
     private final Map<Post, ReportedPostService> reportedPostServices;
 
+    // - 총 게시글 수
+    //- DAU(하루 동안 실제로 서비스에 접속해 활동한 순 사용자 수)
+    //- MAU(한 달 동안 한 번이라도 서비스를 이용한 순 사용자 수)
+    //- DAU/MAU
+    //- 월별 가입자 수, 월별 활성 사용자 수(MAU)
+    //- 탈퇴한 계정 수
+    //- 신고 3회 누적으로 삭제된 게시글 혹은 댓글 수
+
     // 신고된 게시글 조회
     @GetMapping("/{postType}/posts")
     public ResponseEntity<PageResponseDTO<ReportedPostDTO>> getReportedPosts(
