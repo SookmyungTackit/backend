@@ -1,6 +1,5 @@
 package org.example.tackit.domain.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,10 +29,7 @@ public class TipScrap {
     private Post type = Post.Tip;
 
     @Builder
-    public TipScrap(Member member, TipPost tipPost) {
-        if (member == null || tipPost == null) {
-            throw new IllegalArgumentException("회원 또는 게시글은 null일 수 없습니다.");
-        }
+    public TipScrap(Member member, TipPost tipPost, LocalDateTime savedAt) {
         this.member = member;
         this.tipPost = tipPost;
         this.savedAt = LocalDateTime.now();

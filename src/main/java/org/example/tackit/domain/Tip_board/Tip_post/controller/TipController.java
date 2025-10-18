@@ -1,6 +1,7 @@
 package org.example.tackit.domain.Tip_board.Tip_post.controller;
 
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipScrapRespDto;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostReqDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDto;
@@ -87,12 +88,13 @@ public class TipController {
 
     // 6. 게시글 스크랩
     @PostMapping("/{id}/scrap")
-    public ResponseEntity<String> scrapPost(
+    public ResponseEntity<TipScrapRespDto> scrapPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
-
-        String message = tipService.toggleScrap(id, user.getId());
-        return ResponseEntity.ok(message);
+        String org = user.getOrganization();
+        String email = user.getUsername();
+        TipScrapRespDto response = tipService.toggleScrap(id, email, org);
+        return ResponseEntity.ok(response);
     }
 
     // 7. 게시글 신고
