@@ -9,6 +9,7 @@ import org.example.tackit.domain.QnA_board.QnA_comment.repository.QnACommentRepo
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.entity.*;
+import org.example.tackit.domain.notification.service.NotificationService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class QnACommentService {
     private final QnACommentRepository qnACommentRepository;
     private final QnAPostRepository qnAPostRepository;
     private final QnAMemberRepository qnAMemberRepository;
+    private final NotificationService notificationService;
 
     // 댓글 생성 (SENIOR만 가능)
     @Transactional
@@ -44,7 +46,30 @@ public class QnACommentService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return new QnACommentResponseDto(qnACommentRepository.save(comment));
+        // 댓글 DB 저장
+        QnAComment savedComment = qnACommentRepository.save(comment);
+
+        // 알림 전송
+        if(!post.getWriter().getId().equals(member.getId())) {
+            Member postWriter = post.getWriter();
+
+            String message = member.getNickname() + "님이 글에 댓글을 남겼습니다.";
+
+            String url = "/api/qna-post/" + post.getId();
+
+            // 알림 엔티티 생성
+            Notification notification = Notification.builder()
+                    .member(postWriter)
+                    .type(NotificationType.COMMENT)
+                    .message(message)
+                    .relatedUrl(url)
+                    .fromMemberId(member.getId())
+                    .build();
+
+            // 알림 저장 및 전송
+            notificationService.send(notification);
+        }
+        return new QnACommentResponseDto(savedComment);
     }
 
 
