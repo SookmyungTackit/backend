@@ -6,9 +6,12 @@ import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
+import org.example.tackit.domain.Free_board.Free_post.dto.response.FreeScrapResponseDto;
 import org.example.tackit.domain.Free_board.Free_post.repository.*;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
+import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAScrapResponseDto;
 import org.example.tackit.domain.entity.*;
+import org.example.tackit.domain.notification.service.NotificationService;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +37,7 @@ public class FreePostService {
     private final FreePostReportRepository freePostReportRepository;
     private final S3UploadService s3UploadService;
     private final FreePostImageRepository freePostImageRepository;
+    private final NotificationService notificationService;
 
     // [ 게시글 전체 조회 ]
     @Transactional
@@ -253,25 +257,51 @@ public class FreePostService {
 
     // [ 게시글 스크랩 ]
     @Transactional
-    public String toggleScrap(Long id, Long userId) {
-        // 1. 게시글 조회
-        FreePost post = freePostJPARepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
+    public FreeScrapResponseDto toggleScrap(Long postId, String email, String memberOrg) {
+        Member member = freeMemberJPARepository.findByEmail(email)
+                .orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        // 2. 멤버 조회
-        Member member = freeMemberJPARepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
+        FreePost post = freePostJPARepository.findById(postId)
+                .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        if(!post.getWriter().getOrganization().equals(memberOrg)) {
+            throw new AccessDeniedException("해당 조직 게시글이 아닙니다.");
+        }
 
         Optional<FreeScrap> existing = freeScrapJPARepository.findByMemberAndFreePost(member, post);
 
         if (existing.isPresent()) {
             freeScrapJPARepository.delete(existing.get());
-            return "게시글 스크랩을 취소하였습니다.";
-        } else {
-            FreeScrap scrap = new FreeScrap(member, post);
-            freeScrapJPARepository.save(scrap);
-            return "게시글을 스크랩하였습니다.";
+            return new FreeScrapResponseDto(false, null);
         }
+
+        FreeScrap scrap = FreeScrap.builder()
+                .member(member)
+                .freePost(post)
+                .savedAt(LocalDateTime.now())
+                .build();
+
+        freeScrapJPARepository.save(scrap);
+
+        // 1. 알림 전송
+        if(!post.getWriter().getId().equals(member.getId())){
+            Member postWriter = post.getWriter();
+            String message = member.getNickname() + "님이 글을 스크랩하였습니다.";
+            String url = "/api/free-posts/" + post.getId();
+
+            // 2. 알림 엔티티 생성
+            Notification notification = Notification.builder()
+                    .member(postWriter)
+                    .type(NotificationType.SCRAP)
+                    .message(message)
+                    .relatedUrl(url)
+                    .fromMemberId(member.getId())
+                    .build();
+
+            //3. 알림 저장 및 전송을 위해 NotificationService 호출
+            notificationService.send(notification);
+        }
+        return new FreeScrapResponseDto(true, scrap.getSavedAt());
     }
 
 }
