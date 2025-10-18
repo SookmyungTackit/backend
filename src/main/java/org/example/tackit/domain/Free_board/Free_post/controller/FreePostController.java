@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
+import org.example.tackit.domain.Free_board.Free_post.dto.response.FreeScrapResponseDto;
 import org.example.tackit.domain.Free_board.Free_post.service.FreePostService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.global.dto.PageResponseDTO;
@@ -99,11 +100,13 @@ public class FreePostController {
 
     // 7. 게시글 스크랩
     @PostMapping("/{id}/scrap")
-    public ResponseEntity<String> scrapPost(
+    public ResponseEntity<FreeScrapResponseDto> scrapPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
+        String org = user.getOrganization();
+        String email = user.getEmail();
+        FreeScrapResponseDto response = freePostService.toggleScrap(id, email, org);
 
-        String message = freePostService.toggleScrap(id, user.getId());
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(response);
     }
 }
