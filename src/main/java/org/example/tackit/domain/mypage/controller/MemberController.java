@@ -1,5 +1,6 @@
 package org.example.tackit.domain.mypage.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.mypage.dto.request.UpdatePasswordRequest;
 import org.example.tackit.domain.mypage.dto.response.MemberMypageResponse;
@@ -43,7 +44,7 @@ public class MemberController {
     // 비밀번호 변경
     @PatchMapping("/password")
     public ResponseEntity<UpdatePasswordResponse> updatePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                                                 @RequestBody UpdatePasswordRequest request) {
+                                                                 @Valid @RequestBody UpdatePasswordRequest request) {
         UpdatePasswordResponse response = updateMemberService.updatePassword(
                 userDetails.getUsername(),
                 request.getCurrentPassword(),
