@@ -17,8 +17,8 @@ public class FreeScrapResponse {
     private Long freeId;
     private String title;
     private String contentPreview;
-    private String authorName;
-    private String authorProfileImageUrl;
+    private String writer;
+    private String profileImageUrl;
     private LocalDateTime createdAt;
     private Post type;
     private List<String> tags;
@@ -33,8 +33,8 @@ public class FreeScrapResponse {
                 .contentPreview(post.getContent().length() > 100
                         ? post.getContent().substring(0, 100) + "..."
                         : post.getContent())
-                .authorName(post.getWriter().getNickname())
-                .authorProfileImageUrl(post.getWriter().getProfileImageUrl())
+                .writer(post.getWriter().getNickname())
+                .profileImageUrl(post.getWriter().getProfileImageUrl())
                 .createdAt(post.getCreatedAt())
                 .type(scrap.getType())
                 .tags(tags)
