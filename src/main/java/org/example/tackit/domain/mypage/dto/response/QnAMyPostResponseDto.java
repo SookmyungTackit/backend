@@ -16,6 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class QnAMyPostResponseDto {
     private Long postId;
+    private String writer;
+    private String profileImageUrl;
     private String title;
     private String content;
     private LocalDateTime createdAt;
@@ -26,6 +28,8 @@ public class QnAMyPostResponseDto {
     public static QnAMyPostResponseDto fromEntity(QnAPost post, List<String> tags) {
         return QnAMyPostResponseDto.builder()
                 .postId(post.getId())
+                .writer(post.getWriter().getNickname())
+                .profileImageUrl(post.getWriter().getProfileImageUrl())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .createdAt(post.getCreatedAt())

@@ -15,6 +15,7 @@ import java.util.List;
 public class QnAPostResponseDto {
     private final Long postId;
     private final String writer;
+    private final String profileImageUrl;
     private final String title;
     private final String content;
     private final List<String> tags;
@@ -28,6 +29,7 @@ public class QnAPostResponseDto {
         return QnAPostResponseDto.builder()
                 .postId(post.getId())
                 .writer(post.getWriter().getNickname())
+                .profileImageUrl(post.getWriter().getProfileImageUrl())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tags(tagNames)

@@ -93,6 +93,7 @@ public class QnATagCustomRepositoryImpl implements QnATagCustomRepository{
                 .map(post -> new QnATagPostResponseDto(
                         post.getId(),
                         post.getWriter().getNickname(),
+                        post.getWriter().getProfileImageUrl(),
                         post.getTitle(),
                         post.getContent(),
                         post.getCreatedAt(),

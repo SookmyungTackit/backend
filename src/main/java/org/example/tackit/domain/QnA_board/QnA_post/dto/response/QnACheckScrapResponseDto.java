@@ -17,6 +17,7 @@ public class QnACheckScrapResponseDto {
     private final Long postId;
     private final String title;
     private final String writer;
+    private final String writerProfileImageUrl;
     private final String contentPreview;
     private final List<String> tags;
     private final LocalDateTime createdAt;
@@ -33,6 +34,7 @@ public class QnACheckScrapResponseDto {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .writer(post.getWriter().getNickname())
+                .writerProfileImageUrl(post.getWriter().getProfileImageUrl())
                 .contentPreview(content)
                 .tags(tagNames)
                 .createdAt(post.getCreatedAt())
