@@ -75,6 +75,8 @@ public class MyPageFreeService {
         return PageResponseDTO.from(comments, comment -> FreeMyCommentResponseDto.builder()
                 .commentId(comment.getId())
                 .postId(comment.getFreePost().getId())
+                .writer(comment.getWriter().getNickname())
+                .profileImageUrl(comment.getWriter().getProfileImageUrl())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .type(comment.getFreePost().getType())

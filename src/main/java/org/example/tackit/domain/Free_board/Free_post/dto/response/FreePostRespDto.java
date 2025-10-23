@@ -13,6 +13,7 @@ import java.util.List;
 public class FreePostRespDto {
     private long id;
     private final String writer;
+    private String profileImageUrl;
     private final String title;
     private final String content;
     private final List<String> tags;

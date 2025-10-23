@@ -18,6 +18,7 @@ public class FreeScrapResponse {
     private String title;
     private String contentPreview;
     private String authorName;
+    private String authorProfileImageUrl;
     private LocalDateTime createdAt;
     private Post type;
     private List<String> tags;
@@ -33,6 +34,7 @@ public class FreeScrapResponse {
                         ? post.getContent().substring(0, 100) + "..."
                         : post.getContent())
                 .authorName(post.getWriter().getNickname())
+                .authorProfileImageUrl(post.getWriter().getProfileImageUrl())
                 .createdAt(post.getCreatedAt())
                 .type(scrap.getType())
                 .tags(tags)

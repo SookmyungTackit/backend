@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 public class FreeMyCommentResponseDto {
     private Long commentId;
     private Long postId;
+    private String writer;
+    private String profileImageUrl;
     private String content;
     private LocalDateTime createdAt;
     private Post type;

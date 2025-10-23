@@ -52,9 +52,12 @@ public class FreePostService {
             String imageUrl = post.getImages().isEmpty() ? null
                     : post.getImages().get(0).getImageUrl();
 
+            String profileImageUrl = post.getWriter().getProfileImageUrl();
+
             return FreePostRespDto.builder()
                     .id(post.getId())
                     .writer(post.getWriter().getNickname())
+                    .profileImageUrl(profileImageUrl)
                     .title(post.getTitle())
                     .content(post.getContent())
                     .createdAt(post.getCreatedAt())
@@ -83,9 +86,12 @@ public class FreePostService {
         String imageUrl = post.getImages().isEmpty() ? null
                 : post.getImages().get(0).getImageUrl();
 
+        String profileImageUrl = post.getWriter().getProfileImageUrl();
+
         return FreePostRespDto.builder()
                 .id(post.getId())
                 .writer(post.getWriter().getNickname())
+                .profileImageUrl(profileImageUrl)
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tags(tagNames)
