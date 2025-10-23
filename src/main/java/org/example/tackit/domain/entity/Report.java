@@ -3,6 +3,7 @@ package org.example.tackit.domain.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.tackit.domain.report.dto.ReportRequestDto;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class Report {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

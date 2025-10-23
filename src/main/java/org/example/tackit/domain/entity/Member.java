@@ -54,6 +54,9 @@ public class Member {
     public MemberMypageResponse generateMypageResponse() {
         return new MemberMypageResponse(
                 this.nickname,
+                this.email,
+                this.organization,
+                this.getRole(),
                 this.joinedYear,
                 this.calculateYearsOfService(),
                 this.profileImageUrl
