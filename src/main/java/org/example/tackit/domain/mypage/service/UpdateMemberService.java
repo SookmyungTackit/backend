@@ -2,19 +2,25 @@ package org.example.tackit.domain.mypage.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.mypage.dto.response.UpdateNicknameResponse;
 import org.example.tackit.domain.mypage.dto.response.UpdatePasswordResponse;
+import org.example.tackit.domain.mypage.dto.response.UpdateProfileImageResponse;
 import org.example.tackit.domain.mypage.repository.MemberDetailRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @Service
 public class UpdateMemberService {
     private final MemberDetailRepository memberDetailRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3UploadService s3UploadService;
 
     // 닉네임 변경 서비스
     @Transactional
@@ -47,6 +53,36 @@ public class UpdateMemberService {
         member.changePassword(encodedNewPassword);
 
         return new UpdatePasswordResponse(true, "비밀번호 변경 성공");
+    }
+
+    // 프로필 이미지 업로드
+    @Transactional
+    public UpdateProfileImageResponse uploadProfileImage(String email, MultipartFile file) throws IOException {
+        Member member = memberDetailRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
+
+        // 기존 이미지 있으면 삭제
+        if (member.getProfileImageUrl() != null) {
+            s3UploadService.deleteImage(member.getProfileImageUrl());
+        }
+
+        // 새 이미지 업로드
+        String imageUrl = s3UploadService.saveFile(file);
+        member.updateProfileImage(imageUrl);
+
+        return new UpdateProfileImageResponse(imageUrl);
+    }
+
+    //  프로필 이미지 삭제
+    @Transactional
+    public void deleteProfileImage(String email) {
+        Member member = memberDetailRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
+
+        if (member.getProfileImageUrl() != null) {
+            s3UploadService.deleteImage(member.getProfileImageUrl());
+            member.deleteProfileImage();
+        }
     }
 
 

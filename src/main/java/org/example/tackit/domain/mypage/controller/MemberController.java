@@ -7,12 +7,17 @@ import org.example.tackit.domain.mypage.dto.response.MemberMypageResponse;
 import org.example.tackit.domain.mypage.dto.request.UpdateNicknameRequest;
 import org.example.tackit.domain.mypage.dto.response.UpdateNicknameResponse;
 import org.example.tackit.domain.mypage.dto.response.UpdatePasswordResponse;
+import org.example.tackit.domain.mypage.dto.response.UpdateProfileImageResponse;
 import org.example.tackit.domain.mypage.service.MemberService;
 import org.example.tackit.domain.mypage.service.UpdateMemberService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,7 +58,22 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    // 프로필 이미지 업로드
+    @PatchMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UpdateProfileImageResponse> uploadProfileImage(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestPart("image") MultipartFile imageFile) throws IOException {
+        UpdateProfileImageResponse response =
+                updateMemberService.uploadProfileImage(userDetails.getUsername(), imageFile);
+        return ResponseEntity.ok(response);
+    }
 
+    // 프로필 이미지 삭제
+    @DeleteMapping("/profile-image")
+    public ResponseEntity<String> deleteProfileImage(@AuthenticationPrincipal UserDetails userDetails) {
+        updateMemberService.deleteProfileImage(userDetails.getUsername());
+        return ResponseEntity.ok("프로필 이미지가 삭제되었습니다.");
+    }
 
 
 }

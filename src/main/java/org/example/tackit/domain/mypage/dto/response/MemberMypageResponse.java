@@ -11,4 +11,5 @@ public class MemberMypageResponse {
     private String nickname;
     private int joinedYear;
     private int yearsOfService;
+    private String profileImageUrl;
 }
