@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reports")
+@RequestMapping("/api/reports")
 @RequiredArgsConstructor
 public class ReportController {
 
