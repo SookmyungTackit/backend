@@ -48,6 +48,7 @@ public class QnAScrapService {
 
         if (existing.isPresent()) {
             qnAScrapRepository.delete(existing.get());
+            post.decreaseScrapCount();
             return new QnAScrapResponseDto(false, null);
         }
         QnAScrap scrap = QnAScrap.builder()
@@ -56,6 +57,7 @@ public class QnAScrapService {
                 .savedAt(LocalDateTime.now())
                 .build();
         qnAScrapRepository.save(scrap);
+        post.increaseScrapCount();
 
         // 1. 알림 전송
         if(!post.getWriter().getId().equals(user.getId())){

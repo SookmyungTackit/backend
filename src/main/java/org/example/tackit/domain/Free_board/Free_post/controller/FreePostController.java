@@ -3,6 +3,7 @@ package org.example.tackit.domain.Free_board.Free_post.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
+import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePopularPostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreeScrapResponseDto;
 import org.example.tackit.domain.Free_board.Free_post.service.FreePostService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -108,5 +110,15 @@ public class FreePostController {
         FreeScrapResponseDto response = freePostService.toggleScrap(id, email, org);
 
         return ResponseEntity.ok(response);
+    }
+
+    // 인기 3개
+    @GetMapping("/popular")
+    public ResponseEntity<List<FreePopularPostRespDto>> getPopularPosts(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        String organization = user.getOrganization();
+        List<FreePopularPostRespDto> result = freePostService.getPopularPosts(organization);
+        return ResponseEntity.ok(result);
     }
 }

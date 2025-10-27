@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.config.S3.S3UploadService;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPopularPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipScrapRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipMemberJPARepository;
@@ -27,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,6 +78,8 @@ public class TipPostService {
         if (!tipPost.getStatus().equals(Status.ACTIVE)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
+
+        tipPost.increaseViewCount();
 
         List<String> tagNames = tagService.getTagNamesByPost(tipPost);
 
@@ -227,6 +231,7 @@ public class TipPostService {
 
         if (exisiting.isPresent()) {
             tipScrapRepository.delete(exisiting.get());
+            post.decreaseScrapCount();
             return new TipScrapRespDto(false, null);
         }
         TipScrap scrap = TipScrap.builder()
@@ -236,6 +241,7 @@ public class TipPostService {
                 .build();
 
         tipScrapRepository.save(scrap);
+        post.increaseScrapCount();
 
         // 알림 전송
         if(!post.getWriter().getId().equals(member.getId())) {
@@ -284,5 +290,27 @@ public class TipPostService {
         post.increaseReportCount();
         return "게시글을 신고하였습니다.";
     }
+
+    // 인기 3개
+    @Transactional
+    public List<TipPopularPostRespDto> getPopularPosts(String organization) {
+        return tipPostJPARepository.findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status.ACTIVE)
+                .stream()
+                .filter(post -> post.getWriter().getOrganization().equals(organization))
+                .sorted(Comparator
+                        .comparing(
+                                (TipPost post) -> post.getViewCount() == null ? 0L : post.getViewCount(),
+                                Comparator.reverseOrder()
+                        )
+                        .thenComparing(
+                                post -> post.getScrapCount() == null ? 0L : post.getScrapCount(),
+                                Comparator.reverseOrder()
+                        )
+                )
+                .limit(3)
+                .map(TipPopularPostRespDto::from)
+                .toList();
+    }
+
 
 }

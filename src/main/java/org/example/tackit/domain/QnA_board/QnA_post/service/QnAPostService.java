@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.QnAPostRequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequestDto;
+import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPopularPostRespDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostReportRepository;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -155,6 +157,8 @@ public class QnAPostService {
         if (!post.getWriter().getOrganization().equals(org)) {
             throw new AccessDeniedException("해당 조직의 게시글만 조회할 수 있습니다.");
         }
+
+        post.increaseViewCount();
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
         return QnAPostResponseDto.fromEntity(post, tagNames);
@@ -183,6 +187,26 @@ public class QnAPostService {
         return "게시글을 신고하였습니다.";
     }
 
+    // 인기 3개
+    @Transactional(readOnly = true)
+    public List<QnAPopularPostRespDto> getPopularPosts(String organization) {
+        return qnAPostRepository.findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status.ACTIVE)
+                .stream()
+                .filter(post -> post.getWriter().getOrganization().equals(organization))
+                .sorted(Comparator
+                        .comparing(
+                                (QnAPost post) -> post.getViewCount() == null ? 0L : post.getViewCount(),
+                                Comparator.reverseOrder()
+                        )
+                        .thenComparing(
+                                post -> post.getScrapCount() == null ? 0L : post.getScrapCount(),
+                                Comparator.reverseOrder()
+                        )
+                )
+                .limit(3)
+                .map(QnAPopularPostRespDto::from)
+                .toList();
+    }
 
 
 }
