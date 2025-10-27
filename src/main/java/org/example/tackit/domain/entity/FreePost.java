@@ -94,4 +94,19 @@ public class FreePost implements ReportablePost {
         images.add(image);
         image.setFreePost(this);
     }
+
+    public void increaseViewCount() {
+        this.viewCount = (this.viewCount == null ? 0L : this.viewCount) + 1;
+    }
+
+    public void increaseScrapCount() {
+        this.scrapCount = (this.scrapCount == null ? 0L : this.scrapCount) + 1;
+    }
+
+    public void decreaseScrapCount() {
+        if (this.scrapCount != null && this.scrapCount > 0) {
+            this.scrapCount -= 1;
+        }
+    }
+
 }

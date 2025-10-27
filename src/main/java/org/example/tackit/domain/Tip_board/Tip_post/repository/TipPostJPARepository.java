@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TipPostJPARepository extends JpaRepository<TipPost, Long> {
@@ -18,4 +19,10 @@ public interface TipPostJPARepository extends JpaRepository<TipPost, Long> {
 
     long countByStatus(Status status);
 
+    // 인기 3개
+    List<TipPost> findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status status);
+
+    // 통합 인기 3개
+    List<TipPost> findTop3ByStatusAndCreatedAtBetweenOrderByViewCountDescScrapCountDesc(
+            Status status, LocalDateTime startOfWeek, LocalDateTime now);
 }

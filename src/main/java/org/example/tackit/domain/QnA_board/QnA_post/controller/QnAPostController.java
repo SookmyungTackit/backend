@@ -3,6 +3,7 @@ package org.example.tackit.domain.QnA_board.QnA_post.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.QnAPostRequestDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.request.UpdateQnARequestDto;
+import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPopularPostRespDto;
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.service.QnAPostService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
@@ -102,6 +103,16 @@ public class QnAPostController {
         String org = userDetails.getOrganization();
         String message = qnAPostService.reportQnAPost(QnAPostId, userDetails.getId());
         return ResponseEntity.ok(message);
+    }
+
+    // 인기 3개
+    @GetMapping("/popular")
+    public ResponseEntity<List<QnAPopularPostRespDto>> getPopularPosts(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        String organization = user.getOrganization();
+        List<QnAPopularPostRespDto> result = qnAPostService.getPopularPosts(organization);
+        return ResponseEntity.ok(result);
     }
     
 }

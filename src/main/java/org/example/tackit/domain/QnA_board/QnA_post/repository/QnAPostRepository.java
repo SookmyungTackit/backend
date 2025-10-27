@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface QnAPostRepository extends JpaRepository<QnAPost, Long> {
     // 상태로 조회
@@ -15,4 +18,11 @@ public interface QnAPostRepository extends JpaRepository<QnAPost, Long> {
     Page<QnAPost> findByWriterAndStatus(Member writer, Status status, Pageable pageable);
 
     long countByStatus(Status status);
+
+    // 인기 3개
+    List<QnAPost> findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status status);
+
+    // 통합 인기 3개
+    List<QnAPost> findTop3ByStatusAndCreatedAtBetweenOrderByViewCountDescScrapCountDesc(
+            Status status, LocalDateTime startOfWeek, LocalDateTime now);
 }

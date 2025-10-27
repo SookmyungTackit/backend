@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 public interface FreePostJPARepository extends JpaRepository<FreePost, Long> {
     Page<FreePost> findByWriterAndStatus(Member member, Status status, Pageable pageable);
@@ -14,4 +17,11 @@ public interface FreePostJPARepository extends JpaRepository<FreePost, Long> {
     Page<FreePost> findByOrganizationAndStatus(String organization, Status status, Pageable pageable);
 
     long countByStatus(Status status);
+
+    // 인기 3개
+    List<FreePost> findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status status);
+
+    // 통합 인기 3개
+    List<FreePost> findTop3ByStatusAndCreatedAtBetweenOrderByViewCountDescScrapCountDesc(
+            Status status, LocalDateTime startOfWeek, LocalDateTime now);
 }

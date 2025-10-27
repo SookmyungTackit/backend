@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.config.S3.S3UploadService;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.FreePostReqDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.request.UpdateFreeReqDto;
+import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePopularPostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespDto;
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreeScrapResponseDto;
 import org.example.tackit.domain.Free_board.Free_post.repository.*;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,6 +82,8 @@ public class FreePostService {
         if (!post.getStatus().equals(Status.ACTIVE)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
+
+        post.increaseViewCount();
 
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
@@ -278,6 +282,7 @@ public class FreePostService {
 
         if (existing.isPresent()) {
             freeScrapJPARepository.delete(existing.get());
+            post.decreaseScrapCount();
             return new FreeScrapResponseDto(false, null);
         }
 
@@ -288,6 +293,7 @@ public class FreePostService {
                 .build();
 
         freeScrapJPARepository.save(scrap);
+        post.increaseScrapCount();
 
         // 1. 알림 전송
         if(!post.getWriter().getId().equals(member.getId())){
@@ -308,6 +314,27 @@ public class FreePostService {
             notificationService.send(notification);
         }
         return new FreeScrapResponseDto(true, scrap.getSavedAt());
+    }
+
+    // 인기 3개
+    @Transactional(readOnly = true)
+    public List<FreePopularPostRespDto> getPopularPosts(String organization) {
+        return freePostJPARepository.findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status.ACTIVE)
+                .stream()
+                .filter(post -> post.getWriter().getOrganization().equals(organization))
+                .sorted(Comparator
+                        .comparing(
+                                (FreePost post) -> post.getViewCount() == null ? 0L : post.getViewCount(),
+                                Comparator.reverseOrder()
+                        )
+                        .thenComparing(
+                                post -> post.getScrapCount() == null ? 0L : post.getScrapCount(),
+                                Comparator.reverseOrder()
+                        )
+                )
+                .limit(3)
+                .map(FreePopularPostRespDto::from)
+                .toList();
     }
 
 }
