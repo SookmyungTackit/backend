@@ -11,12 +11,14 @@ import java.time.LocalDateTime;
 public class FreeCommentRespDto {
     private final long id;
     private final String writer;
+    private final String profileImageUrl;
     private final String content;
     private final LocalDateTime createdAt;
 
     public FreeCommentRespDto(FreeComment comment) {
         this.id = comment.getId();
         this.writer = comment.getWriter().getNickname();
+        this.profileImageUrl = comment.getWriter().getProfileImageUrl();
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
     }

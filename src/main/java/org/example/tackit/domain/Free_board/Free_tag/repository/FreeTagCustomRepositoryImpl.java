@@ -88,6 +88,7 @@ public class FreeTagCustomRepositoryImpl implements FreeTagCustomRepository{
                 .map(post -> new FreeTagPostResponseDto(
                         post.getId(),
                         post.getWriter().getNickname(),
+                        post.getWriter().getProfileImageUrl(),
                         post.getTitle(),
                         post.getContent(),
                         tagMap.getOrDefault(post.getId(), List.of()),

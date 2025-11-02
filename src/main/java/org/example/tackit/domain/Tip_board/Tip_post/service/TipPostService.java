@@ -4,7 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.config.S3.S3UploadService;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPopularPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipScrapRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipMemberJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostReportRepository;
 import org.example.tackit.domain.Tip_board.Tip_tag.repository.TipPostTagMapRepository;
@@ -14,6 +16,7 @@ import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostReqDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDto;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipScrapRepository;
+import org.example.tackit.domain.notification.service.NotificationService;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +42,7 @@ public class TipPostService {
     private final TipPostTagMapRepository tipPostTagMapRepository;
     private final TipTagService tagService;
     private final S3UploadService s3UploadService;
+    private final NotificationService notificationService;
 
     public PageResponseDTO<TipPostRespDto> getActivePostsByOrganization(String org, Pageable pageable) {
         Page<TipPost> page = tipPostJPARepository.findByOrganizationAndStatus(org, Status.ACTIVE, pageable);
@@ -50,6 +55,7 @@ public class TipPostService {
                     return TipPostRespDto.builder()
                             .id(post.getId())
                             .writer(post.getWriter().getNickname())
+                            .profileImageUrl(post.getWriter().getProfileImageUrl())
                             .title(post.getTitle())
                             .content(post.getContent())
                             .createdAt(post.getCreatedAt())
@@ -73,11 +79,14 @@ public class TipPostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
         }
 
+        tipPost.increaseViewCount();
+
         List<String> tagNames = tagService.getTagNamesByPost(tipPost);
 
         return TipPostRespDto.builder()
                 .id(tipPost.getId())
                 .writer(tipPost.getWriter().getNickname())
+                .profileImageUrl(tipPost.getWriter().getProfileImageUrl())
                 .title(tipPost.getTitle())
                 .content(tipPost.getContent())
                 .tags(tagNames)
@@ -207,26 +216,55 @@ public class TipPostService {
 
     // [ 게시글 스크랩 ]
     @Transactional
-    public String toggleScrap(Long id, Long userId) {
-        // 1. 게시글 조회
+    public TipScrapRespDto toggleScrap(Long id, String email, String memberOrg) {
+        Member member = tipMemberJPARepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
         TipPost post = tipPostJPARepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.") );
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        // 2. 멤버 조회
-        Member member = tipMemberJPARepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
-
-        Optional<TipScrap> existing = tipScrapRepository.findByMemberAndTipPost(member, post);
-
-        if (existing.isPresent()) {
-            tipScrapRepository.delete(existing.get());
-            return "게시글 스크랩을 취소하였습니다.";
-        } else {
-            TipScrap scrap = new TipScrap(member, post);
-            tipScrapRepository.save(scrap);
-            return "게시글을 스크랩하였습니다.";
+        if(!post.getWriter().getOrganization().equals(memberOrg)) {
+            throw new AccessDeniedException("해당 조직 게시글이 아닙니다.");
         }
+
+        Optional<TipScrap> exisiting = tipScrapRepository.findByMemberAndTipPost(member, post);
+
+        if (exisiting.isPresent()) {
+            tipScrapRepository.delete(exisiting.get());
+            post.decreaseScrapCount();
+            return new TipScrapRespDto(false, null);
+        }
+        TipScrap scrap = TipScrap.builder()
+                .member(member)
+                .tipPost(post)
+                .savedAt(LocalDateTime.now())
+                .build();
+
+        tipScrapRepository.save(scrap);
+        post.increaseScrapCount();
+
+        // 알림 전송
+        if(!post.getWriter().getId().equals(member.getId())) {
+            Member postWriter = post.getWriter();
+            String message = member.getNickname() + "님이 글을 스크랩하였습니다.";
+            String url = "/api/tip-posts/" + post.getId();
+
+            // 알림 엔티티 생성
+            // 2. 알림 엔티티 생성
+            Notification notification = Notification.builder()
+                    .member(postWriter)
+                    .type(NotificationType.SCRAP)
+                    .message(message)
+                    .relatedUrl(url)
+                    .fromMemberId(member.getId())
+                    .build();
+
+            //3. 알림 저장 및 전송을 위해 NotificationService 호출
+            notificationService.send(notification);
+        }
+        return new TipScrapRespDto(true, scrap.getSavedAt());
     }
+
 
     // [ 게시글 신고 ]
     @Transactional
@@ -252,5 +290,27 @@ public class TipPostService {
         post.increaseReportCount();
         return "게시글을 신고하였습니다.";
     }
+
+    // 인기 3개
+    @Transactional
+    public List<TipPopularPostRespDto> getPopularPosts(String organization) {
+        return tipPostJPARepository.findTop3ByStatusOrderByViewCountDescScrapCountDesc(Status.ACTIVE)
+                .stream()
+                .filter(post -> post.getWriter().getOrganization().equals(organization))
+                .sorted(Comparator
+                        .comparing(
+                                (TipPost post) -> post.getViewCount() == null ? 0L : post.getViewCount(),
+                                Comparator.reverseOrder()
+                        )
+                        .thenComparing(
+                                post -> post.getScrapCount() == null ? 0L : post.getScrapCount(),
+                                Comparator.reverseOrder()
+                        )
+                )
+                .limit(3)
+                .map(TipPopularPostRespDto::from)
+                .toList();
+    }
+
 
 }

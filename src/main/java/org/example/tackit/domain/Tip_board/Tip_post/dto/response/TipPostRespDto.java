@@ -14,6 +14,7 @@ import java.util.List;
 public class TipPostRespDto {
     private long id;
     private final String writer;
+    private final String profileImageUrl;
     private final String title;
     private final String content;
     private final List<String> tags;
@@ -23,6 +24,7 @@ public class TipPostRespDto {
     public TipPostRespDto(TipPost post, List<String> tags) {
         this.id = post.getId();
         this.writer = post.getWriter().getNickname();
+        this.profileImageUrl = post.getWriter().getProfileImageUrl();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = tags;

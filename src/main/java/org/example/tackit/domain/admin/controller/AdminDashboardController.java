@@ -4,10 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.admin.dto.MemberStatisticsDTO;
 import org.example.tackit.domain.admin.service.AdminDashboardService;
 import org.example.tackit.domain.admin.service.AdminMemberService;
+import org.example.tackit.domain.entity.TargetType;
+import org.example.tackit.domain.report.dto.ReportContentDetailDto;
+import org.example.tackit.domain.report.dto.ReportLogDto;
+import org.example.tackit.domain.report.dto.ReportListDto;
+import org.example.tackit.global.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @RestController
@@ -45,13 +55,28 @@ public class AdminDashboardController {
         return ResponseEntity.ok(count);
     }
 
-    // [ 신고로 비활성화된 게시글 정보 ]
-    // 유형 : 댓글/게시글
-    // 제목 :
-    // 신고 사유 :
-    // 상태 : 신고횟수 / 비활성(3회 이상)
-    // 신고일자
-    // URL
+    // [ 신고 사유 전체 조회  ]
+    @GetMapping("/reports")
+    public ResponseEntity<PageResponseDTO<ReportListDto>> getAllReports(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<ReportListDto> reports = adminDashboardService.findAllReports(pageable);
+
+        PageResponseDTO<ReportListDto> responseDTO = PageResponseDTO.from(reports);
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    // [ 개별 신고 사유 조회 ]
+    @GetMapping("/reports/{targetId}")
+    public ResponseEntity<ReportContentDetailDto> getReportDetails(
+            @PathVariable Long targetId,
+            @RequestParam TargetType targetType
+            ) {
+
+        ReportContentDetailDto details = adminDashboardService.findReportDetails(targetId, targetType);
+        return ResponseEntity.ok(details);
+    }
 
     // [ 회원 가입 통계 ]
     @GetMapping("/user-statistics")
@@ -59,7 +84,5 @@ public class AdminDashboardController {
         MemberStatisticsDTO stats = adminMemberService.getMemberStatistics();
         return ResponseEntity.ok(stats);
     }
-
-
 
 }

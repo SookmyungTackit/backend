@@ -1,6 +1,7 @@
 package org.example.tackit.domain.auth.login.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.auth.login.dto.SignInDto;
 import org.example.tackit.domain.auth.login.dto.SignUpDto;
@@ -23,7 +24,7 @@ public class AuthController {
 
     // 회원가입
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signup(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignUpDto signUpDto) {
         authService.signup(signUpDto);
         return ResponseEntity.ok().body(Map.of("status", "OK", "message", "회원가입 성공했습니다."));
     }

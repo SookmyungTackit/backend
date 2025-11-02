@@ -32,6 +32,8 @@ public class Member {
     @Column(nullable = false)
     private String organization;
 
+    private String profileImageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -52,8 +54,12 @@ public class Member {
     public MemberMypageResponse generateMypageResponse() {
         return new MemberMypageResponse(
                 this.nickname,
+                this.email,
+                this.organization,
+                this.getRole(),
                 this.joinedYear,
-                this.calculateYearsOfService()
+                this.calculateYearsOfService(),
+                this.profileImageUrl
         );
     }
 
@@ -72,5 +78,14 @@ public class Member {
         this.status = Status.DELETED;
     }
 
+    // 프로필 이미지 변경
+    public void updateProfileImage(String imageUrl) {
+        this.profileImageUrl = imageUrl;
+    }
+
+    // 프로필 이미지 삭제
+    public void deleteProfileImage() {
+        this.profileImageUrl = null;
+    }
 
 }

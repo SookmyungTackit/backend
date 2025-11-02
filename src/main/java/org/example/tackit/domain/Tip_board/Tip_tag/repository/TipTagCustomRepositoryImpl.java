@@ -92,6 +92,7 @@ public class TipTagCustomRepositoryImpl implements TipTagCustomRepository {
                 .map(post -> new TipTagPostResponseDto(
                         post.getId(),
                         post.getWriter().getNickname(),
+                        post.getWriter().getProfileImageUrl(),
                         post.getTitle(),
                         post.getContent(),
                         post.getCreatedAt(),

@@ -1,6 +1,8 @@
 package org.example.tackit.domain.Tip_board.Tip_post.controller;
 
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPopularPostRespDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipPostRespDto;
+import org.example.tackit.domain.Tip_board.Tip_post.dto.response.TipScrapRespDto;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostReqDto;
 import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDto;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -87,12 +90,13 @@ public class TipController {
 
     // 6. 게시글 스크랩
     @PostMapping("/{id}/scrap")
-    public ResponseEntity<String> scrapPost(
+    public ResponseEntity<TipScrapRespDto> scrapPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
-
-        String message = tipService.toggleScrap(id, user.getId());
-        return ResponseEntity.ok(message);
+        String org = user.getOrganization();
+        String email = user.getUsername();
+        TipScrapRespDto response = tipService.toggleScrap(id, email, org);
+        return ResponseEntity.ok(response);
     }
 
     // 7. 게시글 신고
@@ -104,5 +108,15 @@ public class TipController {
 
         String message = tipService.report(id, user.getId());
         return ResponseEntity.ok(message);
+    }
+
+    // 인기 3개
+    @GetMapping("/popular")
+    public ResponseEntity<List<TipPopularPostRespDto>> getPopularPosts(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        String organization = user.getOrganization();
+        List<TipPopularPostRespDto> result = tipService.getPopularPosts(organization);
+        return ResponseEntity.ok(result);
     }
 }

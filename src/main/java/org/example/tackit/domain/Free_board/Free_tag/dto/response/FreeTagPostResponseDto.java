@@ -14,6 +14,7 @@ import java.util.List;
 public class FreeTagPostResponseDto {
     private final Long postId;
     private final String writer;
+    private final String profileImageUrl;
     private final String title;
     private final String content;
     private final List<String> tags;
@@ -23,6 +24,7 @@ public class FreeTagPostResponseDto {
     public FreeTagPostResponseDto(Long postId, FreePost post, List<String> tags, String imageUrl) {
         this.postId = postId;
         this.writer = post.getWriter().getNickname();
+        this.profileImageUrl = post.getWriter().getProfileImageUrl();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = tags;

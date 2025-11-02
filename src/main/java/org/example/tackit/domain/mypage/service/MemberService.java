@@ -20,9 +20,4 @@ public class MemberService {
         return member.generateMypageResponse();
     }
 
-    public Member getMemberByEmail(String email) {
-        return memberDetailRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
-    }
-
 }

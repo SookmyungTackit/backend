@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 public class QnAMyCommentResponseDto {
     private Long commentId;
     private Long postId;
+    private String writer;
+    private String profileImageUrl;
     private String content;
     private LocalDateTime createdAt;
     private Post type;
@@ -24,6 +26,8 @@ public class QnAMyCommentResponseDto {
         return QnAMyCommentResponseDto.builder()
                 .commentId(comment.getId())
                 .postId(comment.getQnAPost().getId())
+                .writer(comment.getWriter().getNickname())
+                .profileImageUrl(comment.getWriter().getProfileImageUrl())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .type(comment.getQnAPost().getType())

@@ -17,6 +17,7 @@ import java.util.List;
 public class FreeMyPostResponseDto {
     private Long id;
     private String writer;
+    private String profileImageUrl;
     private String title;
     private String content;
     private List<String> tags;
@@ -28,6 +29,7 @@ public class FreeMyPostResponseDto {
         return FreeMyPostResponseDto.builder()
                 .id(post.getId())
                 .writer(post.getWriter().getNickname())
+                .profileImageUrl(post.getWriter().getProfileImageUrl())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tags(tags)

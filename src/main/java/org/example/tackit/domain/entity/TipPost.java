@@ -89,4 +89,18 @@ public class TipPost implements ReportablePost {
         this.status = Status.ACTIVE;
         this.reportCount = 0;
     }
+
+    public void increaseViewCount() {
+        this.viewCount = (this.viewCount == null ? 0L : this.viewCount) + 1;
+    }
+
+    public void increaseScrapCount() {
+        this.scrapCount = (this.scrapCount == null ? 0L : this.scrapCount) + 1;
+    }
+
+    public void decreaseScrapCount() {
+        if (this.scrapCount != null && this.scrapCount > 0) {
+            this.scrapCount -= 1;
+        }
+    }
 }

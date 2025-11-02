@@ -7,6 +7,7 @@ import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberReposito
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAScrapRepository;
 import org.example.tackit.domain.entity.*;
+import org.example.tackit.domain.notification.service.NotificationService;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ public class QnAScrapService {
     private final QnAPostRepository qnAPostRepository;
     private final QnAMemberRepository qnAMemberRepository;
     private final QnAPostTagService tagService;
+    private final NotificationService notificationService;
 
 
     // 스크랩한적 있으면 스크랩 취소, 없으면 저장
@@ -46,16 +48,36 @@ public class QnAScrapService {
 
         if (existing.isPresent()) {
             qnAScrapRepository.delete(existing.get());
+            post.decreaseScrapCount();
             return new QnAScrapResponseDto(false, null);
-        } else {
-            QnAScrap scrap = QnAScrap.builder()
-                    .user(user)
-                    .qnaPost(post)
-                    .savedAt(LocalDateTime.now())
-                    .build();
-            qnAScrapRepository.save(scrap);
-            return new QnAScrapResponseDto(true, scrap.getSavedAt());
         }
+        QnAScrap scrap = QnAScrap.builder()
+                .user(user)
+                .qnaPost(post)
+                .savedAt(LocalDateTime.now())
+                .build();
+        qnAScrapRepository.save(scrap);
+        post.increaseScrapCount();
+
+        // 1. 알림 전송
+        if(!post.getWriter().getId().equals(user.getId())){
+            Member postWriter = post.getWriter();
+            String message = user.getNickname() + "님이 글을 스크랩하였습니다.";
+            String url = "/api/qna-post/" + post.getId();
+
+            // 2. 알림 엔티티 생성
+            Notification notification = Notification.builder()
+                    .member(postWriter)
+                    .type(NotificationType.SCRAP)
+                    .message(message)
+                    .relatedUrl(url)
+                    .fromMemberId(user.getId())
+                    .build();
+
+            //3. 알림 저장 및 전송을 위해 NotificationService 호출
+            notificationService.send(notification);
+        }
+        return new QnAScrapResponseDto(true, scrap.getSavedAt());
     }
 
     // 내가 찜한 글 불러오기

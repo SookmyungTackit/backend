@@ -1,5 +1,6 @@
 package org.example.tackit.domain.notification.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.entity.Member;
@@ -10,6 +11,7 @@ import org.example.tackit.domain.notification.repository.EmitterRepository;
 import org.example.tackit.domain.notification.repository.NotificationRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
@@ -120,6 +122,20 @@ public class NotificationService {
                     return new NotificationRespDto(notification, fromName);
                 })
                 .collect(Collectors.toList());
+    }
+
+    // [ 알림 읽음 ]
+    @Transactional
+    public void markAsRead(Long notificationId, String email)  {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("알림을 찾을 수 없습니다."));
+
+        // 본인의 알림이 맞는지
+        if(!notification.getMember().getEmail().equals(email)) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
+
+        notification.markAsRead();
     }
 
     // [ SseEmitter로 이벤트 전송하는 공통 메서드 ]

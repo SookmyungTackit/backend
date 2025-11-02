@@ -20,27 +20,22 @@ public class FreeScrap {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "free_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "free_post_id", nullable = false)
     private FreePost freePost;
 
-    @Column(name = "saved_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime savedAt;
 
-    private Post type = Post.Free;
-
-    @Column(nullable = true)
-    private String tag;
+    @Column(nullable = false)
+    private Post type;
 
     @Builder
-    public FreeScrap(Member member, FreePost freePost) {
-        if (member == null || freePost == null) {
-            throw new IllegalArgumentException("회원 또는 게시글은 null일 수 없습니다.");
-        }
+    public FreeScrap(Member member, FreePost freePost, LocalDateTime savedAt) {
         this.member = member;
         this.freePost = freePost;
         this.savedAt = LocalDateTime.now();
-        this.tag = freePost.getTag();
+        this.type = Post.Free;
     }
 
 
