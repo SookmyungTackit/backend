@@ -44,15 +44,13 @@ public class AuthService {
             throw new RuntimeException("이미 사용 중인 닉네임입니다");
         }
 
-        int currentYear = LocalDate.now().getYear();
-
         Member member = Member.builder()
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .nickname(signUpDto.getNickname())
                 .organization(signUpDto.getOrganization())
                 .role(signUpDto.getRole())
-                .joinedYear(currentYear)
+                .joinedYear(signUpDto.getJoinedYear())
                 .status(Status.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();

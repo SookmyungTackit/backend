@@ -20,5 +20,6 @@ public class SignUpDto {
     private String nickname;
     private String organization;
     private Role role;
+    private int joinedYear;
 }
 
