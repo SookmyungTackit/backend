@@ -3,6 +3,7 @@ package org.example.tackit.domain.Free_board.Free_comment.dto.resp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.example.tackit.domain.entity.FreeComment;
+import org.example.tackit.domain.entity.Role;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,8 @@ public class FreeCommentRespDto {
     private final String profileImageUrl;
     private final String content;
     private final LocalDateTime createdAt;
+    private final Role role;
+    private final int joinedYear;
 
     public FreeCommentRespDto(FreeComment comment) {
         this.id = comment.getId();
@@ -21,5 +24,7 @@ public class FreeCommentRespDto {
         this.profileImageUrl = comment.getWriter().getProfileImageUrl();
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
+        this.role= comment.getWriter().getRole();
+        this.joinedYear = comment.getWriter().getJoinedYear();
     }
 }
