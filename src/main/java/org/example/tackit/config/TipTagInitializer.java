@@ -17,14 +17,11 @@ public class TipTagInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (tagRepository.count() == 0) {
             tagRepository.saveAll(List.of(
-                    TipTag.builder().tagName("업무팁").build(),
-                    TipTag.builder().tagName("인수인계").build(),
-                    TipTag.builder().tagName("꼭지켜주세요").build(),
-                    TipTag.builder().tagName("조직문화").build(),
-                    TipTag.builder().tagName("신입FAQ").build(),
-                    TipTag.builder().tagName("업무절차").build(),
-                    TipTag.builder().tagName("현장노하우").build(),
-                    TipTag.builder().tagName("실무경험담").build()
+                    TipTag.builder().tagName("유용한_팁").build(),
+                    TipTag.builder().tagName("온보딩").build(),
+                    TipTag.builder().tagName("팀문화").build(),
+                    TipTag.builder().tagName("경험담_공유").build(),
+                    TipTag.builder().tagName("교육&멘토링").build()
             ));
         }
     }
