@@ -17,14 +17,11 @@ public class QnATagInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (tagRepository.count() == 0) {
             tagRepository.saveAll(List.of(
-                    QnATag.builder().tagName("회사생활").build(),
-                    QnATag.builder().tagName("복지혜택").build(),
-                    QnATag.builder().tagName("조언구해요").build(),
-                    QnATag.builder().tagName("실수했어요").build(),
-                    QnATag.builder().tagName("추천해주세요").build(),
-                    QnATag.builder().tagName("도움요청").build(),
-                    QnATag.builder().tagName("초보").build(),
-                    QnATag.builder().tagName("프로세스").build()
+                    QnATag.builder().tagName("활동질문").build(),
+                    QnATag.builder().tagName("신입고민").build(),
+                    QnATag.builder().tagName("운영&제도").build(),
+                    QnATag.builder().tagName("문화적응").build(),
+                    QnATag.builder().tagName("소통고민").build()
             ));
         }
     }
