@@ -1,0 +1,14 @@
+[Unit]
+Description=Tackit Application Service
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/usr/bin/java -jar /home/ubuntu/app/Tackit-0.0.1-SNAPSHOT.jar
+Restart=always
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
