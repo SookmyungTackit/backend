@@ -6,7 +6,7 @@ phases:
       java: corretto17
   build:
     commands:
-      - ./gradlew build -x test
+      - ./gradlew clean build -x test
   post_build:
     commands:
       # 'artifact_files' 라는 임시 폴더 생성 후 모든 결과물을 이곳으로 복사

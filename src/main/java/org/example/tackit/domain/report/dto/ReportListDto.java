@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ReportListDto {
-    private Long reportId;
+    private Long targetId;
     private TargetType targetType;
     private String title;
     private Status status;

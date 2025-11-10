@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.example.tackit.config.jwt.TokenProvider;
 import org.example.tackit.domain.entity.Member;
-import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.auth.login.dto.SignInDto;
 import org.example.tackit.domain.auth.login.dto.SignUpDto;
@@ -14,13 +13,11 @@ import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-// import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -44,15 +41,13 @@ public class AuthService {
             throw new RuntimeException("이미 사용 중인 닉네임입니다");
         }
 
-        int currentYear = LocalDate.now().getYear();
-
         Member member = Member.builder()
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
                 .nickname(signUpDto.getNickname())
                 .organization(signUpDto.getOrganization())
                 .role(signUpDto.getRole())
-                .joinedYear(currentYear)
+                .joinedYear(signUpDto.getJoinedYear())
                 .status(Status.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();

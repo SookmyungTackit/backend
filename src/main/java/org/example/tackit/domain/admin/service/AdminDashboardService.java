@@ -95,7 +95,7 @@ public class AdminDashboardService {
             ReportedContentInfo info = getReportedContentInfo(target.getTargetId(), target.getTargetType());
 
             return ReportListDto.builder()
-                    .reportId(target.getTargetId())
+                    .targetId(target.getTargetId())
                     .targetType(target.getTargetType())
                     .title(info.content())
                     .status(info.status())

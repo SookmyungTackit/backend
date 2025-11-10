@@ -10,8 +10,9 @@ permissions:
     mode: 755
     owner: ubuntu
     group: ubuntu
-hooks:
-  ApplicationStart:
-    - location: scripts/start.sh
-      timeout: 100
-      runas: ubuntu
+
+# hooks:
+#  ApplicationStart:
+#    - location: scripts/start.sh
+#      timeout: 100
+#      runas: ubuntu
