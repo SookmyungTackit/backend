@@ -3,7 +3,7 @@ version: 0.2
 phases:
   build:
     commands:
-      - ./gradlew build
+      - ./gradlew clean build
 artifacts:
   files:
     - build/libs/*[!plain].jar
