@@ -10,7 +10,6 @@ import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespD
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreeScrapResponseDto;
 import org.example.tackit.domain.Free_board.Free_post.repository.*;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
-import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAScrapResponseDto;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.notification.service.NotificationService;
 import org.example.tackit.global.dto.PageResponseDTO;
@@ -71,7 +70,7 @@ public class FreePostService {
 
     // [ 게시글 상세 조회 ]
     @Transactional
-    public FreePostRespDto getPostById(Long id, String org) {
+    public FreePostRespDto getPostById(Long id, String org, Long memberId) {
         FreePost post = freePostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
@@ -92,6 +91,9 @@ public class FreePostService {
 
         String profileImageUrl = post.getWriter().getProfileImageUrl();
 
+        // 스크랩 여부 조회
+        boolean isScraped = freeScrapJPARepository.existsByFreePostIdAndMemberId(id, memberId);
+
         return FreePostRespDto.builder()
                 .id(post.getId())
                 .writer(post.getWriter().getNickname())
@@ -101,6 +103,7 @@ public class FreePostService {
                 .tags(tagNames)
                 .imageUrl(imageUrl)
                 .createdAt(post.getCreatedAt())
+                .isScraped(isScraped)
                 .build();
     }
 
