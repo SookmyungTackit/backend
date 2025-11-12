@@ -92,7 +92,7 @@ public class FreePostService {
         String profileImageUrl = post.getWriter().getProfileImageUrl();
 
         // 스크랩 여부 조회
-        boolean isScraped = freeScrapJPARepository.existsByFreePostIdAndMemberId(id, memberId);
+        boolean isScrap = freeScrapJPARepository.existsByFreePostIdAndMemberId(id, memberId);
 
         return FreePostRespDto.builder()
                 .id(post.getId())
@@ -103,7 +103,7 @@ public class FreePostService {
                 .tags(tagNames)
                 .imageUrl(imageUrl)
                 .createdAt(post.getCreatedAt())
-                .isScraped(isScraped)
+                .isScrap(isScrap)
                 .build();
     }
 

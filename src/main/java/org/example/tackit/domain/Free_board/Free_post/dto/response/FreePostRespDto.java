@@ -18,5 +18,5 @@ public class FreePostRespDto {
     private final LocalDateTime createdAt;
     private String imageUrl;
 
-    private boolean isScraped;
+    private boolean isScrap;
 }
