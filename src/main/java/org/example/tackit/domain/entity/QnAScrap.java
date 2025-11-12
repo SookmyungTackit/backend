@@ -17,8 +17,8 @@ public class QnAScrap {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Member user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_post_id", nullable = false)
@@ -31,8 +31,8 @@ public class QnAScrap {
     private Post type;
 
     @Builder
-    public QnAScrap(Member user, QnAPost qnaPost, LocalDateTime savedAt) {
-        this.user = user;
+    public QnAScrap(Member member, QnAPost qnaPost, LocalDateTime savedAt) {
+        this.member = member;
         this.qnaPost = qnaPost;
         this.savedAt = savedAt;
         this.type = Post.QnA; // 여기서 기본값 명확하게 지정

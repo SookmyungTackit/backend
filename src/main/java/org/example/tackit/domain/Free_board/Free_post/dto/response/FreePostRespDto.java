@@ -1,9 +1,7 @@
 package org.example.tackit.domain.Free_board.Free_post.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.example.tackit.domain.entity.FreePost;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,4 +17,6 @@ public class FreePostRespDto {
     private final List<String> tags;
     private final LocalDateTime createdAt;
     private String imageUrl;
+
+    private boolean isScrap;
 }

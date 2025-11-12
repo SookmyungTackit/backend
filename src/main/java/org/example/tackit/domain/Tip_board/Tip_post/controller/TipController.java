@@ -47,7 +47,8 @@ public class TipController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
         String org = user.getOrganization();
-        TipPostRespDto post = tipService.getPostById(id, org);
+
+        TipPostRespDto post = tipService.getPostById(id, org, user.getId());
         return ResponseEntity.ok(post);
     }
 
