@@ -67,7 +67,7 @@ public class TipPostService {
 
     // [ 게시글 상세 조회 ]
     @Transactional
-    public TipPostRespDto getPostById(Long id, String org) {
+    public TipPostRespDto getPostById(Long id, String org, Long memberId) {
         TipPost tipPost = tipPostJPARepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
@@ -83,6 +83,9 @@ public class TipPostService {
 
         List<String> tagNames = tagService.getTagNamesByPost(tipPost);
 
+        // 스크랩 여부 조회
+        boolean isScrap = tipScrapRepository.existsByTipPostIdAndMemberId(id, memberId);
+
         return TipPostRespDto.builder()
                 .id(tipPost.getId())
                 .writer(tipPost.getWriter().getNickname())
@@ -92,6 +95,7 @@ public class TipPostService {
                 .tags(tagNames)
                 .imageUrl(tipPost.getImages().isEmpty() ? null : tipPost.getImages().get(0).getImageUrl())
                 .createdAt(tipPost.getCreatedAt())
+                .isScrap(isScrap)
                 .build();
     }
 

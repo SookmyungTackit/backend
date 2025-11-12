@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface TipScrapRepository extends JpaRepository<TipScrap, Long> {
     Page<TipScrap> findByMemberAndType(Member member, Post type, Pageable pageable);
     Optional<TipScrap> findByMemberAndTipPost(Member member, TipPost tipPost);
+    boolean existsByTipPostIdAndMemberId(Long tipPostId, Long memberId);
 }
