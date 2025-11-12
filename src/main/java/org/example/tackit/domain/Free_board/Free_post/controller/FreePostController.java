@@ -44,7 +44,7 @@ public class FreePostController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
         String org = user.getOrganization();
-        FreePostRespDto post = freePostService.getPostById(id, org);
+        FreePostRespDto post = freePostService.getPostById(id, org, user.getId());
         return ResponseEntity.ok(post);
     }
 
@@ -94,7 +94,6 @@ public class FreePostController {
     public ResponseEntity<String> reportPost(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user) {
-        String org = user.getOrganization();
 
         String message = freePostService.report(id, user.getId());
         return ResponseEntity.ok(message);

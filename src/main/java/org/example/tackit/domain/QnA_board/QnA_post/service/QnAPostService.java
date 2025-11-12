@@ -9,6 +9,7 @@ import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponse
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAMemberRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostReportRepository;
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository;
+import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAScrapRepository;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.global.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,6 +33,7 @@ public class QnAPostService {
     private final QnAPostTagService tagService;
     private final QnAPostReportRepository qnAPostReportRepository;
     private final S3UploadService s3UploadService;
+    private final QnAScrapRepository qnAScrapRepository;
 
     // 게시글 작성 (NEWBIE만 가능)
     @Transactional
@@ -68,7 +69,7 @@ public class QnAPostService {
 
         List<String> tagNames = tagService.assignTagsToPost(post, dto.getTagIds());
 
-        return QnAPostResponseDto.fromEntity(post, tagNames);
+        return QnAPostResponseDto.fromEntity(post, tagNames, false);
     }
 
     // 게시글 수정 (작성자만 가능)
@@ -112,7 +113,7 @@ public class QnAPostService {
             post.addImage(image);
         } // 이미지 유지
 
-        return QnAPostResponseDto.fromEntity(post, tagNames);
+        return QnAPostResponseDto.fromEntity(post, tagNames, false);
     }
 
     // 게시글 삭제 (작성자, 관리자만 가능)
@@ -139,18 +140,18 @@ public class QnAPostService {
         Page<QnAPost> page = qnAPostRepository.findAllByStatusAndWriter_Organization(Status.ACTIVE, org, pageable);
         List<QnAPost> posts = page.getContent();
 
-        Map<Long, List<String>> tagMap = tagService.getTagNamesByPosts(posts); 
+        Map<Long, List<String>> tagMap = tagService.getTagNamesByPosts(posts);
 
         return PageResponseDTO.from(page, post -> {
             List<String> tagNames = tagMap.getOrDefault(post.getId(), List.of());
-            return QnAPostResponseDto.fromEntity(post, tagNames);
+            // 전체 조회 시에는 스크랩 여부 false 값으로 고정
+            return QnAPostResponseDto.fromEntity(post, tagNames, false);
         });
     }
 
 
     // 게시글 상세 조회
-    @Transactional(readOnly = true)
-    public QnAPostResponseDto getPostById(Long id, String org) {
+    public QnAPostResponseDto getPostById(Long id, String org, Long memberId) {
         QnAPost post = qnAPostRepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
@@ -161,7 +162,10 @@ public class QnAPostService {
         post.increaseViewCount();
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
-        return QnAPostResponseDto.fromEntity(post, tagNames);
+        // 스크랩 여부 조회
+        boolean isScrap = qnAScrapRepository.existsByQnaPostIdAndMemberId(id, memberId);
+
+        return QnAPostResponseDto.fromEntity(post, tagNames, isScrap);
     }
 
     // 게시글 신고하기

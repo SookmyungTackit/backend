@@ -14,7 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,12 +22,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/qna-post")
+@RequestMapping("/api/qna-posts")
 public class QnAPostController {
     private final QnAPostService qnAPostService;
 
     // 게시글 생성
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<QnAPostResponseDto> createQnAPost(
             @RequestPart("request") QnAPostRequestDto dto,
             @RequestPart(value = "image", required = false) MultipartFile image,
@@ -72,7 +71,7 @@ public class QnAPostController {
     }
 
     // 게시글 전체 조회
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<PageResponseDTO<QnAPostResponseDto>> findAllQnAPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 5) Pageable pageable
@@ -90,7 +89,8 @@ public class QnAPostController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         String org = userDetails.getOrganization();
-        QnAPostResponseDto post = qnAPostService.getPostById(QnAPostId, org);
+        Long memberId = userDetails.getId();
+        QnAPostResponseDto post = qnAPostService.getPostById(QnAPostId, org, memberId);
         return ResponseEntity.ok(post);
     }
 

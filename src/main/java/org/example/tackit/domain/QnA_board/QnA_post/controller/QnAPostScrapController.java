@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/qna-post")
+@RequestMapping("/api/qna-posts")
 public class QnAPostScrapController {
     private final QnAScrapService qnAScrapService;
 

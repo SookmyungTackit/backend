@@ -20,6 +20,7 @@ public class TipPostRespDto {
     private final List<String> tags;
     private final LocalDateTime createdAt;
     private final String imageUrl;
+    private final boolean isScrap;
 
     public TipPostRespDto(TipPost post, List<String> tags) {
         this.id = post.getId();
@@ -30,5 +31,6 @@ public class TipPostRespDto {
         this.tags = tags;
         this.createdAt = post.getCreatedAt();
         this.imageUrl = post.getImages().isEmpty() ? null : post.getImages().get(0).getImageUrl();
+        this.isScrap = false;
     }
 }
