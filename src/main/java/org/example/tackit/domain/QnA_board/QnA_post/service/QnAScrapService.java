@@ -33,7 +33,7 @@ public class QnAScrapService {
     // 스크랩한적 있으면 스크랩 취소, 없으면 저장
     @Transactional
     public QnAScrapResponseDto toggleScrap(long postId, String email, String userOrg){
-        Member user = qnAMemberRepository.findByEmail(email)
+        Member member = qnAMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         QnAPost post = qnAPostRepository.findById(postId)
@@ -44,7 +44,7 @@ public class QnAScrapService {
             throw new AccessDeniedException("해당 조직 게시글이 아닙니다.");
         }
 
-        Optional<QnAScrap> existing = qnAScrapRepository.findByUserAndQnaPost(user, post);
+        Optional<QnAScrap> existing = qnAScrapRepository.findByMemberAndQnaPost(member, post);
 
         if (existing.isPresent()) {
             qnAScrapRepository.delete(existing.get());
@@ -52,7 +52,7 @@ public class QnAScrapService {
             return new QnAScrapResponseDto(false, null);
         }
         QnAScrap scrap = QnAScrap.builder()
-                .user(user)
+                .member(member)
                 .qnaPost(post)
                 .savedAt(LocalDateTime.now())
                 .build();
@@ -60,9 +60,9 @@ public class QnAScrapService {
         post.increaseScrapCount();
 
         // 1. 알림 전송
-        if(!post.getWriter().getId().equals(user.getId())){
+        if(!post.getWriter().getId().equals(member.getId())){
             Member postWriter = post.getWriter();
-            String message = user.getNickname() + "님이 글을 스크랩하였습니다.";
+            String message = member.getNickname() + "님이 글을 스크랩하였습니다.";
             String url = "/api/qna-post/" + post.getId();
 
             // 2. 알림 엔티티 생성
@@ -71,7 +71,7 @@ public class QnAScrapService {
                     .type(NotificationType.SCRAP)
                     .message(message)
                     .relatedUrl(url)
-                    .fromMemberId(user.getId())
+                    .fromMemberId(member.getId())
                     .build();
 
             //3. 알림 저장 및 전송을 위해 NotificationService 호출
@@ -87,7 +87,7 @@ public class QnAScrapService {
         Member user = qnAMemberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Page<QnAScrap> page = qnAScrapRepository.findByUserAndQnaPost_Status(user,Status.ACTIVE, pageable);
+        Page<QnAScrap> page = qnAScrapRepository.findByMemberAndQnaPost_Status(user,Status.ACTIVE, pageable);
         List<QnAPost> posts = page.getContent().stream() // 실제 스크랩들 꺼냄
                 .map(QnAScrap::getQnaPost) // 각 스크랩에서 게시글 꺼냄
                 .toList(); // 게시글 리스트들 만들기

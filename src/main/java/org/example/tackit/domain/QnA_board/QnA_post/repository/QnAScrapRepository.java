@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface QnAScrapRepository extends JpaRepository<QnAScrap, Long> {
-    Optional<QnAScrap> findByUserAndQnaPost(Member user, QnAPost qnaPost);
+    Optional<QnAScrap> findByMemberAndQnaPost(Member member, QnAPost qnaPost);
     @EntityGraph(attributePaths = {"qnaPost", "qnaPost.writer"}) // 페이징 함께 지원, writer까지 fetch해서 n+1방지
-    Page<QnAScrap> findByUserAndQnaPost_Status(Member user, Status status, Pageable pageable);
+    Page<QnAScrap> findByMemberAndQnaPost_Status(Member member, Status status, Pageable pageable);
 
+    boolean existsByQnaPostIdAndMemberId(Long qnaPostId, Long memberId);
 }

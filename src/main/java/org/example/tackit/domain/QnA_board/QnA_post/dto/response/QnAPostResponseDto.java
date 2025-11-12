@@ -3,7 +3,6 @@ package org.example.tackit.domain.QnA_board.QnA_post.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.example.tackit.domain.entity.QnAPost;
 
 import java.time.LocalDateTime;
@@ -22,7 +21,9 @@ public class QnAPostResponseDto {
     private final LocalDateTime createdAt;
     private String imageUrl;
 
-    public static QnAPostResponseDto fromEntity(QnAPost post, List<String> tagNames) {
+    private boolean isScraped;
+
+    public static QnAPostResponseDto fromEntity(QnAPost post, List<String> tagNames, boolean isScraped) {
         String imageUrl = post.getImages().isEmpty() ? null
                 : post.getImages().get(0).getImageUrl();
 
@@ -35,6 +36,7 @@ public class QnAPostResponseDto {
                 .tags(tagNames)
                 .createdAt(post.getCreatedAt())
                 .imageUrl(imageUrl)
+                .isScraped(isScraped)
                 .build();
     }
 }
