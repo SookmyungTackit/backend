@@ -163,9 +163,9 @@ public class QnAPostService {
         List<String> tagNames = tagService.getTagNamesByPost(post);
 
         // 스크랩 여부 조회
-        boolean isScraped = qnAScrapRepository.existsByQnaPostIdAndMemberId(id, memberId);
+        boolean isScrap = qnAScrapRepository.existsByQnaPostIdAndMemberId(id, memberId);
 
-        return QnAPostResponseDto.fromEntity(post, tagNames, isScraped);
+        return QnAPostResponseDto.fromEntity(post, tagNames, isScrap);
     }
 
     // 게시글 신고하기

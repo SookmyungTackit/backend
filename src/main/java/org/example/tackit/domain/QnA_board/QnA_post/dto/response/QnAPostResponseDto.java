@@ -21,9 +21,9 @@ public class QnAPostResponseDto {
     private final LocalDateTime createdAt;
     private String imageUrl;
 
-    private boolean isScraped;
+    private boolean isScrap;
 
-    public static QnAPostResponseDto fromEntity(QnAPost post, List<String> tagNames, boolean isScraped) {
+    public static QnAPostResponseDto fromEntity(QnAPost post, List<String> tagNames, boolean isScrap) {
         String imageUrl = post.getImages().isEmpty() ? null
                 : post.getImages().get(0).getImageUrl();
 
@@ -36,7 +36,7 @@ public class QnAPostResponseDto {
                 .tags(tagNames)
                 .createdAt(post.getCreatedAt())
                 .imageUrl(imageUrl)
-                .isScraped(isScraped)
+                .isScrap(isScrap)
                 .build();
     }
 }
