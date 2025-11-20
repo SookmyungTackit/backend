@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.example.tackit.config.jwt.TokenProvider;
+import org.example.tackit.domain.auth.login.dto.FindEmailRespDto;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.auth.login.dto.SignInDto;
 import org.example.tackit.domain.auth.login.dto.SignUpDto;
 import org.example.tackit.domain.auth.login.dto.TokenDto;
 import org.example.tackit.domain.auth.login.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,8 +19,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -44,6 +48,7 @@ public class AuthService {
         Member member = Member.builder()
                 .email(signUpDto.getEmail())
                 .password(passwordEncoder.encode(signUpDto.getPassword()))
+                .name(signUpDto.getName())
                 .nickname(signUpDto.getNickname())
                 .organization(signUpDto.getOrganization())
                 .role(signUpDto.getRole())
@@ -86,6 +91,21 @@ public class AuthService {
     public TokenDto reissue(String bearerToken) {
         String refreshToken = resolveRefreshToken(bearerToken);
         return tokenProvider.reissueAccessToken(refreshToken);
+    }
+
+    // 이메일 찾기
+    @Transactional
+    public FindEmailRespDto findEmailbyOrgAndNickname(String organization, String name) {
+        Optional<Member> memberOptional = userRepository.findByOrganizationAndName(organization, name);
+
+
+        Member member = memberOptional.orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다.")
+        );
+
+        return FindEmailRespDto.builder()
+                .email(member.getEmail())
+                .build();
     }
 }
 
