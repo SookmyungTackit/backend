@@ -3,12 +3,9 @@ package org.example.tackit.domain.auth.login.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.auth.login.dto.SignInDto;
-import org.example.tackit.domain.auth.login.dto.SignUpDto;
-import org.example.tackit.domain.auth.login.dto.TokenDto;
+import org.example.tackit.domain.auth.login.dto.*;
 import org.example.tackit.domain.auth.login.service.AuthService;
 import org.example.tackit.domain.auth.login.service.CheckService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +40,19 @@ public class AuthController {
         String bearerToken = request.getHeader("Authorization");
         TokenDto tokenDto = authService.reissue(bearerToken);
         return ResponseEntity.ok(tokenDto);
+    }
+
+    // 이메일 찾기
+    @PostMapping("/find-email")
+    public ResponseEntity<FindEmailRespDto> findEmail(
+            @RequestBody FindEmailReqDto findEmailReqDto
+    ) {
+        FindEmailRespDto resp = authService.findEmailbyOrgAndNickname(
+                findEmailReqDto.getOrganization(),
+                findEmailReqDto.getName()
+        );
+
+        return ResponseEntity.ok(resp);
     }
 }
 

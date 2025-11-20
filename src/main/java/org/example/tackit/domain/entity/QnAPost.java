@@ -27,6 +27,8 @@ public class QnAPost implements ReportablePost {
     private Member writer;
 
     private String title;
+
+    @Lob
     private String content;
     private LocalDateTime createdAt;
     private Post type;

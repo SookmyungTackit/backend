@@ -26,6 +26,7 @@ public class AdminDataInitializer implements CommandLineRunner {
             Member admin = Member.builder()
                     .email("admin")
                     .password(passwordEncoder.encode("admin1")) // BCrypt 인코딩
+                    .name("숙명")
                     .nickname("관리자")
                     .organization("ADMIN")
                     .joinedYear(2025)
