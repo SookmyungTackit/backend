@@ -54,5 +54,30 @@ public class AuthController {
 
         return ResponseEntity.ok(resp);
     }
+
+    // 비밀번호 찾기
+    @PostMapping("/find-password")
+    public ResponseEntity<TokenDto> findPassword(
+            @RequestBody FindPwReqDto findPwReqDto
+    ) {
+        TokenDto tokenDto = authService.findPwByIdentity(
+                findPwReqDto.getName(),
+                findPwReqDto.getOrganization(),
+                findPwReqDto.getEmail()
+        );
+
+        return ResponseEntity.ok(tokenDto);
+    }
+
+    // 비밀번호 재설정
+    @PatchMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody ResetPwReqDto resetPwReqDto
+    ) {
+        authService.resetPassword(authorizationHeader, resetPwReqDto.getNewPassword());
+
+        return ResponseEntity.ok().body(Map.of("status", "OK", "message", "비밀번호가 성공적으로 변경되었습니다."));
+    }
 }
 
