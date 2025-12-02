@@ -2,10 +2,10 @@ package org.example.tackit;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Role;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.mypage.repository.MemberDetailRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberSchedulerTest {
 
     @Autowired
-    private MemberDetailRepository memberDetailRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
     private EntityManager em; // 영속성 컨텍스트 선언
@@ -34,20 +34,20 @@ class MemberSchedulerTest {
                 .joinedYear(2024)
                 .status(Status.ACTIVE)
                 .build();
-        memberDetailRepository.save(newbie);
+        memberRepository.save(newbie);
 
         int currentYear = 2025;
         int thresholdYear = currentYear - 1;
 
         // when: bulk update 실행
-        int updatedCount = memberDetailRepository.bulkUpdateRole(Role.NEWBIE, Role.SENIOR, thresholdYear);
+        int updatedCount = memberRepository.bulkUpdateRole(Role.NEWBIE, Role.SENIOR, thresholdYear);
 
         // then: 업데이트된 row 수 확인
         assertThat(updatedCount).isEqualTo(1);
 
         // 캐시 초기화 후 DB에서 다시 조회 (영속성 컨텍스트)
         em.clear();
-        Member updatedMember = memberDetailRepository.findById(newbie.getId()).orElseThrow();
+        Member updatedMember = memberRepository.findById(newbie.getId()).orElseThrow();
 
         // role이 SENIOR로 바뀌었는지 확인
         assertThat(updatedMember.getRole()).isEqualTo(Role.SENIOR);

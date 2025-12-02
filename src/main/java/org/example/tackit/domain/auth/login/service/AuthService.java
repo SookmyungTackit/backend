@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.example.tackit.config.jwt.TokenProvider;
+import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.auth.login.dto.*;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.auth.login.repository.UserRepository;
-import org.example.tackit.domain.mypage.repository.MemberDetailRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,7 +33,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
     private final RedisUtil redisUtil;
-    private final MemberDetailRepository memberDetailRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void signup(SignUpDto signUpDto) {
@@ -173,7 +173,7 @@ public class AuthService {
         }
 
         // 5. 비밀번호 업데이트
-        Member member = memberDetailRepository.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
 
         String encodedNewPassword = passwordEncoder.encode(newPassword);
