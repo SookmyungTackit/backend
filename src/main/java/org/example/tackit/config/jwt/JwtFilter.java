@@ -38,6 +38,13 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // 필터를 적용하지 않을 경로 지정
+    // auth/reset-password 요청은 토큰 인증 건너뛰도록
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().equals("/auth/reset-password") && request.getMethod().equals("PATCH");
+    }
+
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {

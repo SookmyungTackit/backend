@@ -70,7 +70,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN") // 관리자 페이지 role 추가
-                        .requestMatchers("/auth/**") // 로그인, 회원가입은 열어주기
+                        .requestMatchers("/auth/**") // 로그인, 회원가입, 이메일 및 비밀번호 찾기는 열어주기
                         .permitAll()
                         .requestMatchers("/api/s3/**").permitAll()
                         .requestMatchers("/api/actuator/**").permitAll() // actuator 경로 열기

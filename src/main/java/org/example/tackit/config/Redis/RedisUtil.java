@@ -16,6 +16,9 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value);
     }
 
+    // 저장 2 : 비밀번호 재설정 토큰의 만료 시간 지정을 위해
+    public void save(String key, String value, long timeoutSeconds) { redisTemplate.opsForValue().set(key, value, timeoutSeconds, TimeUnit.SECONDS); }
+
     // 조회 (refreshToken 비교용)
     public String getData(String key) {
         return redisTemplate.opsForValue().get(key);
