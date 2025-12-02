@@ -11,14 +11,12 @@ import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.User;
 import org.example.tackit.domain.auth.login.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -214,6 +212,17 @@ public class TokenProvider {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    // 비밀번호 재설정 토큰인지 확인
+    public boolean isResetToken(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            Object resetClaim = claims.get("isResetToken");
+            return resetClaim instanceof Boolean && (Boolean) resetClaim;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 

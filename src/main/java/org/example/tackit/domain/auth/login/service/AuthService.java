@@ -4,12 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tackit.config.Redis.RedisUtil;
 import org.example.tackit.config.jwt.TokenProvider;
-import org.example.tackit.domain.auth.login.dto.FindEmailRespDto;
+import org.example.tackit.domain.auth.login.dto.*;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
-import org.example.tackit.domain.auth.login.dto.SignInDto;
-import org.example.tackit.domain.auth.login.dto.SignUpDto;
-import org.example.tackit.domain.auth.login.dto.TokenDto;
 import org.example.tackit.domain.auth.login.repository.UserRepository;
 import org.example.tackit.domain.mypage.repository.MemberDetailRepository;
 import org.springframework.http.HttpStatus;
@@ -82,7 +79,7 @@ public class AuthService {
     }
 
     // Bearer 제거 및 형식 검증
-    public String resolveRefreshToken(String refreshToken) {
+    public String resolveBearerToken(String refreshToken) {
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
             throw new BadCredentialsException("리프레시 토큰이 누락되었거나 올바르지 않습니다.");
         }
@@ -92,7 +89,7 @@ public class AuthService {
     // 토큰 재발급 처리
     @Transactional
     public TokenDto reissue(String bearerToken) {
-        String refreshToken = resolveRefreshToken(bearerToken);
+        String refreshToken = resolveBearerToken(bearerToken);
         return tokenProvider.reissueAccessToken(refreshToken);
     }
 
@@ -112,7 +109,7 @@ public class AuthService {
 
     // 비밀번호 찾기
     @Transactional
-    public TokenDto findPwByIdentity(String name, String organization, String email) {
+    public ResetTokenDto findPwByIdentity(String name, String organization, String email) {
         try {
             // 1. 정보 일치 확인 및 회원 조회
             log.info("비밀번호 찾기 본인 확인 시도: 이름={}, 소속={}, 이메일={}", name, organization, email);
@@ -143,14 +140,11 @@ public class AuthService {
             );
 
             // 5. 토큰 반환
-            return TokenDto.builder()
-                    .accessToken(resetToken)
-                    .refreshToken(null)
+            return ResetTokenDto.builder()
                     .grantType("Bearer")
-                    .accessTokenExpiresIn(tokenProvider.getResetTokenExpiresIn())
+                    .resetToken(resetToken)
+                    .expiresIn(expirationTimeSeconds)
                     .build();
-        } catch (RuntimeException e) {
-            throw e;
         } catch (Exception e) {
             log.error("비밀번호 찾기 처리 중 에러 발생", e);
             throw new RuntimeException("서버 오류가 발생했습니다.", e);
@@ -161,10 +155,10 @@ public class AuthService {
     @Transactional
     public void resetPassword(String authorizationHeader, String newPassword) {
         // 1. 토큰 추출 및 형식 검증
-        String resetToken = resolveRefreshToken(authorizationHeader);
+        String resetToken = resolveBearerToken(authorizationHeader);
 
         // 2. JWT 유효성 및 용도 확인
-        if( !tokenProvider.validateToken(resetToken) || !tokenProvider.validateToken(resetToken) ) {
+        if( !tokenProvider.validateToken(resetToken) || !tokenProvider.isResetToken(resetToken) ) {
             throw new BadCredentialsException("유효하지 않거나 만료된 재설정 토큰입니다.");
         }
 

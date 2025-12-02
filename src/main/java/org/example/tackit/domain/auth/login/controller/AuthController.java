@@ -57,10 +57,10 @@ public class AuthController {
 
     // 비밀번호 찾기
     @PostMapping("/find-password")
-    public ResponseEntity<TokenDto> findPassword(
+    public ResponseEntity<ResetTokenDto> findPassword(
             @RequestBody FindPwReqDto findPwReqDto
     ) {
-        TokenDto tokenDto = authService.findPwByIdentity(
+        ResetTokenDto tokenDto = authService.findPwByIdentity(
                 findPwReqDto.getName(),
                 findPwReqDto.getOrganization(),
                 findPwReqDto.getEmail()

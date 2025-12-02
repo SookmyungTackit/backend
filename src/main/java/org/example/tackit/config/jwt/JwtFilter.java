@@ -26,14 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws IOException, ServletException {
 
-        // 이때 auth/reset-password 요청은 토큰 인증 건너뛰도록
-        String requestPath = request.getRequestURI();
-        String requestMethod = request.getMethod();
-        if( requestPath.equals("/auth/reset-password") && requestMethod.equals("PATCH")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         // 1. Request Header 에서 토큰을 꺼냄
         String jwt = resolveToken(request);
 
@@ -44,6 +36,13 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // 필터를 적용하지 않을 경로 지정
+    // auth/reset-password 요청은 토큰 인증 건너뛰도록
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().equals("/auth/reset-password") && request.getMethod().equals("PATCH");
     }
 
     private String resolveToken(HttpServletRequest request) {
