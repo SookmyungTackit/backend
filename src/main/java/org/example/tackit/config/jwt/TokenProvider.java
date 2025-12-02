@@ -11,14 +11,12 @@ import org.example.tackit.domain.auth.login.security.CustomUserDetails;
 import org.example.tackit.domain.entity.Member;
 import org.example.tackit.domain.entity.Status;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.User;
 import org.example.tackit.domain.auth.login.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -35,6 +33,9 @@ public class TokenProvider {
     private static final String BEARER_TYPE = "Bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;            // 1일
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
+
+    //  비밀번호 재설정 토큰 (5분)
+    private static final long RESET_TOKEN_EXPIRE_TIME = 1000 * 60 * 5;
     private final Key key;
     private final RedisUtil redisUtil;
     private final MemberRepository memberRepository;
@@ -68,6 +69,24 @@ public class TokenProvider {
                 .build();
     }
 
+    // 비밀번호 재설정 전용 일회성 토큰
+    // 보안 원칙 : 최소 권한 부여
+    // authorities 클레임을 포함시키지 않게 하여, 다른 API 호출하지 않도록
+    public String generateResetToken(String email) {
+        long now = (new Date()).getTime();
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setExpiration(new Date(now + RESET_TOKEN_EXPIRE_TIME))
+                .claim("isResetToken", true)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // 비밀번호 재설정 토큰의 만료 시간 반환
+    public long getResetTokenExpiresIn() {
+        return RESET_TOKEN_EXPIRE_TIME;
+    }
 
 
     public TokenDto reissueAccessToken(String refreshToken) {
@@ -193,6 +212,17 @@ public class TokenProvider {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    // 비밀번호 재설정 토큰인지 확인
+    public boolean isResetToken(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            Object resetClaim = claims.get("isResetToken");
+            return resetClaim instanceof Boolean && (Boolean) resetClaim;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 
