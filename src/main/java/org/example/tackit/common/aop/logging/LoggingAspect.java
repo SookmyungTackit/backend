@@ -1,4 +1,4 @@
-package org.example.tackit.common.aop;
+package org.example.tackit.common.aop.logging;
 
 
 import jakarta.servlet.http.HttpServletRequest;

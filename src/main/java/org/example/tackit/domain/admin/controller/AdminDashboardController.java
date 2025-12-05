@@ -7,7 +7,7 @@ import org.example.tackit.domain.admin.service.AdminMemberService;
 import org.example.tackit.domain.entity.TargetType;
 import org.example.tackit.domain.report.dto.ReportContentDetailDto;
 import org.example.tackit.domain.report.dto.ReportListDto;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

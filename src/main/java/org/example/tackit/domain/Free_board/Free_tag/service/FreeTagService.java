@@ -1,12 +1,10 @@
 package org.example.tackit.domain.Free_board.Free_tag.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tackit.domain.Free_board.Free_post.service.FreePostTagService;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagPostResponseDto;
 import org.example.tackit.domain.Free_board.Free_tag.dto.response.FreeTagResponseDto;
-import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreeTagRepository;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

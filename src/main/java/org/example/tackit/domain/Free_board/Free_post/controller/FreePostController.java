@@ -8,7 +8,7 @@ import org.example.tackit.domain.Free_board.Free_post.dto.response.FreePostRespD
 import org.example.tackit.domain.Free_board.Free_post.dto.response.FreeScrapResponseDto;
 import org.example.tackit.domain.Free_board.Free_post.service.FreePostService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;

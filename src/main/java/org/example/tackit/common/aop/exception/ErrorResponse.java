@@ -1,4 +1,4 @@
-package org.example.tackit.global.exception;
+package org.example.tackit.common.aop.exception;
 
 public class ErrorResponse {
     private final String message;

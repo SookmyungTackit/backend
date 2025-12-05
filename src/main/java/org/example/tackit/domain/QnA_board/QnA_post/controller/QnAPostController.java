@@ -7,7 +7,7 @@ import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPopularPostR
 import org.example.tackit.domain.QnA_board.QnA_post.dto.response.QnAPostResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_post.service.QnAPostService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;

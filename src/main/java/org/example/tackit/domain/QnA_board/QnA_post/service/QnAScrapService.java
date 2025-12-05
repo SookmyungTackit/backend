@@ -8,7 +8,7 @@ import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAPostRepository
 import org.example.tackit.domain.QnA_board.QnA_post.repository.QnAScrapRepository;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.notification.service.NotificationService;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;

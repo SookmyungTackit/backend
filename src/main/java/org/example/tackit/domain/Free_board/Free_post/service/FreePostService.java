@@ -12,20 +12,21 @@ import org.example.tackit.domain.Free_board.Free_post.repository.*;
 import org.example.tackit.domain.Free_board.Free_tag.repository.FreePostTagMapRepository;
 import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.notification.service.NotificationService;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
+import org.example.tackit.global.exception.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import static org.example.tackit.global.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -72,14 +73,14 @@ public class FreePostService {
     @Transactional
     public FreePostRespDto getPostById(Long id, String org, Long memberId) {
         FreePost post = freePostJPARepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+                .orElseThrow( () -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND) );
 
         if (!post.getOrganization().equals(org)) {
-            throw new AccessDeniedException("해당 조직의 게시글이 아닙니다.");
+            throw new AccessDeniedCustomException(ErrorCode.ACCESS_DENIED_ORGANIZATION);
         }
 
         if (!post.getStatus().equals(Status.ACTIVE)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비활성화된 게시글입니다.");
+            throw new PostInactiveException(ErrorCode.POST_IS_INACTIVE);
         }
 
         post.increaseViewCount();
@@ -110,9 +111,10 @@ public class FreePostService {
     // [ 게시글 작성 ]
     @Transactional
     public FreePostRespDto createPost(FreePostReqDto dto, String email, String org) throws IOException {
+
         // 1. 유저 조회
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
-                .orElseThrow( () -> new IllegalArgumentException("작성자가 DB에 존재하지 않습니다."));
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         // 2. 게시글 생성
         FreePost post = FreePost.builder()
@@ -159,15 +161,15 @@ public class FreePostService {
     @Transactional
     public FreePostRespDto update(Long id, UpdateFreeReqDto req, String email, String org) throws IOException {
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         FreePost post = freePostJPARepository.findById(id)
-                .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow( () -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND) );
 
         boolean isWriter = post.getWriter().getId().equals(member.getId());
 
         if (!isWriter) {
-            throw new AccessDeniedException("작성자만 수정할 수 있습니다.");
+            throw new AccessDeniedCustomException(ErrorCode.ACCESS_DENIED_EDIT);
         }
 
         post.update(req.getTitle(), req.getContent());
@@ -227,16 +229,16 @@ public class FreePostService {
     @Transactional
     public void delete(Long id, String email, String org) {
         Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         FreePost post = freePostJPARepository.findById(id)
-                 .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow( () -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND) );
 
         boolean isWriter = post.getWriter().getId().equals(member.getId());
         boolean isAdmin = member.getRole() == Role.ADMIN;
 
         if (!isAdmin && !isWriter) {
-            throw new AccessDeniedException("작성자 또는 관리자만 삭제할 수 있습니다.");
+            throw new AccessDeniedCustomException(ErrorCode.ACCESS_DENIED_DELETE);
         }
 
         post.delete(); // Soft Deleted
@@ -245,11 +247,11 @@ public class FreePostService {
     // [ 게시글 신고 ]
     @Transactional
     public String report(Long postId, Long userId) {
-        FreePost post = freePostJPARepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
-
         Member member = freeMemberJPARepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다.") );
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
+
+        FreePost post = freePostJPARepository.findById(postId)
+                .orElseThrow( () -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND) );
 
         boolean alreadyReported = freePostReportRepository.existsByMemberAndFreePost(member, post);
 
@@ -270,15 +272,15 @@ public class FreePostService {
 
     // [ 게시글 스크랩 ]
     @Transactional
-    public FreeScrapResponseDto toggleScrap(Long postId, String email, String memberOrg) {
+    public FreeScrapResponseDto toggleScrap(Long postId, String email, String org) {
         Member member = freeMemberJPARepository.findByEmail(email)
-                .orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         FreePost post = freePostJPARepository.findById(postId)
-                .orElseThrow( () -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow( () -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND) );
 
-        if(!post.getWriter().getOrganization().equals(memberOrg)) {
-            throw new AccessDeniedException("해당 조직 게시글이 아닙니다.");
+        if (!post.getOrganization().equals(org)) {
+            throw new AccessDeniedCustomException(ErrorCode.ACCESS_DENIED_ORGANIZATION);
         }
 
         Optional<FreeScrap> existing = freeScrapJPARepository.findByMemberAndFreePost(member, post);

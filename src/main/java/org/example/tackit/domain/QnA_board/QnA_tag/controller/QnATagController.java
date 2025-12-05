@@ -5,7 +5,7 @@ import org.example.tackit.domain.QnA_board.QnA_tag.dto.response.QnATagPostRespon
 import org.example.tackit.domain.QnA_board.QnA_tag.dto.response.QnATagResponseDto;
 import org.example.tackit.domain.QnA_board.QnA_tag.service.QnATagService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;

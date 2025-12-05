@@ -17,7 +17,7 @@ import org.example.tackit.domain.Tip_board.Tip_post.dto.request.TipPostUpdateDto
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostJPARepository;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipScrapRepository;
 import org.example.tackit.domain.notification.service.NotificationService;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
