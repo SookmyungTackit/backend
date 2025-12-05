@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.tackit.domain.Tip_board.Tip_tag.dto.response.TipTagPostResponseDto;
 import org.example.tackit.domain.Tip_board.Tip_tag.dto.response.TipTagResponseDto;
 import org.example.tackit.domain.Tip_board.Tip_tag.repository.TipTagRepository;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
