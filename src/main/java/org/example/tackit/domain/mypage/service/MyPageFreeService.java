@@ -10,7 +10,7 @@ import org.example.tackit.domain.entity.*;
 import org.example.tackit.domain.mypage.dto.response.FreeMyCommentResponseDto;
 import org.example.tackit.domain.mypage.dto.response.FreeMyPostResponseDto;
 import org.example.tackit.domain.mypage.dto.response.FreeScrapResponse;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

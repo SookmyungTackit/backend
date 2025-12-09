@@ -5,7 +5,7 @@ import org.example.tackit.domain.Tip_board.Tip_tag.dto.response.TipTagPostRespon
 import org.example.tackit.domain.Tip_board.Tip_tag.dto.response.TipTagResponseDto;
 import org.example.tackit.domain.Tip_board.Tip_tag.service.TipTagService;
 import org.example.tackit.domain.auth.login.security.CustomUserDetails;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
