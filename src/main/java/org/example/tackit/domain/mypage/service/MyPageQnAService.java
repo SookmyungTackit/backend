@@ -11,7 +11,7 @@ import org.example.tackit.domain.entity.QnAPost;
 import org.example.tackit.domain.entity.Status;
 import org.example.tackit.domain.mypage.dto.response.QnAMyCommentResponseDto;
 import org.example.tackit.domain.mypage.dto.response.QnAMyPostResponseDto;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

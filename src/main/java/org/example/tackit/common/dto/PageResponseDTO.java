@@ -1,4 +1,4 @@
-package org.example.tackit.global.dto;
+package org.example.tackit.common.dto;
 
 import lombok.Getter;
 import org.springframework.data.domain.Page;

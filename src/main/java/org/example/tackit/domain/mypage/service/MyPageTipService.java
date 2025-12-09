@@ -5,12 +5,10 @@ import org.example.tackit.domain.Tip_board.Tip_post.repository.TipPostJPAReposit
 import org.example.tackit.domain.Tip_board.Tip_tag.repository.TipPostTagMapRepository;
 import org.example.tackit.domain.admin.repository.MemberRepository;
 import org.example.tackit.domain.entity.*;
-import org.example.tackit.domain.mypage.dto.response.FreeMyPostResponseDto;
-import org.example.tackit.domain.mypage.dto.response.FreeScrapResponse;
 import org.example.tackit.domain.mypage.dto.response.TipMyPostResponseDto;
 import org.example.tackit.domain.mypage.dto.response.TipScrapResponse;
 import org.example.tackit.domain.Tip_board.Tip_post.repository.TipScrapRepository;
-import org.example.tackit.global.dto.PageResponseDTO;
+import org.example.tackit.common.dto.PageResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
