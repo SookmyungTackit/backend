@@ -43,12 +43,13 @@ public class ExceptionHandlerAdvice {
         // 모든 처리되지 않은 예외를 catch
         log.error("Unhandled Exception: {}", ex.getMessage(), ex);
 
-        // 500 Internal Server Error로 고정하여 응답 DTO 생성
+        final ErrorCode serverError = ErrorCode.INTERNAL_SERVER_ERROR;
+
         ErrorResponse response = new ErrorResponse(
-                "요청을 처리하는 중에 서버 오류가 발생했습니다.",
-                HttpStatus.INTERNAL_SERVER_ERROR.value()
+                serverError.getMessage(), // String (메시지)
+                serverError.getHttpStatus().value() // int (상태 코드 값)
         );
 
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, serverError.getHttpStatus());
     }
 }

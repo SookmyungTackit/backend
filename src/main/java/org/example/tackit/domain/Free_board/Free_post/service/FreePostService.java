@@ -273,7 +273,7 @@ public class FreePostService {
     // [ 게시글 스크랩 ]
     @Transactional
     public FreeScrapResponseDto toggleScrap(Long postId, String email, String org) {
-        Member member = freeMemberJPARepository.findByEmail(email)
+        Member member = freeMemberJPARepository.findByEmailAndOrganization(email, org)
                 .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         FreePost post = freePostJPARepository.findById(postId)

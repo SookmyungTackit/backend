@@ -16,7 +16,10 @@ public enum ErrorCode {
     ACCESS_DENIED_DELETE(HttpStatus.FORBIDDEN, "A003", "작성자 또는 관리자만 삭제할 수 있습니다."),
 
     // 400
-    POST_IS_INACTIVE(HttpStatus.BAD_REQUEST, "P002", "비활성화된 게시글입니다.");
+    POST_IS_INACTIVE(HttpStatus.BAD_REQUEST, "P002", "비활성화된 게시글입니다."),
+
+    // 500
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "요청을 처리하는 중에 서버 오류가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
